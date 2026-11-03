@@ -3,6 +3,7 @@ import requests
 import json
 import urllib.parse
 import time
+import random
 
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
@@ -47,8 +48,13 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Hardcoded Groq API Key
-GROQ_API_KEY = "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"
+# Hardcoded Groq API Key & Optional Secondary Secret Key Support
+PRIMARY_KEY = "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"
+SECONDARY_KEY = st.secrets.get("GROQ_API_KEY_2", "")
+AVAILABLE_KEYS = [k for k in [PRIMARY_KEY, SECONDARY_KEY] if k.strip() != ""]
+
+def get_active_key():
+    return random.choice(AVAILABLE_KEYS) if AVAILABLE_KEYS else PRIMARY_KEY
 
 # Function to dynamically fetch and auto-find available models from Groq API
 def get_available_models(api_key):
@@ -60,7 +66,7 @@ def get_available_models(api_key):
     ]
     try:
         headers = {"Authorization": f"Bearer {api_key}"}
-        response = requests.get("https://api.groq.com/openai/v1/models", headers=headers)
+        response = requests.get("https://api.groq.com/openai/v1/models", headers=headers, timeout=5)
         if response.status_code == 200:
             data = response.json().get("data", [])
             fetched = []
@@ -182,56 +188,64 @@ if prompt:
                 message_placeholder.markdown(full_response)
                 st.image(generated_image_url)
             else:
-                # Automatic Model Finder & Fallback Loop
-                models_to_test = get_available_models(GROQ_API_KEY)
+                current_api_key = get_active_key()
+                models_to_test = get_available_models(current_api_key)
                 headers = {
-                    "Authorization": f"Bearer {GROQ_API_KEY}",
+                    "Authorization": f"Bearer {current_api_key}",
                     "Content-Type": "application/json"
                 }
                 
                 success = False
-                for model_name in models_to_test:
-                    payload = {
-                        "model": model_name,
-                        "messages": [
-                            {"role": "system", "content": "You are Indian GPT, an AI created by Shubham. If anyone asks who created you or made you, always proudly answer that you were created by Shubham."},
-                            {"role": "user", "content": prompt}
-                        ],
-                        "stream": True
-                    }
-                    
-                    try:
-                        response = requests.post(
-                            "https://api.groq.com/openai/v1/chat/completions",
-                            headers=headers,
-                            json=payload,
-                            stream=True
-                        )
+                # Retry mechanism to cycle through models and bypass 429 rate limits smoothly across devices
+                for attempt in range(2):
+                    if success:
+                        break
+                    for model_name in models_to_test:
+                        payload = {
+                            "model": model_name,
+                            "messages": [
+                                {"role": "system", "content": "You are Indian GPT, an AI created by Shubham. If anyone asks who created you or made you, always proudly answer that you were created by Shubham."},
+                                {"role": "user", "content": prompt}
+                            ],
+                            "stream": True
+                        }
                         
-                        if response.status_code == 200:
-                            for line in response.iter_lines():
-                                if line:
-                                    line_str = line.decode("utf-8")
-                                    if line_str.startswith("data: "):
-                                        json_str = line_str[6:]
-                                        if json_str != "[DONE]":
-                                            try:
-                                                body = json.loads(json_str)
-                                                delta = body["choices"][0]["delta"]
-                                                if "content" in delta and delta["content"]:
-                                                    resp_chunk = delta["content"]
-                                                    full_response += resp_chunk
-                                                    message_placeholder.markdown(full_response + "▌")
-                                            except:
-                                                pass
-                            message_placeholder.markdown(full_response)
-                            success = True
-                            break # Successful response peye geche, loop break korbe
-                    except:
-                        continue
+                        try:
+                            response = requests.post(
+                                "https://api.groq.com/openai/v1/chat/completions",
+                                headers=headers,
+                                json=payload,
+                                stream=True,
+                                timeout=15
+                            )
+                            
+                            if response.status_code == 200:
+                                for line in response.iter_lines():
+                                    if line:
+                                        line_str = line.decode("utf-8")
+                                        if line_str.startswith("data: "):
+                                            json_str = line_str[6:]
+                                            if json_str != "[DONE]":
+                                                try:
+                                                    body = json.loads(json_str)
+                                                    delta = body["choices"][0]["delta"]
+                                                    if "content" in delta and delta["content"]:
+                                                        resp_chunk = delta["content"]
+                                                        full_response += resp_chunk
+                                                        message_placeholder.markdown(full_response + "▌")
+                                                except:
+                                                    pass
+                                message_placeholder.markdown(full_response)
+                                success = True
+                                break
+                            elif response.status_code == 429:
+                                time.sleep(1) # Brief pause before trying fallback model
+                                continue
+                        except:
+                            continue
                 
                 if not success:
-                    full_response = "API Error: Konorokom active model pawa jacche na ba sob guli model fail koreche."
+                    full_response = "Server ekhon ektu busy ache ba limit cross hoyeche. Ektu por abar 'send' e click koro bhai!"
                     message_placeholder.markdown(full_response)
             
             assistant_msg = {"role": "assistant", "content": full_response}
