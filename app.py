@@ -4,6 +4,7 @@ import json
 import urllib.parse
 import time
 import random
+from duckduckgo_search import DDGS
 
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
@@ -56,6 +57,19 @@ AVAILABLE_KEYS = [k for k in [PRIMARY_KEY, SECONDARY_KEY] if k.strip() != ""]
 def get_active_key():
     return random.choice(AVAILABLE_KEYS) if AVAILABLE_KEYS else PRIMARY_KEY
 
+# Live Web Search Function (DuckDuckGo Grounding)
+def search_web(query):
+    try:
+        results = []
+        with DDGS() as ddgs:
+            for r in ddgs.text(query, max_results=3):
+                results.append(f"Source: {r.get('title')}\nContent: {r.get('body')}")
+        if results:
+            return "\n\n".join(results)
+    except:
+        pass
+    return ""
+
 # Function to dynamically fetch and auto-find available models from Groq API
 def get_available_models(api_key):
     default_models = [
@@ -84,7 +98,7 @@ def get_available_models(api_key):
 # Initialize Session States
 if "chat_sessions" not in st.session_state:
     st.session_state.chat_sessions = {
-        "New Chat": [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT"}]
+        "New Chat": [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT with Live Web Search!"}]
     }
 
 if "current_chat" not in st.session_state:
@@ -99,7 +113,7 @@ with st.sidebar:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT"}]
+        st.session_state.chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT with Live Web Search!"}]
         st.session_state.current_chat = new_chat_name
         st.rerun()
 
@@ -116,7 +130,7 @@ with st.sidebar:
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ Auto Model Finder Active")
+    st.caption("⚡ Live Web Search & Auto Model Finder Active")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
@@ -166,7 +180,7 @@ if prompt:
         
         thinking_html = """
         <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
-            <span>🤖 Thinking your answer</span>
+            <span>🌐 Searching web & thinking</span>
             <span class="dot1" style="font-size: 20px;">.</span>
             <span class="dot2" style="font-size: 20px;">.</span>
             <span class="dot3" style="font-size: 20px;">.</span>
@@ -188,6 +202,18 @@ if prompt:
                 message_placeholder.markdown(full_response)
                 st.image(generated_image_url)
             else:
+                # Perform Live Web Search Grounding
+                search_context = search_web(prompt)
+                
+                system_content = (
+                    "You are Indian GPT, an advanced AI search assistant created by Shubham. "
+                    "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
+                    "Use the provided live web search results below to give an accurate, up-to-date, and detailed answer."
+                )
+                
+                if search_context:
+                    system_content += f"\n\nLive Web Search Results:\n{search_context}"
+
                 current_api_key = get_active_key()
                 models_to_test = get_available_models(current_api_key)
                 headers = {
@@ -204,7 +230,7 @@ if prompt:
                         payload = {
                             "model": model_name,
                             "messages": [
-                                {"role": "system", "content": "You are Indian GPT, an AI created by Shubham. If anyone asks who created you or made you, always proudly answer that you were created by Shubham."},
+                                {"role": "system", "content": system_content},
                                 {"role": "user", "content": prompt}
                             ],
                             "stream": True
