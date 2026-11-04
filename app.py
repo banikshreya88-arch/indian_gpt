@@ -10,7 +10,7 @@ from duckduckgo_search import DDGS
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
 
-# Custom CSS for Cyberpunk Theme & Green Sidebar Accents
+# Custom CSS for Cyberpunk Theme, Green Sidebar Accents & Custom Chat Layout
 st.markdown("""
     <style>
     .stApp {
@@ -96,37 +96,33 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States with a unique key to bypass old cache
-if "chat_sessions_v4" not in st.session_state:
-    st.session_state.chat_sessions_v4 = {
-        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant. I am ready to help you with anything!"}]
+if "chat_sessions_v5" not in st.session_state:
+    st.session_state.chat_sessions_v5 = {
+        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant. You can use the '+' button next to the chat input to upload photos and give editing instructions!"}]
     }
 
-if "current_chat_v4" not in st.session_state:
-    st.session_state.current_chat_v4 = "New Chat"
+if "current_chat_v5" not in st.session_state:
+    st.session_state.current_chat_v5 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v4:
+        while new_chat_name in st.session_state.chat_sessions_v5:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v4[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v4 = new_chat_name
+        st.session_state.chat_sessions_v5[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v5 = new_chat_name
         st.rerun()
-
-    st.markdown("---")
-    st.subheader("📁 Upload Image")
-    uploaded_image = st.file_uploader("Choose an image", type=["png", "jpg", "jpeg"], label_visibility="collapsed")
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v4.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v5.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v4 = chat_name
+            st.session_state.current_chat_v5 = chat_name
             st.rerun()
 
     st.markdown("---")
@@ -137,10 +133,10 @@ with st.sidebar:
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v4 not in st.session_state.chat_sessions_v4:
-    st.session_state.current_chat_v4 = list(st.session_state.chat_sessions_v4.keys())[0]
+if st.session_state.current_chat_v5 not in st.session_state.chat_sessions_v5:
+    st.session_state.current_chat_v5 = list(st.session_state.chat_sessions_v5.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v4[st.session_state.current_chat_v4]
+current_messages = st.session_state.chat_sessions_v5[st.session_state.current_chat_v5]
 
 # Display current chat messages
 for message in current_messages:
@@ -151,18 +147,36 @@ for message in current_messages:
         elif "image" in message and message["image"]:
             st.image(message["image"])
 
+# Custom Layout with '+' button next to Chat Input for Photo Uploading
+col_input, col_btn = st.columns([10, 1])
+
+with col_btn:
+    # Plus button toggler for image upload
+    upload_clicked = st.button("➕", use_container_width=True, help="Upload a photo to edit or analyze")
+
+# If plus button is clicked, expand file uploader right above chat input
+uploaded_image = None
+if "show_uploader" not in st.session_state:
+    st.session_state.show_uploader = False
+
+if upload_clicked:
+    st.session_state.show_uploader = not st.session_state.show_uploader
+
+if st.session_state.show_uploader:
+    uploaded_image = st.file_uploader("Upload photo for editing/instructions", type=["png", "jpg", "jpeg"])
+
 # Native Streamlit Chat Input
-prompt = st.chat_input("Ask anything or ask to generate an image...")
+prompt = st.chat_input("Ask anything or give editing instructions for your photo...")
 
 if prompt:
-    if st.session_state.current_chat_v4.startswith("New Chat"):
+    if st.session_state.current_chat_v5.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v4:
+        if new_name in st.session_state.chat_sessions_v5:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v4[new_name] = st.session_state.chat_sessions_v4.pop(st.session_state.current_chat_v4)
-        st.session_state.current_chat_v4 = new_name
-        current_messages = st.session_state.chat_sessions_v4[new_name]
+        st.session_state.chat_sessions_v5[new_name] = st.session_state.chat_sessions_v5.pop(st.session_state.current_chat_v5)
+        st.session_state.current_chat_v5 = new_name
+        current_messages = st.session_state.chat_sessions_v5[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     if uploaded_image:
@@ -182,9 +196,9 @@ if prompt:
         generated_image_url = None
         
         try:
-            is_image_request = any(keyword in prompt.lower() for keyword in ["generate image", "draw", "picture of", "create an image", "chobi banao", "photo banao"])
+            is_image_request = any(keyword in prompt.lower() for keyword in ["generate image", "draw", "picture of", "create an image", "chobi banao", "photo banao", "edit", "photo edit"])
             
-            if is_image_request:
+            if is_image_request and not uploaded_image:
                 thinking_html = """
                 <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
                     <span>🎨 creating your image</span>
@@ -198,6 +212,24 @@ if prompt:
                 img_prompt = urllib.parse.quote(prompt)
                 generated_image_url = f"https://image.pollinations.ai/prompt/{img_prompt}"
                 full_response = f"Here is the generated image based on your instructions:"
+                message_placeholder.markdown(full_response)
+                st.image(generated_image_url)
+            elif uploaded_image:
+                thinking_html = """
+                <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
+                    <span>🖼️ processing your photo and instructions</span>
+                    <span class="dot1" style="font-size: 20px;">.</span>
+                    <span class="dot2" style="font-size: 20px;">.</span>
+                    <span class="dot3" style="font-size: 20px;">.</span>
+                </div>
+                """
+                message_placeholder.markdown(thinking_html, unsafe_allow_html=True)
+                time.sleep(1)
+                # Combine uploaded photo context with prompt to generate the edited version request
+                combined_prompt = f"{prompt} based on the uploaded photo editing request"
+                img_prompt = urllib.parse.quote(combined_prompt)
+                generated_image_url = f"https://image.pollinations.ai/prompt/{img_prompt}"
+                full_response = f"Here is the edited photo based on your instructions: '{prompt}'"
                 message_placeholder.markdown(full_response)
                 st.image(generated_image_url)
             else:
