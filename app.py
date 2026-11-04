@@ -95,16 +95,16 @@ def get_available_models(api_key):
         pass
     return default_models
 
-# Initialize Session States with persistent structure
+# Initialize Session States
 if "chat_sessions" not in st.session_state:
     st.session_state.chat_sessions = {
-        "New Chat": [{"role": "assistant", "content": "Hi bhai, ami tor personal chatbot Indian GPT. Ekhon theke ami tor shob kotha mone rakhbo!"}]
+        "New Chat": [{"role": "assistant", "content": "Hello! I am your personal AI assistant Indian GPT with full memory and live web search."}]
     }
 
 if "current_chat" not in st.session_state:
     st.session_state.current_chat = "New Chat"
 
-# Sidebar
+# Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
@@ -113,7 +113,7 @@ with st.sidebar:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hi bhai, ami tor personal chatbot Indian GPT. Ekhon theke ami tor shob kotha mone rakhbo!"}]
+        st.session_state.chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
         st.session_state.current_chat = new_chat_name
         st.rerun()
 
@@ -130,7 +130,7 @@ with st.sidebar:
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ Full Memory & Universal Google Search Active")
+    st.caption("⚡ Live Web Search & Full Memory Active")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
@@ -152,7 +152,7 @@ for message in current_messages:
             st.image(message["image"])
 
 # Native Streamlit Chat Input
-prompt = st.chat_input("Ki jante chas? (Ask anything or ask to generate an image...)")
+prompt = st.chat_input("Ask anything or ask to generate an image...")
 
 if prompt:
     if st.session_state.current_chat.startswith("New Chat"):
@@ -197,7 +197,7 @@ if prompt:
                 time.sleep(1)
                 img_prompt = urllib.parse.quote(prompt)
                 generated_image_url = f"https://image.pollinations.ai/prompt/{img_prompt}"
-                full_response = f"Elo bhai, tor instructions moto chobi toiri kore diyechi:"
+                full_response = f"Here is the generated image based on your instructions:"
                 message_placeholder.markdown(full_response)
                 st.image(generated_image_url)
             else:
@@ -241,15 +241,13 @@ if prompt:
                 if search_context:
                     system_content += f"\n\nLive Web Search Results:\n{search_context}"
 
-                # Build full conversational history payload for memory retention
                 messages_payload = [{"role": "system", "content": system_content}]
-                for msg in current_messages[:-1]: # Include previous conversation turns
+                for msg in current_messages[:-1]:
                     role = msg["role"]
                     content = msg["content"]
                     if role in ["user", "assistant"]:
                         messages_payload.append({"role": role, "content": content})
                 
-                # Add current user prompt
                 messages_payload.append({"role": "user", "content": prompt})
 
                 current_api_key = get_active_key()
@@ -305,7 +303,7 @@ if prompt:
                             continue
                 
                 if not success:
-                    full_response = "Server ekhon ektu busy ache ba limit cross hoyeche. Ektu por abar 'send' e click koro bhai!"
+                    full_response = "Server is currently busy or rate limited. Please click send again!"
                     message_placeholder.markdown(full_response)
             
             assistant_msg = {"role": "assistant", "content": full_response}
