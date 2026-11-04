@@ -95,10 +95,10 @@ def get_available_models(api_key):
         pass
     return default_models
 
-# Initialize Session States
+# Initialize Session States with persistent structure
 if "chat_sessions" not in st.session_state:
     st.session_state.chat_sessions = {
-        "New Chat": [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT with IST Time & Universal Web Search!"}]
+        "New Chat": [{"role": "assistant", "content": "Hi bhai, ami tor personal chatbot Indian GPT. Ekhon theke ami tor shob kotha mone rakhbo!"}]
     }
 
 if "current_chat" not in st.session_state:
@@ -113,7 +113,7 @@ with st.sidebar:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT with IST Time & Universal Web Search!"}]
+        st.session_state.chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hi bhai, ami tor personal chatbot Indian GPT. Ekhon theke ami tor shob kotha mone rakhbo!"}]
         st.session_state.current_chat = new_chat_name
         st.rerun()
 
@@ -130,7 +130,7 @@ with st.sidebar:
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ IST Time & Universal Google Search Active")
+    st.caption("⚡ Full Memory & Universal Google Search Active")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
@@ -201,7 +201,6 @@ if prompt:
                 message_placeholder.markdown(full_response)
                 st.image(generated_image_url)
             else:
-                # Universal smart check: triggers web search for anything except basic greetings
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
@@ -235,11 +234,23 @@ if prompt:
                 system_content = (
                     f"Current Indian Standard Time (IST) is {current_time_str}. "
                     "You are Indian GPT, an advanced AI search and assistant created by Shubham. "
-                    "If anyone asks who created you or made you, always proudly answer that you were created by Shubham."
+                    "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
+                    "Always remember and recall previous conversations in this chat session to maintain full context."
                 )
                 
                 if search_context:
                     system_content += f"\n\nLive Web Search Results:\n{search_context}"
+
+                # Build full conversational history payload for memory retention
+                messages_payload = [{"role": "system", "content": system_content}]
+                for msg in current_messages[:-1]: # Include previous conversation turns
+                    role = msg["role"]
+                    content = msg["content"]
+                    if role in ["user", "assistant"]:
+                        messages_payload.append({"role": role, "content": content})
+                
+                # Add current user prompt
+                messages_payload.append({"role": "user", "content": prompt})
 
                 current_api_key = get_active_key()
                 models_to_test = get_available_models(current_api_key)
@@ -255,10 +266,7 @@ if prompt:
                     for model_name in models_to_test:
                         payload = {
                             "model": model_name,
-                            "messages": [
-                                {"role": "system", "content": system_content},
-                                {"role": "user", "content": prompt}
-                            ],
+                            "messages": messages_payload,
                             "stream": True
                         }
                         
