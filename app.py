@@ -86,7 +86,6 @@ def get_available_models(api_key):
             fetched = []
             for m in data:
                 m_id = m.get("id", "")
-                # Filter out audio, whisper, guard, and vision models to keep pure chat models
                 if not any(k in m_id.lower() for k in ["whisper", "guard", "orpheus", "vision", "audio"]):
                     fetched.append(m_id)
             if fetched:
@@ -180,7 +179,7 @@ if prompt:
         
         thinking_html = """
         <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
-            <span>🌐 Searching web & thinking</span>
+            <span>🌐 searching in the google</span>
             <span class="dot1" style="font-size: 20px;">.</span>
             <span class="dot2" style="font-size: 20px;">.</span>
             <span class="dot3" style="font-size: 20px;">.</span>
@@ -222,7 +221,6 @@ if prompt:
                 }
                 
                 success = False
-                # Retry mechanism to cycle through models and bypass 429 rate limits smoothly across devices
                 for attempt in range(2):
                     if success:
                         break
@@ -265,7 +263,7 @@ if prompt:
                                 success = True
                                 break
                             elif response.status_code == 429:
-                                time.sleep(1) # Brief pause before trying fallback model
+                                time.sleep(1)
                                 continue
                         except:
                             continue
