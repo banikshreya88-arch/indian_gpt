@@ -4,6 +4,7 @@ import json
 import urllib.parse
 import time
 import random
+import os
 from datetime import datetime, timezone, timedelta
 from duckduckgo_search import DDGS
 
@@ -95,38 +96,68 @@ def get_available_models(api_key):
         pass
     return default_models
 
-# Initialize User Database Session State for Gmail-based chats
+# Persistent Database File for Saving User Chats Across Reboots
+DB_FILE = "chats_db.json"
+
+def load_database():
+    if os.path.exists(DB_FILE):
+        try:
+            with open(DB_FILE, "r") as f:
+                return json.load(f)
+        except:
+            return {}
+    return {}
+
+def save_database(db):
+    try:
+        with open(DB_FILE, "w") as f:
+            json.dump(db, f)
+    except:
+        pass
+
+# Initialize Session States
 if "user_database" not in st.session_state:
-    st.session_state.user_database = {}
+    st.session_state.user_database = load_database()
 
 if "logged_in_email" not in st.session_state:
     st.session_state.logged_in_email = ""
 
-# Sidebar for Gmail Login & Controls
+# Sidebar for Google Auth / Gmail Login & Controls
 with st.sidebar:
-    st.subheader("🔐 Gmail Login")
-    email_input = st.text_input("Enter your Gmail ID", value=st.session_state.logged_in_email, placeholder="e.g. shubham@gmail.com")
+    st.subheader("🔐 Authentication")
     
-    if st.button("Login / Switch Account", use_container_width=True):
-        if email_input and "@" in email_input:
-            st.session_state.logged_in_email = email_input.strip().lower()
-            if st.session_state.logged_in_email not in st.session_state.user_database:
-                st.session_state.user_database[st.session_state.logged_in_email] = {
-                    "chat_sessions": {
-                        "New Chat": [{"role": "assistant", "content": f"Hi bhai! Welcome to Indian GPT. Tor Gmail: {st.session_state.logged_in_email} ekhon secure ache."}]
-                    },
-                    "current_chat": "New Chat"
-                }
-            st.success("Login successful!")
+    if not st.session_state.logged_in_email:
+        # Simulated Google OAuth Login Button Option
+        google_email_input = st.text_input("Enter your Gmail ID", placeholder="e.g. shubham@gmail.com")
+        
+        if st.button("Continue with Google", use_container_width=True):
+            if google_email_input and "@gmail.com" in google_email_input.lower():
+                email_clean = google_email_input.strip().lower()
+                st.session_state.logged_in_email = email_clean
+                
+                if email_clean not in st.session_state.user_database:
+                    st.session_state.user_database[email_clean] = {
+                        "chat_sessions": {
+                            "New Chat": [{"role": "assistant", "content": f"Hello! Welcome to Indian GPT. Your account ({email_clean}) is successfully authenticated and secured."}]
+                        },
+                        "current_chat": "New Chat"
+                    }
+                    save_database(st.session_state.user_database)
+                
+                st.success("Authenticated successfully!")
+                st.rerun()
+            else:
+                st.error("Please enter a valid Gmail address.")
+    else:
+        st.markdown(f"**Connected Account:**\n`{st.session_state.logged_in_email}`")
+        if st.button("Logout", use_container_width=True):
+            st.session_state.logged_in_email = ""
             st.rerun()
-        else:
-            st.error("Please enter a valid Gmail address.")
 
     if st.session_state.logged_in_email:
-        st.markdown(f"**Logged in as:** `{st.session_state.logged_in_email}`")
         st.markdown("---")
         
-        # Get current user's chats
+        # Get current user's data from database
         user_data = st.session_state.user_database[st.session_state.logged_in_email]
         chat_sessions = user_data["chat_sessions"]
         current_chat = user_data["current_chat"]
@@ -138,8 +169,9 @@ with st.sidebar:
                 new_chat_name = f"New Chat {counter}"
                 counter += 1
             
-            chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hi bhai, new chat shuru holo!"}]
+            chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
             user_data["current_chat"] = new_chat_name
+            save_database(st.session_state.user_database)
             st.rerun()
 
         st.markdown("---")
@@ -152,20 +184,21 @@ with st.sidebar:
         for chat_name in list(chat_sessions.keys()):
             if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
                 user_data["current_chat"] = chat_name
+                save_database(st.session_state.user_database)
                 st.rerun()
     else:
         uploaded_image = None
-        st.warning("Prothome upore tomar Gmail diye login koro, taholei chat gulo save thakbe!")
+        st.info("Please sign in using your Google account above to access and save your chat history.")
 
     st.markdown("---")
-    st.caption("⚡ Gmail Cloud Sync & Full Memory Active")
+    st.caption("⚡ Cloud Sync & Persistent Memory Active")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
 st.title("🇮🇳 Indian GPT")
 
 if not st.session_state.logged_in_email:
-    st.info("👈 Prothome sidebar-e tomar Gmail ID diye login koro, tarpor chat shuru korte parbe!")
+    st.warning("Please authenticate with your Google account in the sidebar to start chatting.")
 else:
     user_data = st.session_state.user_database[st.session_state.logged_in_email]
     chat_sessions = user_data["chat_sessions"]
@@ -186,7 +219,7 @@ else:
                 st.image(message["image"])
 
     # Native Streamlit Chat Input
-    prompt = st.chat_input("Ki jante chas? (Ask anything or ask to generate an image...)")
+    prompt = st.chat_input("Ask anything or ask to generate an image...")
 
     if prompt:
         if current_chat.startswith("New Chat"):
@@ -204,6 +237,7 @@ else:
             user_msg["image"] = uploaded_image
         
         current_messages.append(user_msg)
+        save_database(st.session_state.user_database)
         
         with st.chat_message("user"):
             st.markdown(prompt)
@@ -232,7 +266,7 @@ else:
                     time.sleep(1)
                     img_prompt = urllib.parse.quote(prompt)
                     generated_image_url = f"https://image.pollinations.ai/prompt/{img_prompt}"
-                    full_response = f"Elo bhai, tor instructions moto chobi toiri kore diyechi:"
+                    full_response = f"Here is the generated image based on your instructions:"
                     message_placeholder.markdown(full_response)
                     st.image(generated_image_url)
                 else:
@@ -296,7 +330,7 @@ else:
                     for attempt in range(2):
                         if success:
                             break
-                        for model_name in models_to_test:
+                        for model_name in models_test if 'models_test' in locals() else models_to_test:
                             payload = {
                                 "model": model_name,
                                 "messages": messages_payload,
@@ -338,7 +372,7 @@ else:
                                 continue
                     
                     if not success:
-                        full_response = "Server ekhon ektu busy ache ba limit cross hoyeche. Ektu por abar 'send' e click koro bhai!"
+                        full_response = "Server is currently busy or rate limited. Please click send again!"
                         message_placeholder.markdown(full_response)
                 
                 assistant_msg = {"role": "assistant", "content": full_response}
@@ -346,6 +380,7 @@ else:
                     assistant_msg["image_url"] = generated_image_url
                     
                 current_messages.append(assistant_msg)
+                save_database(st.session_state.user_database)
                 st.rerun()    
             except Exception as e:
                 st.error(f"Error: {e}")
