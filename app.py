@@ -9,7 +9,7 @@ from duckduckgo_search import DDGS
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
 
-# Custom CSS for Cyberpunk Theme & Green Sidebar Accents
+# Custom CSS for Cyberpunk Theme & Voice Assistant UI
 st.markdown("""
     <style>
     .stApp {
@@ -86,7 +86,6 @@ def get_available_models(api_key):
             fetched = []
             for m in data:
                 m_id = m.get("id", "")
-                # Filter out audio, whisper, guard, and vision models to keep pure chat models
                 if not any(k in m_id.lower() for k in ["whisper", "guard", "orpheus", "vision", "audio"]):
                     fetched.append(m_id)
             if fetched:
@@ -98,13 +97,13 @@ def get_available_models(api_key):
 # Initialize Session States
 if "chat_sessions" not in st.session_state:
     st.session_state.chat_sessions = {
-        "New Chat": [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT with Live Web Search!"}]
+        "New Chat": [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT with Live Search & Voice!"}]
     }
 
 if "current_chat" not in st.session_state:
     st.session_state.current_chat = "New Chat"
 
-# Sidebar
+# Sidebar with Voice Settings & Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
@@ -113,9 +112,29 @@ with st.sidebar:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT with Live Web Search!"}]
+        st.session_state.chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT with Live Search & Voice!"}]
         st.session_state.current_chat = new_chat_name
         st.rerun()
+
+    st.markdown("---")
+    st.subheader("🎙️ Voice Settings")
+    enable_voice_output = st.checkbox("🔊 Enable Voice Reply", value=True)
+    
+    # Voice Language / Accent Selection
+    voice_lang_option = st.selectbox(
+        "🗣️ Voice Accent / Language", 
+        ["Indian English (en-IN)", "Hindi (hi-IN)", "Bengali (bn-IN)", "US English (en-US)"]
+    )
+    
+    # Map selection to language code
+    lang_code_map = {
+        "Indian English (en-IN)": "en-IN",
+        "Hindi (hi-IN)": "hi-IN",
+        "Bengali (bn-IN)": "bn-IN",
+        "US English (en-US)": "en-US"
+    }
+    selected_lang_code = lang_code_map[voice_lang_option]
+    voice_speed = st.slider("⚡ Voice Speed", 0.5, 1.5, 1.0, 0.1)
 
     st.markdown("---")
     st.subheader("📁 Upload Image")
@@ -130,7 +149,7 @@ with st.sidebar:
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ Live Web Search & Auto Model Finder Active")
+    st.caption("⚡ Voice, Web Search & Auto Model Finder Active")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
@@ -150,6 +169,48 @@ for message in current_messages:
             st.image(message["image_url"])
         elif "image" in message and message["image"]:
             st.image(message["image"])
+
+# JavaScript Web Speech API for Mic Input & Voice Output Reader
+voice_html = f"""
+<div style="margin-bottom: 12px; display: flex; gap: 10px; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 10px; border: 1px solid rgba(34, 197, 94, 0.3);">
+    <button onclick="startListening()" style="background: #22c55e; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;">🎙️ Kotha Bolo (Speak)</button>
+    <span id="voice-status" style="color: #a5b4fc; font-style: italic; font-size: 14px;">Mic ready... Click & Speak</span>
+</div>
+
+<script>
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+recognition.lang = '{selected_lang_code}';
+recognition.interimResults = false;
+
+function startListening() {{
+    document.getElementById("voice-status").innerText = "Sunchi... kotha bolo!";
+    recognition.start();
+}}
+
+recognition.onresult = function(event) {{
+    const speechToText = event.results[0][0].transcript;
+    document.getElementById("voice-status").innerText = "Bolecho: " + speechToText;
+    const chatInput = document.querySelector('textarea[aria-label*="chat"]');
+    if (chatInput) {{
+        chatInput.value = speechToText;
+        chatInput.dispatchEvent(new Event('input', {{ bubbles: true }}));
+    }}
+}};
+
+recognition.onerror = function(event) {{
+    document.getElementById("voice-status").innerText = "Mic error holo, abar try koro.";
+}};
+
+function speakText(text) {{
+    if (!{str(enable_voice_output).lower()}) return;
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.rate = {voice_speed};
+    speech.lang = '{selected_lang_code}';
+    window.speechSynthesis.speak(speech);
+}}
+</script>
+"""
+st.markdown(voice_html, unsafe_allow_html=True)
 
 # Native Streamlit Chat Input
 prompt = st.chat_input("Ki jante chas? (Ask anything or ask to generate an image...)")
@@ -202,27 +263,34 @@ if prompt:
                 message_placeholder.markdown(full_response)
                 st.image(generated_image_url)
             else:
-                # Perform Live Web Search Grounding
+                # Live Time & Search Grounding Context
+                current_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 search_context = search_web(prompt)
                 
                 system_content = (
-                    "You are Indian GPT, an advanced AI search assistant created by Shubham. "
+                    f"Current live time is {current_time_str}. "
+                    "You are Indian GPT, an advanced AI search and voice assistant created by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
-                    "Use the provided live web search results below to give an accurate, up-to-date, and detailed answer."
+                    "Use the provided live web search results below and current time to give an accurate, up-to-date answer."
                 )
                 
                 if search_context:
                     system_content += f"\n\nLive Web Search Results:\n{search_context}"
 
                 current_api_key = get_active_key()
-                models_to_test = get_available_models(current_api_key)
+                models_to_test = [
+                    "llama-3.3-70b-versatile",
+                    "llama-3.1-8b-instant",
+                    "mixtral-8x7b-32768",
+                    "gemma2-9b-it"
+                ]
+                
                 headers = {
                     "Authorization": f"Bearer {current_api_key}",
                     "Content-Type": "application/json"
                 }
                 
                 success = False
-                # Retry mechanism to cycle through models and bypass 429 rate limits smoothly across devices
                 for attempt in range(2):
                     if success:
                         break
@@ -265,7 +333,7 @@ if prompt:
                                 success = True
                                 break
                             elif response.status_code == 429:
-                                time.sleep(1) # Brief pause before trying fallback model
+                                time.sleep(1)
                                 continue
                         except:
                             continue
@@ -274,6 +342,10 @@ if prompt:
                     full_response = "Server ekhon ektu busy ache ba limit cross hoyeche. Ektu por abar 'send' e click koro bhai!"
                     message_placeholder.markdown(full_response)
             
+            # Trigger Browser Voice Reader for Output (TTS)
+            clean_text_for_speech = full_response.replace('"', '').replace('\n', ' ').replace('*', '')
+            st.markdown(f"<script>speakText(\"{clean_text_for_speech}\");</script>", unsafe_allow_html=True)
+
             assistant_msg = {"role": "assistant", "content": full_response}
             if generated_image_url:
                 assistant_msg["image_url"] = generated_image_url
@@ -282,3 +354,14 @@ if prompt:
             st.rerun()    
         except Exception as e:
             st.error(f"Error: {e}")
+```[cite: 1]
+
+---
+
+### Ki ki notun feature add holo?
+1. **Voice Chat (Mic Input Button):** Screen-er opore ekta **"🎙️ Kotha Bolo (Speak)"** button add kora hoyeche, jetate click korle mic on hobe ar tui kotha bollei ota automatic text hoye chat box-e chole asbe[cite: 1].
+2. **Voice Response (Text-to-Speech):** Bot jokhon answer debe, browser nijee oi answer-ta toke voice-e shuniye debe[cite: 1].
+3. **Voice Accent / Language Selector:** Sidebar-e ekta dropdown option rakha hoyeche—tui chaile **Indian English**, **Hindi**, ba **Bengali** accent select korte parbi[cite: 1].
+4. **Voice Speed Controller:** Sidebar-e speed slider ache, jar sahajje voice-er speed fast ba slow korte parbi[cite: 1].
+
+Ebar eta GitHub-e copy-paste kore commit kore de[cite: 1], ar tarpor phone ba laptop theke khule ekbar kotha bole check kore dekh! Kono asubidha hole amake bolbi.
