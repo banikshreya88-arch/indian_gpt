@@ -10,8 +10,11 @@ from duckduckgo_search import DDGS
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
 
-# Custom CSS for Cyberpunk Theme & Green Sidebar Accents
+# Google Search Console Verification Meta Tag & Cyberpunk Theme
 st.markdown("""
+    <head>
+        <meta name="google-site-verification" content="rr7Az4-575FHS6bJqjygyHP8eNDiqJXuqAOOQtRidB8" />
+    </head>
     <style>
     .stApp {
         background: linear-gradient(rgba(5, 10, 25, 0.85), rgba(10, 15, 30, 0.95)), 
@@ -96,33 +99,33 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States with a unique key
-if "chat_sessions_v9" not in st.session_state:
-    st.session_state.chat_sessions_v9 = {
+if "chat_sessions_v11" not in st.session_state:
+    st.session_state.chat_sessions_v11 = {
         "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant. Ask me anything or type to generate high-quality images!"}]
     }
 
-if "current_chat_v9" not in st.session_state:
-    st.session_state.current_chat_v9 = "New Chat"
+if "current_chat_v11" not in st.session_state:
+    st.session_state.current_chat_v11 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v9:
+        while new_chat_name in st.session_state.chat_sessions_v11:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v9[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v9 = new_chat_name
+        st.session_state.chat_sessions_v11[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v11 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v9.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v11.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v9 = chat_name
+            st.session_state.current_chat_v11 = chat_name
             st.rerun()
 
     st.markdown("---")
@@ -133,10 +136,10 @@ with st.sidebar:
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v9 not in st.session_state.chat_sessions_v9:
-    st.session_state.current_chat_v9 = list(st.session_state.chat_sessions_v9.keys())[0]
+if st.session_state.current_chat_v11 not in st.session_state.chat_sessions_v11:
+    st.session_state.current_chat_v11 = list(st.session_state.chat_sessions_v11.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v9[st.session_state.current_chat_v9]
+current_messages = st.session_state.chat_sessions_v11[st.session_state.current_chat_v11]
 
 # Display current chat messages
 for message in current_messages:
@@ -149,14 +152,14 @@ for message in current_messages:
 prompt = st.chat_input("Ask anything or ask to generate a high-quality image...")
 
 if prompt:
-    if st.session_state.current_chat_v9.startswith("New Chat"):
+    if st.session_state.current_chat_v11.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v9:
+        if new_name in st.session_state.chat_sessions_v11:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v9[new_name] = st.session_state.chat_sessions_v9.pop(st.session_state.current_chat_v9)
-        st.session_state.current_chat_v9 = new_name
-        current_messages = st.session_state.chat_sessions_v9[new_name]
+        st.session_state.chat_sessions_v11[new_name] = st.session_state.chat_sessions_v11.pop(st.session_state.current_chat_v11)
+        st.session_state.current_chat_v11 = new_name
+        current_messages = st.session_state.chat_sessions_v11[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -171,7 +174,6 @@ if prompt:
         generated_image_url = None
         
         try:
-            # Bulletproof image request detection
             p_lower = prompt.lower()
             image_keywords = [
                 "generate", "genarate", "draw", "picture", "image", "photo", 
@@ -203,7 +205,6 @@ if prompt:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
-                # Check if search is actually needed (only for news, current info, weather, latest facts)
                 search_triggers = ["who won", "news", "score", "weather", "latest", "current", "price", "who is", "what is happening"]
                 needs_search = any(trig in p_lower for trig in search_triggers)
                 
