@@ -4,6 +4,7 @@ import json
 import urllib.parse
 import time
 import random
+from datetime import datetime, timezone, timedelta
 from duckduckgo_search import DDGS
 
 # Page Config
@@ -97,7 +98,7 @@ def get_available_models(api_key):
 # Initialize Session States
 if "chat_sessions" not in st.session_state:
     st.session_state.chat_sessions = {
-        "New Chat": [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT!"}]
+        "New Chat": [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT with IST Time & Universal Web Search!"}]
     }
 
 if "current_chat" not in st.session_state:
@@ -112,7 +113,7 @@ with st.sidebar:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT!"}]
+        st.session_state.chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT with IST Time & Universal Web Search!"}]
         st.session_state.current_chat = new_chat_name
         st.rerun()
 
@@ -129,7 +130,7 @@ with st.sidebar:
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ Smart Live Web Search & Auto Model Finder Active")
+    st.caption("⚡ IST Time & Universal Google Search Active")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
@@ -200,12 +201,12 @@ if prompt:
                 message_placeholder.markdown(full_response)
                 st.image(generated_image_url)
             else:
-                # Smart Check: Only trigger web search for time, live events, scores, news or current info queries
-                live_keywords = ["time", "ajke", "today", "news", "score", "match", "khela", "ipl", "world cup", "live", "current", "who is the current", "recent"]
-                needs_search = any(kw in prompt.lower() for kw in live_keywords)
+                # Universal smart check: triggers web search for anything except basic greetings
+                greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
+                is_simple_greeting = prompt.lower().strip() in greetings
                 
                 search_context = ""
-                if needs_search:
+                if not is_simple_greeting:
                     search_loading_html = """
                     <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
                         <span>🌐 searching in the google</span>
@@ -227,10 +228,13 @@ if prompt:
                     """
                     message_placeholder.markdown(thinking_html, unsafe_allow_html=True)
                 
-                current_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                # Indian Standard Time (IST - UTC+5:30)
+                ist = timezone(timedelta(hours=5, minutes=30))
+                current_time_str = datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S")
+                
                 system_content = (
-                    f"Current live time is {current_time_str}. "
-                    "You are Indian GPT, an advanced AI assistant created by Shubham. "
+                    f"Current Indian Standard Time (IST) is {current_time_str}. "
+                    "You are Indian GPT, an advanced AI search and assistant created by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham."
                 )
                 
