@@ -120,13 +120,11 @@ with st.sidebar:
     st.subheader("🎙️ Voice Settings")
     enable_voice_output = st.checkbox("🔊 Enable Voice Reply", value=True)
     
-    # Voice Language / Accent Selection
     voice_lang_option = st.selectbox(
         "🗣️ Voice Accent / Language", 
         ["Indian English (en-IN)", "Hindi (hi-IN)", "Bengali (bn-IN)", "US English (en-US)"]
     )
     
-    # Map selection to language code
     lang_code_map = {
         "Indian English (en-IN)": "en-IN",
         "Hindi (hi-IN)": "hi-IN",
@@ -263,7 +261,6 @@ if prompt:
                 message_placeholder.markdown(full_response)
                 st.image(generated_image_url)
             else:
-                # Live Time & Search Grounding Context
                 current_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 search_context = search_web(prompt)
                 
@@ -278,13 +275,7 @@ if prompt:
                     system_content += f"\n\nLive Web Search Results:\n{search_context}"
 
                 current_api_key = get_active_key()
-                models_to_test = [
-                    "llama-3.3-70b-versatile",
-                    "llama-3.1-8b-instant",
-                    "mixtral-8x7b-32768",
-                    "gemma2-9b-it"
-                ]
-                
+                models_to_test = get_available_models(current_api_key)
                 headers = {
                     "Authorization": f"Bearer {current_api_key}",
                     "Content-Type": "application/json"
@@ -342,7 +333,6 @@ if prompt:
                     full_response = "Server ekhon ektu busy ache ba limit cross hoyeche. Ektu por abar 'send' e click koro bhai!"
                     message_placeholder.markdown(full_response)
             
-            # Trigger Browser Voice Reader for Output (TTS)
             clean_text_for_speech = full_response.replace('"', '').replace('\n', ' ').replace('*', '')
             st.markdown(f"<script>speakText(\"{clean_text_for_speech}\");</script>", unsafe_allow_html=True)
 
@@ -354,14 +344,6 @@ if prompt:
             st.rerun()    
         except Exception as e:
             st.error(f"Error: {e}")
-```[cite: 1]
+```[cite: 1, 2]
 
----
-
-### Ki ki notun feature add holo?
-1. **Voice Chat (Mic Input Button):** Screen-er opore ekta **"🎙️ Kotha Bolo (Speak)"** button add kora hoyeche, jetate click korle mic on hobe ar tui kotha bollei ota automatic text hoye chat box-e chole asbe[cite: 1].
-2. **Voice Response (Text-to-Speech):** Bot jokhon answer debe, browser nijee oi answer-ta toke voice-e shuniye debe[cite: 1].
-3. **Voice Accent / Language Selector:** Sidebar-e ekta dropdown option rakha hoyeche—tui chaile **Indian English**, **Hindi**, ba **Bengali** accent select korte parbi[cite: 1].
-4. **Voice Speed Controller:** Sidebar-e speed slider ache, jar sahajje voice-er speed fast ba slow korte parbi[cite: 1].
-
-Ebar eta GitHub-e copy-paste kore commit kore de[cite: 1], ar tarpor phone ba laptop theke khule ekbar kotha bole check kore dekh! Kono asubidha hole amake bolbi.
+Ebar code-ta paste kore commit kore dilei ar kono error ashbe na, ar app-ta ekdam makhon-er moto cholbe!
