@@ -14,7 +14,7 @@ st.markdown("""
     <style>
     .stApp {
         background: linear-gradient(rgba(5, 10, 25, 0.85), rgba(10, 15, 30, 0.95)), 
-                    url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
+                    url('[https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop](https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop)') no-repeat center center fixed;
         background-size: cover;
         color: #ffffff;
     }
@@ -80,7 +80,7 @@ def get_available_models(api_key):
     ]
     try:
         headers = {"Authorization": f"Bearer {api_key}"}
-        response = requests.get("https://api.groq.com/openai/v1/models", headers=headers, timeout=5)
+        response = requests.get("[https://api.groq.com/openai/v1/models](https://api.groq.com/openai/v1/models)", headers=headers, timeout=5)
         if response.status_code == 200:
             data = response.json().get("data", [])
             fetched = []
@@ -256,7 +256,7 @@ if prompt:
             if is_image_request:
                 time.sleep(1)
                 img_prompt = urllib.parse.quote(prompt)
-                generated_image_url = f"https://image.pollinations.ai/prompt/{img_prompt}"
+                generated_image_url = f"[https://image.pollinations.ai/prompt/](https://image.pollinations.ai/prompt/){img_prompt}"
                 full_response = f"Elo bhai, tor instructions moto chobi toiri kore diyechi:"
                 message_placeholder.markdown(full_response)
                 st.image(generated_image_url)
@@ -297,7 +297,7 @@ if prompt:
                         
                         try:
                             response = requests.post(
-                                "https://api.groq.com/openai/v1/chat/completions",
+                                "[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)",
                                 headers=headers,
                                 json=payload,
                                 stream=True,
@@ -344,6 +344,3 @@ if prompt:
             st.rerun()    
         except Exception as e:
             st.error(f"Error: {e}")
-```[cite: 1, 2]
-
-Ebar code-ta paste kore commit kore dilei ar kono error ashbe na, ar app-ta ekdam makhon-er moto cholbe!
