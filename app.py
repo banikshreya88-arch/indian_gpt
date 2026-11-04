@@ -96,25 +96,25 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States with a unique key to bypass old cache
-if "chat_sessions_v2" not in st.session_state:
-    st.session_state.chat_sessions_v2 = {
+if "chat_sessions_v4" not in st.session_state:
+    st.session_state.chat_sessions_v4 = {
         "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant. I am ready to help you with anything!"}]
     }
 
-if "current_chat_v2" not in st.session_state:
-    st.session_state.current_chat_v2 = "New Chat"
+if "current_chat_v4" not in st.session_state:
+    st.session_state.current_chat_v4 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v2:
+        while new_chat_name in st.session_state.chat_sessions_v4:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v2[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v2 = new_chat_name
+        st.session_state.chat_sessions_v4[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v4 = new_chat_name
         st.rerun()
 
     st.markdown("---")
@@ -124,9 +124,9 @@ with st.sidebar:
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v2.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v4.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v2 = chat_name
+            st.session_state.current_chat_v4 = chat_name
             st.rerun()
 
     st.markdown("---")
@@ -137,10 +137,10 @@ with st.sidebar:
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v2 not in st.session_state.chat_sessions_v2:
-    st.session_state.current_chat_v2 = list(st.session_state.chat_sessions_v2.keys())[0]
+if st.session_state.current_chat_v4 not in st.session_state.chat_sessions_v4:
+    st.session_state.current_chat_v4 = list(st.session_state.chat_sessions_v4.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v2[st.session_state.current_chat_v2]
+current_messages = st.session_state.chat_sessions_v4[st.session_state.current_chat_v4]
 
 # Display current chat messages
 for message in current_messages:
@@ -155,14 +155,14 @@ for message in current_messages:
 prompt = st.chat_input("Ask anything or ask to generate an image...")
 
 if prompt:
-    if st.session_state.current_chat_v2.startswith("New Chat"):
+    if st.session_state.current_chat_v4.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v2:
+        if new_name in st.session_state.chat_sessions_v4:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v2[new_name] = st.session_state.chat_sessions_v2.pop(st.session_state.current_chat_v2)
-        st.session_state.current_chat_v2 = new_name
-        current_messages = st.session_state.chat_sessions_v2[new_name]
+        st.session_state.chat_sessions_v4[new_name] = st.session_state.chat_sessions_v4.pop(st.session_state.current_chat_v4)
+        st.session_state.current_chat_v4 = new_name
+        current_messages = st.session_state.chat_sessions_v4[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     if uploaded_image:
@@ -314,4 +314,3 @@ if prompt:
             st.rerun()    
         except Exception as e:
             st.error(f"Error: {e}")
-```[cite: 4]
