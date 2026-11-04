@@ -96,33 +96,33 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States with a unique key
-if "chat_sessions_v7" not in st.session_state:
-    st.session_state.chat_sessions_v7 = {
+if "chat_sessions_v8" not in st.session_state:
+    st.session_state.chat_sessions_v8 = {
         "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant. Ask me anything or type to generate high-quality images!"}]
     }
 
-if "current_chat_v7" not in st.session_state:
-    st.session_state.current_chat_v7 = "New Chat"
+if "current_chat_v8" not in st.session_state:
+    st.session_state.current_chat_v8 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v7:
+        while new_chat_name in st.session_state.chat_sessions_v8:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v7[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v7 = new_chat_name
+        st.session_state.chat_sessions_v8[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v8 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v7.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v8.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v7 = chat_name
+            st.session_state.current_chat_v8 = chat_name
             st.rerun()
 
     st.markdown("---")
@@ -133,10 +133,10 @@ with st.sidebar:
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v7 not in st.session_state.chat_sessions_v7:
-    st.session_state.current_chat_v7 = list(st.session_state.chat_sessions_v7.keys())[0]
+if st.session_state.current_chat_v8 not in st.session_state.chat_sessions_v8:
+    st.session_state.current_chat_v8 = list(st.session_state.chat_sessions_v8.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v7[st.session_state.current_chat_v7]
+current_messages = st.session_state.chat_sessions_v8[st.session_state.current_chat_v8]
 
 # Display current chat messages
 for message in current_messages:
@@ -149,14 +149,14 @@ for message in current_messages:
 prompt = st.chat_input("Ask anything or ask to generate a high-quality image...")
 
 if prompt:
-    if st.session_state.current_chat_v7.startswith("New Chat"):
+    if st.session_state.current_chat_v8.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v7:
+        if new_name in st.session_state.chat_sessions_v8:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v7[new_name] = st.session_state.chat_sessions_v7.pop(st.session_state.current_chat_v7)
-        st.session_state.current_chat_v7 = new_name
-        current_messages = st.session_state.chat_sessions_v7[new_name]
+        st.session_state.chat_sessions_v8[new_name] = st.session_state.chat_sessions_v8.pop(st.session_state.current_chat_v8)
+        st.session_state.current_chat_v8 = new_name
+        current_messages = st.session_state.chat_sessions_v8[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -171,9 +171,14 @@ if prompt:
         generated_image_url = None
         
         try:
-            # Expanded keywords for high-quality image generation requests
-            image_keywords = ["generate image", "draw", "picture of", "create an image", "chobi banao", "photo banao", "paint", "sketch", "art", "wallpaper", "portrait", "ghibli"]
-            is_image_request = any(keyword in prompt.lower() for keyword in image_keywords)
+            # Bulletproof image request detection for various spellings and keywords
+            p_lower = prompt.lower()
+            image_keywords = [
+                "generate", "genarate", "draw", "picture", "image", "photo", 
+                "chobi", "banao", "paint", "sketch", "art", "wallpaper", 
+                "portrait", "ghibli", "create"
+            ]
+            is_image_request = any(keyword in p_lower for keyword in image_keywords)
             
             if is_image_request:
                 thinking_html = """
