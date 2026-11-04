@@ -97,7 +97,7 @@ def get_available_models(api_key):
 # Initialize Session States
 if "chat_sessions" not in st.session_state:
     st.session_state.chat_sessions = {
-        "New Chat": [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT with Live Web Search!"}]
+        "New Chat": [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT!"}]
     }
 
 if "current_chat" not in st.session_state:
@@ -112,7 +112,7 @@ with st.sidebar:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT with Live Web Search!"}]
+        st.session_state.chat_sessions[new_chat_name] = [{"role": "assistant", "content": "Hi bro i am your personal chatbot Indian GPT!"}]
         st.session_state.current_chat = new_chat_name
         st.rerun()
 
@@ -129,7 +129,7 @@ with st.sidebar:
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ Live Web Search & Auto Model Finder Active")
+    st.caption("⚡ Smart Live Web Search & Auto Model Finder Active")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
@@ -177,16 +177,6 @@ if prompt:
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         
-        thinking_html = """
-        <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
-            <span>🌐 searching in the google</span>
-            <span class="dot1" style="font-size: 20px;">.</span>
-            <span class="dot2" style="font-size: 20px;">.</span>
-            <span class="dot3" style="font-size: 20px;">.</span>
-        </div>
-        """
-        message_placeholder.markdown(thinking_html, unsafe_allow_html=True)
-        
         full_response = ""
         generated_image_url = None
         
@@ -194,6 +184,15 @@ if prompt:
             is_image_request = any(keyword in prompt.lower() for keyword in ["generate image", "draw", "picture of", "create an image", "chobi banao", "photo banao"])
             
             if is_image_request:
+                thinking_html = """
+                <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
+                    <span>🎨 creating your image</span>
+                    <span class="dot1" style="font-size: 20px;">.</span>
+                    <span class="dot2" style="font-size: 20px;">.</span>
+                    <span class="dot3" style="font-size: 20px;">.</span>
+                </div>
+                """
+                message_placeholder.markdown(thinking_html, unsafe_allow_html=True)
                 time.sleep(1)
                 img_prompt = urllib.parse.quote(prompt)
                 generated_image_url = f"https://image.pollinations.ai/prompt/{img_prompt}"
@@ -201,13 +200,38 @@ if prompt:
                 message_placeholder.markdown(full_response)
                 st.image(generated_image_url)
             else:
-                # Perform Live Web Search Grounding
-                search_context = search_web(prompt)
+                # Smart Check: Only trigger web search for time, live events, scores, news or current info queries
+                live_keywords = ["time", "ajke", "today", "news", "score", "match", "khela", "ipl", "world cup", "live", "current", "who is the current", "recent"]
+                needs_search = any(kw in prompt.lower() for kw in live_keywords)
                 
+                search_context = ""
+                if needs_search:
+                    search_loading_html = """
+                    <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
+                        <span>🌐 searching in the google</span>
+                        <span class="dot1" style="font-size: 20px;">.</span>
+                        <span class="dot2" style="font-size: 20px;">.</span>
+                        <span class="dot3" style="font-size: 20px;">.</span>
+                    </div>
+                    """
+                    message_placeholder.markdown(search_loading_html, unsafe_allow_html=True)
+                    search_context = search_web(prompt)
+                else:
+                    thinking_html = """
+                    <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
+                        <span>🤖 thinking your answer</span>
+                        <span class="dot1" style="font-size: 20px;">.</span>
+                        <span class="dot2" style="font-size: 20px;">.</span>
+                        <span class="dot3" style="font-size: 20px;">.</span>
+                    </div>
+                    """
+                    message_placeholder.markdown(thinking_html, unsafe_allow_html=True)
+                
+                current_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 system_content = (
-                    "You are Indian GPT, an advanced AI search assistant created by Shubham. "
-                    "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
-                    "Use the provided live web search results below to give an accurate, up-to-date, and detailed answer."
+                    f"Current live time is {current_time_str}. "
+                    "You are Indian GPT, an advanced AI assistant created by Shubham. "
+                    "If anyone asks who created you or made you, always proudly answer that you were created by Shubham."
                 )
                 
                 if search_context:
