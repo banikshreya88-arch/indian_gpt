@@ -77,29 +77,13 @@ def search_web(query):
         pass
     return ""
 
-# Function to dynamically fetch and auto-find available models from Groq API
+# Optimized models list prioritizing Llama 3 models to prevent language glitches
 def get_available_models(api_key):
-    default_models = [
+    return [
         "llama-3.3-70b-versatile",
         "llama-3.1-8b-instant",
-        "mixtral-8x7b-32768",
-        "gemma2-9b-it"
+        "mixtral-8x7b-32768"
     ]
-    try:
-        headers = {"Authorization": f"Bearer {api_key}"}
-        response = requests.get("https://api.groq.com/openai/v1/models", headers=headers, timeout=5)
-        if response.status_code == 200:
-            data = response.json().get("data", [])
-            fetched = []
-            for m in data:
-                m_id = m.get("id", "")
-                if not any(k in m_id.lower() for k in ["whisper", "guard", "orpheus", "audio"]):
-                    fetched.append(m_id)
-            if fetched:
-                return fetched
-    except:
-        pass
-    return default_models
 
 # Initialize Session States with a unique key
 if "chat_sessions_v12" not in st.session_state:
@@ -237,8 +221,9 @@ if prompt:
                     f"Current Indian Standard Time (IST) is {current_time_str}. "
                     "You are Indian GPT, an advanced AI assistant created exclusively by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
-                    "LANGUAGE RULE (CRITICAL): You must ALWAYS reply in the EXACT same language and script that the user uses in their message. "
-                    "If the user writes in English, reply in English. If the user writes in Romanized Bengali/Hinglish (e.g. Banglish like 'bhai ki korchis'), you MUST reply back in the exact same Romanized script/Banglish style. Never switch to Arabic, Urdu script, or any unexpected language. Match the user's language and style precisely."
+                    "STRICT LANGUAGE LOCK: You must ALWAYS respond in the exact same language, script, and style as the user's latest input message. "
+                    "If the user writes in English, reply in English. If the user writes in Romanized Bengali/Hinglish/Banglish (e.g. 'bhai ki korchis' or 'kya hal hai'), reply back in that exact same Romanized style. "
+                    "NEVER switch to Arabic, Urdu script, or any other unrequested language under any circumstances."
                 )
                 
                 if search_context:
