@@ -10,17 +10,17 @@ from duckduckgo_search import DDGS
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
 
-# Custom CSS for Cyberpunk Theme & Crystal Clear Text Contrast with Your Custom Background Image
+# Custom CSS for Cyberpunk Theme & Bright Crystal Clear Text Contrast with Your Custom Background Image
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(rgba(5, 10, 25, 0.85), rgba(10, 15, 30, 0.92)), 
+        background: linear-gradient(rgba(5, 10, 25, 0.45), rgba(10, 15, 30, 0.55)), 
                     url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
         background-size: cover;
         color: #ffffff !important;
     }
     .stSidebar {
-        background-color: rgba(15, 23, 42, 0.95) !important;
+        background-color: rgba(15, 23, 42, 0.85) !important;
     }
     .stSidebar * {
         color: #ffffff !important;
@@ -28,12 +28,14 @@ st.markdown("""
     h1, h2, h3, h4, h5, h6, p, span, label, li {
         color: #ffffff !important;
         opacity: 1 !important;
+        text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.9);
     }
     .stMarkdown p, .stMarkdown div {
-        color: #f8fafc !important;
+        color: #ffffff !important;
+        text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.9);
     }
     .stSidebar h3, .stSidebar label, .stSidebar span {
-        color: #22c55e !important;
+        color: #4ade80 !important;
         font-weight: 700 !important;
     }
     .stChatInput textarea {
