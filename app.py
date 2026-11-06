@@ -14,7 +14,7 @@ st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(rgba(5, 10, 25, 0.10), rgba(10, 15, 30, 0.15)), 
+        background: linear-gradient(rgba(5, 10, 25, 0.15), rgba(10, 15, 30, 0.20)), 
                     url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
         background-size: cover;
         color: #ffffff !important;
@@ -318,4 +318,4 @@ if prompt:
             st.rerun()    
         except Exception as e:
             st.error(f"Error: {e}")
-            
+```[cite: 6]
