@@ -77,12 +77,11 @@ def search_web(query):
         pass
     return ""
 
-# Optimized models list prioritizing Llama 3 models to prevent language glitches
+# Fast models list to avoid rate limits
 def get_available_models(api_key):
     return [
-        "llama-3.3-70b-versatile",
         "llama-3.1-8b-instant",
-        "mixtral-8x7b-32768"
+        "gemma2-9b-it"
     ]
 
 # Initialize Session States with a unique key
@@ -246,7 +245,7 @@ if prompt:
                 }
                 
                 success = False
-                for attempt in range(2):
+                for attempt in range(3):
                     if success:
                         break
                     for model_name in models_to_test:
@@ -286,13 +285,13 @@ if prompt:
                                 if success:
                                     break
                             elif response.status_code == 429:
-                                time.sleep(1)
+                                time.sleep(2)
                                 continue
                         except:
                             continue
                 
                 if not success:
-                    full_response = "Server is currently busy or rate limited. Please click send again!"
+                    full_response = "Server is currently busy or rate limited (Error 429). Please wait 5 seconds and click send again!"
                     message_placeholder.markdown(full_response)
             
             assistant_msg = {"role": "assistant", "content": full_response}
