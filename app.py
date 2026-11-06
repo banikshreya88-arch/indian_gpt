@@ -96,33 +96,33 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States with a unique key
-if "chat_sessions_v9" not in st.session_state:
-    st.session_state.chat_sessions_v9 = {
-        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant. Ask me anything or type to generate high-quality images!"}]
+if "chat_sessions_v10" not in st.session_state:
+    st.session_state.chat_sessions_v10 = {
+        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or type to generate high-quality images!"}]
     }
 
-if "current_chat_v9" not in st.session_state:
-    st.session_state.current_chat_v9 = "New Chat"
+if "current_chat_v10" not in st.session_state:
+    st.session_state.current_chat_v10 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v9:
+        while new_chat_name in st.session_state.chat_sessions_v10:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v9[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v9 = new_chat_name
+        st.session_state.chat_sessions_v10[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v10 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v9.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v10.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v9 = chat_name
+            st.session_state.current_chat_v10 = chat_name
             st.rerun()
 
     st.markdown("---")
@@ -133,10 +133,10 @@ with st.sidebar:
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v9 not in st.session_state.chat_sessions_v9:
-    st.session_state.current_chat_v9 = list(st.session_state.chat_sessions_v9.keys())[0]
+if st.session_state.current_chat_v10 not in st.session_state.chat_sessions_v10:
+    st.session_state.current_chat_v10 = list(st.session_state.chat_sessions_v10.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v9[st.session_state.current_chat_v9]
+current_messages = st.session_state.chat_sessions_v10[st.session_state.current_chat_v10]
 
 # Display current chat messages
 for message in current_messages:
@@ -149,14 +149,14 @@ for message in current_messages:
 prompt = st.chat_input("Ask anything or ask to generate a high-quality image...")
 
 if prompt:
-    if st.session_state.current_chat_v9.startswith("New Chat"):
+    if st.session_state.current_chat_v10.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v9:
+        if new_name in st.session_state.chat_sessions_v10:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v9[new_name] = st.session_state.chat_sessions_v9.pop(st.session_state.current_chat_v9)
-        st.session_state.current_chat_v9 = new_name
-        current_messages = st.session_state.chat_sessions_v9[new_name]
+        st.session_state.chat_sessions_v10[new_name] = st.session_state.chat_sessions_v10.pop(st.session_state.current_chat_v10)
+        st.session_state.current_chat_v10 = new_name
+        current_messages = st.session_state.chat_sessions_v10[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -171,7 +171,6 @@ if prompt:
         generated_image_url = None
         
         try:
-            # Bulletproof image request detection
             p_lower = prompt.lower()
             image_keywords = [
                 "generate", "genarate", "draw", "picture", "image", "photo", 
@@ -203,7 +202,6 @@ if prompt:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
-                # Check if search is actually needed (only for news, current info, weather, latest facts)
                 search_triggers = ["who won", "news", "score", "weather", "latest", "current", "price", "who is", "what is happening"]
                 needs_search = any(trig in p_lower for trig in search_triggers)
                 
@@ -236,9 +234,10 @@ if prompt:
                 
                 system_content = (
                     f"Current Indian Standard Time (IST) is {current_time_str}. "
-                    "You are Indian GPT, an advanced AI search and assistant created by Shubham. "
+                    "You are Indian GPT, an advanced AI assistant created exclusively by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
-                    "Always remember and recall previous conversations in this chat session to maintain full context."
+                    "LANGUAGE INSTRUCTION: You are an Indian AI. You understand and can read/write all Indian regional languages (Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, etc.) as well as English. "
+                    "CRITICAL: If the user writes to you in Roman script (English letters) speaking Bengali, Hindi, or any Indian language (like 'tui kemon achhi', 'kya hal hai', 'aap kaise hain'), you MUST reply back in the exact same Roman script style (Banglish/Hinglish style using English letters) matching their vibe, unless they explicitly ask for another language or script. Never switch to Arabic, Urdu script, or random unrelated languages. Always maintain clear, friendly Indian tone."
                 )
                 
                 if search_context:
@@ -297,8 +296,9 @@ if prompt:
                                                 except:
                                                     pass
                                 message_placeholder.markdown(full_response)
-                                success = True
-                                break
+                                success = success or (len(full_response.strip()) > 0)
+                                if success:
+                                    break
                             elif response.status_code == 429:
                                 time.sleep(1)
                                 continue
@@ -317,3 +317,4 @@ if prompt:
             st.rerun()    
         except Exception as e:
             st.error(f"Error: {e}")
+            
