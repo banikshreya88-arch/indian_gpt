@@ -71,17 +71,14 @@ def search_web(query):
         text_results = []
         image_results = []
         
-        # Smart query enhancement for regional boards and studies
         q_lower = query.lower()
         search_query = query
         if "class 8" in q_lower or "wb board" in q_lower or "wbbse" in q_lower or "syllabus" in q_lower or "bangla" in q_lower:
             search_query = f"WBBSE West Bengal board class 8 {query} syllabus books"
             
         with DDGS() as ddgs:
-            # Fetch more text snippets for accuracy
             for r in ddgs.text(search_query, max_results=5):
                 text_results.append(f"Source: {r.get('title')}\nContent: {r.get('body')}")
-            # Fetch relevant web images
             for img in ddgs.images(search_query, max_results=3):
                 img_url = img.get("image")
                 if img_url:
