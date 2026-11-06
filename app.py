@@ -77,29 +77,12 @@ def search_web(query):
         pass
     return ""
 
-# Function to dynamically fetch and auto-find available models from Groq API
+# Fast models list to avoid rate limits
 def get_available_models(api_key):
-    default_models = [
-        "llama-3.3-70b-versatile",
+    return [
         "llama-3.1-8b-instant",
-        "mixtral-8x7b-32768",
         "gemma2-9b-it"
     ]
-    try:
-        headers = {"Authorization": f"Bearer {api_key}"}
-        response = requests.get("https://api.groq.com/openai/v1/models", headers=headers, timeout=5)
-        if response.status_code == 200:
-            data = response.json().get("data", [])
-            fetched = []
-            for m in data:
-                m_id = m.get("id", "")
-                if not any(k in m_id.lower() for k in ["whisper", "guard", "orpheus", "audio"]):
-                    fetched.append(m_id)
-            if fetched:
-                return fetched
-    except:
-        pass
-    return default_models
 
 # Initialize Session States with a unique key
 if "chat_sessions_v12" not in st.session_state:
@@ -237,8 +220,8 @@ if prompt:
                     f"Current Indian Standard Time (IST) is {current_time_str}. "
                     "You are Indian GPT, an advanced AI assistant created exclusively by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
-                    "LANGUAGE RULE (CRITICAL): You must ALWAYS reply in the EXACT same language and script that the user uses in their message. "
-                    "If the user writes in English, reply in English. If the user writes in Romanized Bengali/Hinglish (e.g. Banglish like 'bhai ki korchis'), you MUST reply back in the exact same Romanized script/Banglish style. Never switch to Arabic, Urdu script, or any unexpected language. Match the user's language and style precisely."
+                    "STRICT LANGUAGE ENFORCEMENT: You are allowed to reply ONLY in English or in the exact Indian language/script/vibe (such as Romanized Bengali/Banglish, Hinglish, Hindi, or regional Indian languages) used by the user. "
+                    "ABSOLUTE PROHIBITION: You must NEVER reply in Arabic, Urdu script, Persian, or any non-Indian foreign language under any circumstances whatsoever. If the user writes in English, reply in English. If the user writes in Banglish/Hinglish, reply in that exact same style."
                 )
                 
                 if search_context:
@@ -261,7 +244,7 @@ if prompt:
                 }
                 
                 success = False
-                for attempt in range(2):
+                for attempt in range(3):
                     if success:
                         break
                     for model_name in models_to_test:
@@ -301,13 +284,13 @@ if prompt:
                                 if success:
                                     break
                             elif response.status_code == 429:
-                                time.sleep(1)
+                                time.sleep(2)
                                 continue
                         except:
                             continue
                 
                 if not success:
-                    full_response = "Server is currently busy or rate limited. Please click send again!"
+                    full_response = "Server is currently busy or rate limited (Error 429). Please wait 5 seconds and click send again!"
                     message_placeholder.markdown(full_response)
             
             assistant_msg = {"role": "assistant", "content": full_response}
