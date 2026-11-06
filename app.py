@@ -10,11 +10,11 @@ from duckduckgo_search import DDGS
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
 
-# Custom CSS for Cyberpunk Theme & Bright Crystal Clear Text Contrast with Your Custom Background Image
+# Custom CSS for Cyberpunk Theme & Bright Crystal Clear Text Contrast with Your Custom AI Chip Background
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(rgba(5, 10, 25, 0.45), rgba(10, 15, 30, 0.55)), 
+        background: linear-gradient(rgba(5, 10, 25, 0.20), rgba(10, 15, 30, 0.30)), 
                     url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
         background-size: cover;
         color: #ffffff !important;
@@ -28,11 +28,11 @@ st.markdown("""
     h1, h2, h3, h4, h5, h6, p, span, label, li {
         color: #ffffff !important;
         opacity: 1 !important;
-        text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.9);
+        text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.95);
     }
     .stMarkdown p, .stMarkdown div {
         color: #ffffff !important;
-        text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.9);
+        text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.95);
     }
     .stSidebar h3, .stSidebar label, .stSidebar span {
         color: #4ade80 !important;
@@ -260,7 +260,7 @@ if prompt:
                     "Content-Type": "application/json"
                 }
                 
-                success = False
+                    success = False
                 for attempt in range(2):
                     if success:
                         break
@@ -318,3 +318,4 @@ if prompt:
             st.rerun()    
         except Exception as e:
             st.error(f"Error: {e}")
+```[cite: 6]
