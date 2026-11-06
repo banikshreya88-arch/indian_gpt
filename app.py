@@ -10,12 +10,12 @@ from duckduckgo_search import DDGS
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
 
-# Custom CSS for Cyberpunk Theme & Crystal Clear Text Contrast
+# Custom CSS for Cyberpunk Theme & Crystal Clear Text Contrast with Your Custom Background Image
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(rgba(5, 10, 25, 0.90), rgba(10, 15, 30, 0.98)), 
-                    url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
+        background: linear-gradient(rgba(5, 10, 25, 0.85), rgba(10, 15, 30, 0.92)), 
+                    url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
         background-size: cover;
         color: #ffffff !important;
     }
