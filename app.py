@@ -283,19 +283,19 @@ if prompt:
                             if response.status_code == 200:
                                 for line in response.iter_lines():
                                     if line:
-                        line_str = line.decode("utf-8")
-                        if line_str.startswith("data: "):
-                            json_str = line_str[6:]
-                            if json_str != "[DONE]":
-                                try:
-                                    body = json.loads(json_str)
-                                    delta = body["choices"][0]["delta"]
-                                    if "content" in delta and delta["content"]:
-                                        resp_chunk = delta["content"]
-                                        full_response += resp_chunk
-                                        message_placeholder.markdown(full_response + "▌")
-                                except:
-                                    pass
+                                        line_str = line.decode("utf-8")
+                                        if line_str.startswith("data: "):
+                                            json_str = line_str[6:]
+                                            if json_str != "[DONE]":
+                                                try:
+                                                    body = json.loads(json_str)
+                                                    delta = body["choices"][0]["delta"]
+                                                    if "content" in delta and delta["content"]:
+                                                        resp_chunk = delta["content"]
+                                                        full_response += resp_chunk
+                                                        message_placeholder.markdown(full_response + "▌")
+                                                except:
+                                                    pass
                                 message_placeholder.markdown(full_response)
                                 success = success or (len(full_response.strip()) > 0)
                                 if success:
