@@ -96,33 +96,33 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States with a unique key
-if "chat_sessions_v10" not in st.session_state:
-    st.session_state.chat_sessions_v10 = {
-        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or type to generate high-quality images!"}]
+if "chat_sessions_v11" not in st.session_state:
+    st.session_state.chat_sessions_v11 = {
+        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or tell me to generate an image!"}]
     }
 
-if "current_chat_v10" not in st.session_state:
-    st.session_state.current_chat_v10 = "New Chat"
+if "current_chat_v11" not in st.session_state:
+    st.session_state.current_chat_v11 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v10:
+        while new_chat_name in st.session_state.chat_sessions_v11:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v10[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v10 = new_chat_name
+        st.session_state.chat_sessions_v11[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v11 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v10.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v11.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v10 = chat_name
+            st.session_state.current_chat_v11 = chat_name
             st.rerun()
 
     st.markdown("---")
@@ -133,10 +133,10 @@ with st.sidebar:
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v10 not in st.session_state.chat_sessions_v10:
-    st.session_state.current_chat_v10 = list(st.session_state.chat_sessions_v10.keys())[0]
+if st.session_state.current_chat_v11 not in st.session_state.chat_sessions_v11:
+    st.session_state.current_chat_v11 = list(st.session_state.chat_sessions_v11.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v10[st.session_state.current_chat_v10]
+current_messages = st.session_state.chat_sessions_v11[st.session_state.current_chat_v11]
 
 # Display current chat messages
 for message in current_messages:
@@ -146,17 +146,17 @@ for message in current_messages:
             st.image(message["image_url"])
 
 # Native Streamlit Chat Input (Clean & Full Width)
-prompt = st.chat_input("Ask anything or ask to generate a high-quality image...")
+prompt = st.chat_input("Ask anything or type 'generate image of...' to create one...")
 
 if prompt:
-    if st.session_state.current_chat_v10.startswith("New Chat"):
+    if st.session_state.current_chat_v11.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v10:
+        if new_name in st.session_state.chat_sessions_v11:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v10[new_name] = st.session_state.chat_sessions_v10.pop(st.session_state.current_chat_v10)
-        st.session_state.current_chat_v10 = new_name
-        current_messages = st.session_state.chat_sessions_v10[new_name]
+        st.session_state.chat_sessions_v11[new_name] = st.session_state.chat_sessions_v11.pop(st.session_state.current_chat_v11)
+        st.session_state.current_chat_v11 = new_name
+        current_messages = st.session_state.chat_sessions_v11[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -171,13 +171,10 @@ if prompt:
         generated_image_url = None
         
         try:
-            p_lower = prompt.lower()
-            image_keywords = [
-                "generate", "genarate", "draw", "picture", "image", "photo", 
-                "chobi", "banao", "paint", "sketch", "art", "wallpaper", 
-                "portrait", "ghibli", "create"
-            ]
-            is_image_request = any(keyword in p_lower for keyword in image_keywords)
+            p_lower = prompt.lower().strip()
+            # Strict image command triggers
+            image_starters = ["generate image", "genarate image", "draw image", "create image", "make an image", "chobi banao", "chobi toiri koro", "draw a", "generate a picture", "create a picture", "banao ekta chobi"]
+            is_image_request = any(p_lower.startswith(starter) or f" {starter}" in p_lower for starter in image_starters)
             
             if is_image_request:
                 thinking_html = """
@@ -237,7 +234,7 @@ if prompt:
                     "You are Indian GPT, an advanced AI assistant created exclusively by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
                     "LANGUAGE INSTRUCTION: You are an Indian AI. You understand and can read/write all Indian regional languages (Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, etc.) as well as English. "
-                    "CRITICAL: If the user writes to you in Roman script (English letters) speaking Bengali, Hindi, or any Indian language (like 'tui kemon achhi', 'kya hal hai', 'aap kaise hain'), you MUST reply back in the exact same Roman script style (Banglish/Hinglish style using English letters) matching their vibe, unless they explicitly ask for another language or script. Never switch to Arabic, Urdu script, or random unrelated languages. Always maintain clear, friendly Indian tone."
+                    "CRITICAL: If the user writes to you in Roman script (English letters) speaking Bengali, Hindi, or any Indian language (like 'tui ki korchis', 'kya hal hai', 'aap kaise hain'), you MUST reply back in the exact same Roman script style (Banglish/Hinglish style using English letters) matching their vibe, unless they explicitly ask for another language or script. Never switch to Arabic, Urdu script, or random unrelated languages. Always maintain clear, friendly Indian tone."
                 )
                 
                 if search_context:
@@ -317,4 +314,3 @@ if prompt:
             st.rerun()    
         except Exception as e:
             st.error(f"Error: {e}")
-            
