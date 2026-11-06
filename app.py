@@ -64,18 +64,28 @@ AVAILABLE_KEYS = [k for k in [PRIMARY_KEY, SECONDARY_KEY] if k.strip() != ""]
 def get_active_key():
     return random.choice(AVAILABLE_KEYS) if AVAILABLE_KEYS else PRIMARY_KEY
 
-# Live Web Search Function (DuckDuckGo Grounding)
+# Live Web Search & Image Grounding Function (DuckDuckGo Search + Images)
 def search_web(query):
+    search_output = {"text": "", "images": []}
     try:
-        results = []
+        text_results = []
+        image_results = []
         with DDGS() as ddgs:
+            # Fetch text snippets
             for r in ddgs.text(query, max_results=3):
-                results.append(f"Source: {r.get('title')}\nContent: {r.get('body')}")
-        if results:
-            return "\n\n".join(results)
+                text_results.append(f"Source: {r.get('title')}\nContent: {r.get('body')}")
+            # Fetch relevant web images
+            for img in ddgs.images(query, max_results=3):
+                img_url = img.get("image")
+                if img_url:
+                    image_results.append(img_url)
+        
+        if text_results:
+            search_output["text"] = "\n\n".join(text_results)
+        search_output["images"] = image_results
     except:
         pass
-    return ""
+    return search_output
 
 # Function to dynamically fetch and auto-find available models from Groq API
 def get_available_models(api_key):
@@ -150,6 +160,11 @@ for message in current_messages:
         st.markdown(message["content"])
         if "image_url" in message and message["image_url"]:
             st.image(message["image_url"])
+        if "web_images" in message and message["web_images"]:
+            cols = st.columns(len(message["web_images"]))
+            for idx, img_u in enumerate(message["web_images"]):
+                with cols[idx]:
+                    st.image(img_u, use_column_width=True)
 
 # Native Streamlit Chat Input (Clean & Full Width)
 prompt = st.chat_input("Ask anything or type 'generate image of...' to create one...")
@@ -175,6 +190,7 @@ if prompt:
         
         full_response = ""
         generated_image_url = None
+        fetched_web_images = []
         
         try:
             p_lower = prompt.lower().strip()
@@ -204,21 +220,23 @@ if prompt:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
-                search_triggers = ["who won", "news", "score", "weather", "latest", "current", "price", "who is", "what is happening"]
-                needs_search = any(trig in p_lower for trig in search_triggers)
+                search_triggers = ["who won", "news", "score", "weather", "latest", "current", "price", "who is", "what is happening", "study", "syllabus", "board", "game", "code", "explain", "history", "science"]
+                needs_search = any(trig in p_lower for trig in search_triggers) or len(prompt.split()) > 2
                 
                 search_context = ""
                 if not is_simple_greeting and needs_search:
                     search_loading_html = """
                     <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
-                        <span>🌐 searching in the google</span>
+                        <span>🌐 searching in the google & gathering photos</span>
                         <span class="dot1" style="font-size: 20px;">.</span>
                         <span class="dot2" style="font-size: 20px;">.</span>
                         <span class="dot3" style="font-size: 20px;">.</span>
                     </div>
                     """
                     message_placeholder.markdown(search_loading_html, unsafe_allow_html=True)
-                    search_context = search_web(prompt)
+                    search_data = search_web(prompt)
+                    search_context = search_data["text"]
+                    fetched_web_images = search_data["images"]
                 else:
                     thinking_html = """
                     <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
@@ -237,8 +255,10 @@ if prompt:
                     f"Current Indian Standard Time (IST) is {current_time_str}. "
                     "You are Indian GPT, an advanced AI assistant created exclusively by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
-                    "CRITICAL LANGUAGE OVERRIDE: YOU MUST ONLY USE ENGLISH OR INDIAN LANGUAGES/SCRIPTS (BENGALI, HINDI, HINGLISCH, BANGLISH). "
-                    "NEVER WRITE IN ARABIC, PERSIAN, OR URDU SCRIPT. IF YOU WRITE ANY ARABIC, IT IS AN ERROR. REPLY ONLY IN ENGLISH OR THE USER'S EXACT LANGUAGE STYLE."
+                    "ACCURACY REQUIREMENT: Provide highly accurate, precise, and verified answers for all educational, coding, syllabus, gaming, and general knowledge questions. "
+                    "STRICT LANGUAGE LOCK (CRITICAL): You are allowed to communicate ONLY in English or in Indian languages and scripts (such as Bengali, Hindi, Hinglish, Banglish, or any regional Indian language/script). "
+                    "You must ALWAYS reply in the exact same language, script, and style as the user's input. "
+                    "ABSOLUTE PROHIBITION: You are strictly forbidden from using Arabic, Urdu script, Persian, or any other unrequested foreign language under any circumstances whatsoever."
                 )
                 
                 if search_context:
@@ -297,6 +317,11 @@ if prompt:
                                                 except:
                                                     pass
                                 message_placeholder.markdown(full_response)
+                                if fetched_web_images:
+                                    cols = st.columns(len(fetched_web_images))
+                                    for idx, img_u in enumerate(fetched_web_images):
+                                        with cols[idx]:
+                                            st.image(img_u, use_column_width=True)
                                 success = success or (len(full_response.strip()) > 0)
                                 if success:
                                     break
@@ -313,6 +338,8 @@ if prompt:
             assistant_msg = {"role": "assistant", "content": full_response}
             if generated_image_url:
                 assistant_msg["image_url"] = generated_image_url
+            if fetched_web_images:
+                assistant_msg["web_images"] = fetched_web_images
                 
             current_messages.append(assistant_msg)
             st.rerun()    
