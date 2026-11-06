@@ -10,14 +10,14 @@ from duckduckgo_search import DDGS
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
 
-# Custom CSS for Cyberpunk Theme & Green Sidebar Accents
+# Custom CSS for Cyberpunk Theme & Crystal Clear Text Contrast
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(rgba(5, 10, 25, 0.85), rgba(10, 15, 30, 0.95)), 
+        background: linear-gradient(rgba(5, 10, 25, 0.90), rgba(10, 15, 30, 0.98)), 
                     url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
         background-size: cover;
-        color: #ffffff;
+        color: #ffffff !important;
     }
     .stSidebar {
         background-color: rgba(15, 23, 42, 0.95) !important;
@@ -25,15 +25,19 @@ st.markdown("""
     .stSidebar * {
         color: #ffffff !important;
     }
-    h1, h2, h3, p, label {
+    h1, h2, h3, h4, h5, h6, p, span, label, li {
         color: #ffffff !important;
+        opacity: 1 !important;
+    }
+    .stMarkdown p, .stMarkdown div {
+        color: #f8fafc !important;
     }
     .stSidebar h3, .stSidebar label, .stSidebar span {
         color: #22c55e !important;
         font-weight: 700 !important;
     }
     .stChatInput textarea {
-        color: #2563eb !important;
+        color: #0f172a !important;
         background-color: #f8fafc !important;
         font-weight: 600 !important;
     }
@@ -96,33 +100,33 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States with a unique key
-if "chat_sessions_v11" not in st.session_state:
-    st.session_state.chat_sessions_v11 = {
+if "chat_sessions_v12" not in st.session_state:
+    st.session_state.chat_sessions_v12 = {
         "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or tell me to generate an image!"}]
     }
 
-if "current_chat_v11" not in st.session_state:
-    st.session_state.current_chat_v11 = "New Chat"
+if "current_chat_v12" not in st.session_state:
+    st.session_state.current_chat_v12 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v11:
+        while new_chat_name in st.session_state.chat_sessions_v12:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v11[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v11 = new_chat_name
+        st.session_state.chat_sessions_v12[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v12 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v11.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v12.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v11 = chat_name
+            st.session_state.current_chat_v12 = chat_name
             st.rerun()
 
     st.markdown("---")
@@ -133,10 +137,10 @@ with st.sidebar:
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v11 not in st.session_state.chat_sessions_v11:
-    st.session_state.current_chat_v11 = list(st.session_state.chat_sessions_v11.keys())[0]
+if st.session_state.current_chat_v12 not in st.session_state.chat_sessions_v12:
+    st.session_state.current_chat_v12 = list(st.session_state.chat_sessions_v12.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v11[st.session_state.current_chat_v11]
+current_messages = st.session_state.chat_sessions_v12[st.session_state.current_chat_v12]
 
 # Display current chat messages
 for message in current_messages:
@@ -149,14 +153,14 @@ for message in current_messages:
 prompt = st.chat_input("Ask anything or type 'generate image of...' to create one...")
 
 if prompt:
-    if st.session_state.current_chat_v11.startswith("New Chat"):
+    if st.session_state.current_chat_v12.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v11:
+        if new_name in st.session_state.chat_sessions_v12:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v11[new_name] = st.session_state.chat_sessions_v11.pop(st.session_state.current_chat_v11)
-        st.session_state.current_chat_v11 = new_name
-        current_messages = st.session_state.chat_sessions_v11[new_name]
+        st.session_state.chat_sessions_v12[new_name] = st.session_state.chat_sessions_v12.pop(st.session_state.current_chat_v12)
+        st.session_state.current_chat_v12 = new_name
+        current_messages = st.session_state.chat_sessions_v12[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -172,7 +176,6 @@ if prompt:
         
         try:
             p_lower = prompt.lower().strip()
-            # Strict image command triggers
             image_starters = ["generate image", "genarate image", "draw image", "create image", "make an image", "chobi banao", "chobi toiri koro", "draw a", "generate a picture", "create a picture", "banao ekta chobi"]
             is_image_request = any(p_lower.startswith(starter) or f" {starter}" in p_lower for starter in image_starters)
             
@@ -225,7 +228,6 @@ if prompt:
                     """
                     message_placeholder.markdown(thinking_html, unsafe_allow_html=True)
                 
-                # Indian Standard Time (IST - UTC+5:30)
                 ist = timezone(timedelta(hours=5, minutes=30))
                 current_time_str = datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S")
                 
