@@ -56,26 +56,36 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Hardcoded Groq API Key & Optional Secondary Secret Key Support
-PRIMARY_KEY = "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"
-SECONDARY_KEY = st.secrets.get("GROQ_API_KEY_2", "")
-AVAILABLE_KEYS = [k for k in [PRIMARY_KEY, SECONDARY_KEY] if k.strip() != ""]
+# Multiple API Keys Support (Tui ekhane aro key add korte paris list-er modhye)
+KEYS_POOL = [
+    "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",
+    # "ekhane tor maane onno kono key thakle paste korte paris",
+]
 
-def get_active_key():
-    return random.choice(AVAILABLE_KEYS) if AVAILABLE_KEYS else PRIMARY_KEY
+# Streamlit secrets thekeo key tule nibe jodi thake
+sec_key = st.secrets.get("GROQ_API_KEY_2", "")
+if sec_key and sec_key not in KEYS_POOL:
+    KEYS_POOL.append(sec_key)
 
-# Live Web Search & Image Grounding Function (DuckDuckGo Search + Images)
+def get_next_key(index):
+    return KEYS_POOL[index % len(KEYS_POOL)]
+
+# Live Web Search & Image Grounding Function (Enhanced for WBBSE & Accurate Data)
 def search_web(query):
     search_output = {"text": "", "images": []}
     try:
         text_results = []
         image_results = []
+        
+        q_lower = query.lower()
+        search_query = query
+        if "class 8" in q_lower or "wb board" in q_lower or "wbbse" in q_lower or "syllabus" in q_lower or "bangla" in q_lower:
+            search_query = f"WBBSE West Bengal board class 8 {query} syllabus books"
+            
         with DDGS() as ddgs:
-            # Fetch text snippets
-            for r in ddgs.text(query, max_results=3):
+            for r in ddgs.text(search_query, max_results=5):
                 text_results.append(f"Source: {r.get('title')}\nContent: {r.get('body')}")
-            # Fetch relevant web images
-            for img in ddgs.images(query, max_results=3):
+            for img in ddgs.images(search_query, max_results=3):
                 img_url = img.get("image")
                 if img_url:
                     image_results.append(img_url)
@@ -142,7 +152,7 @@ with st.sidebar:
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ Live Web Search & Full Memory Active")
+    st.caption("⚡ Live Web Search & Multi-Key Active")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
@@ -220,8 +230,12 @@ if prompt:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
-                search_triggers = ["who won", "news", "score", "weather", "latest", "current", "price", "who is", "what is happening", "study", "syllabus", "board", "game", "code", "explain", "history", "science"]
-                needs_search = any(trig in p_lower for trig in search_triggers) or len(prompt.split()) > 2
+                search_triggers = [
+                    "who won", "news", "score", "weather", "latest", "current", "price", 
+                    "who is", "what is happening", "syllabus", "board", "wbbse", "wb board", 
+                    "class 8", "class 9", "class 10", "exam routine", "result"
+                ]
+                needs_search = any(trig in p_lower for trig in search_triggers)
                 
                 search_context = ""
                 if not is_simple_greeting and needs_search:
@@ -273,18 +287,21 @@ if prompt:
                 
                 messages_payload.append({"role": "user", "content": prompt})
 
-                current_api_key = get_active_key()
-                models_to_test = get_available_models(current_api_key)
-                headers = {
-                    "Authorization": f"Bearer {current_api_key}",
-                    "Content-Type": "application/json"
-                }
-                
                 success = False
-                for attempt in range(2):
+                # Try multiple keys automatically if one hits rate limit
+                for key_idx in range(len(KEYS_POOL)):
                     if success:
                         break
+                    current_api_key = get_next_key(key_idx)
+                    models_to_test = get_available_models(current_api_key)
+                    headers = {
+                        "Authorization": f"Bearer {current_api_key}",
+                        "Content-Type": "application/json"
+                    }
+                    
                     for model_name in models_to_test:
+                        if success:
+                            break
                         payload = {
                             "model": model_name,
                             "messages": messages_payload,
