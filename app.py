@@ -218,15 +218,19 @@ if prompt:
                 img_prompt = urllib.parse.quote(enhanced_prompt)
                 generated_image_url = f"https://image.pollinations.ai/prompt/{img_prompt}?width=1024&height=1024&nologo=true"
                 
-                full_response = "Here is your high-quality generated image:"
+                full_response = "Here is your high-quality generated_image:"
                 message_placeholder.markdown(full_response)
                 st.image(generated_image_url)
             else:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
-                # STRICT SEARCH TRIGGERS: Only search when real-time info or specific news/scores are requested. Otherwise use model's internal memory.
-                search_triggers = ["who won", "news", "score", "weather", "latest", "current price", "what is happening today"]
+                # ENHANCED SEARCH TRIGGERS: Automatically searches web for factual questions, study topics, syllabus, news, or general lookups.
+                search_triggers = [
+                    "who won", "news", "score", "weather", "latest", "current price", "what is happening",
+                    "syllabus", "board", "wbbse", "wb board", "class", "exam", "history", "science", 
+                    "search", "find", "google", "information about", "tell me about", "what is", "who is", "when did"
+                ]
                 needs_search = any(trig in p_lower for trig in search_triggers)
                 
                 search_context = ""
