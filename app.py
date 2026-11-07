@@ -68,7 +68,7 @@ if sec_key and sec_key not in KEYS_POOL:
 def get_next_key(index):
     return KEYS_POOL[index % len(KEYS_POOL)]
 
-# Tavily AI Search API Integration (Text Only - No Random Photos)
+# Tavily AI Search API Integration (Smartly used ONLY for current/live facts)
 TAVILY_API_KEY = "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"
 
 def search_web(query):
@@ -78,10 +78,10 @@ def search_web(query):
             payload = {
                 "api_key": TAVILY_API_KEY,
                 "query": query,
-                "max_results": 5,
+                "max_results": 4,
                 "include_images": False
             }
-            resp = requests.post("https://api.tavily.com/search", json=payload, timeout=10)
+            resp = requests.post("https://api.tavily.com/search", json=payload, timeout=8)
             if resp.status_code == 200:
                 data = resp.json()
                 results = data.get("results", [])
@@ -116,47 +116,47 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States
-if "chat_sessions_v13" not in st.session_state:
-    st.session_state.chat_sessions_v13 = {
+if "chat_sessions_v14" not in st.session_state:
+    st.session_state.chat_sessions_v14 = {
         "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or tell me to generate an image!"}]
     }
 
-if "current_chat_v13" not in st.session_state:
-    st.session_state.current_chat_v13 = "New Chat"
+if "current_chat_v14" not in st.session_state:
+    st.session_state.current_chat_v14 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v13:
+        while new_chat_name in st.session_state.chat_sessions_v14:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v13[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v13 = new_chat_name
+        st.session_state.chat_sessions_v14[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v14 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v13.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v14.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v13 = chat_name
+            st.session_state.current_chat_v14 = chat_name
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ Tavily Text Search Active")
+    st.caption("⚡ Smart Hybrid AI Engine")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v13 not in st.session_state.chat_sessions_v13:
-    st.session_state.current_chat_v13 = list(st.session_state.chat_sessions_v13.keys())[0]
+if st.session_state.current_chat_v14 not in st.session_state.chat_sessions_v14:
+    st.session_state.current_chat_v14 = list(st.session_state.chat_sessions_v14.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v13[st.session_state.current_chat_v13]
+current_messages = st.session_state.chat_sessions_v14[st.session_state.current_chat_v14]
 
 # Display current chat messages
 for message in current_messages:
@@ -169,14 +169,14 @@ for message in current_messages:
 prompt = st.chat_input("Ask anything or type 'generate image of...' to create one...")
 
 if prompt:
-    if st.session_state.current_chat_v13.startswith("New Chat"):
+    if st.session_state.current_chat_v14.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v13:
+        if new_name in st.session_state.chat_sessions_v14:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v13[new_name] = st.session_state.chat_sessions_v13.pop(st.session_state.current_chat_v13)
-        st.session_state.current_chat_v13 = new_name
-        current_messages = st.session_state.chat_sessions_v13[new_name]
+        st.session_state.chat_sessions_v14[new_name] = st.session_state.chat_sessions_v12.pop(st.session_state.current_chat_v14) if "chat_sessions_v12" in st.session_state else st.session_state.chat_sessions_v14.pop(st.session_state.current_chat_v14)
+        st.session_state.current_chat_v14 = new_name
+        current_messages = st.session_state.chat_sessions_v14[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -218,9 +218,13 @@ if prompt:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
+                # SMART CONDITION: Only search if query explicitly asks about current winners, live scores, 2026 events, or recent news!
+                search_triggers = ["winner", "jiteche", "won", "match", "score", "news", "current", "ajke", "ekhon", "latest", "2026", "who won"]
+                needs_search = any(trigger in p_lower for trigger in search_triggers) and not is_simple_greeting
+                
                 search_context = ""
                 
-                if not is_simple_greeting:
+                if needs_search:
                     search_loading_html = """
                     <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
                         <span>🌐 searching live web info</span>
@@ -249,7 +253,7 @@ if prompt:
                     f"Current Indian Standard Time (IST) is {current_time_str}. "
                     "You are Indian GPT, an advanced AI assistant created exclusively by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
-                    "MANDATORY SEARCH GROUNDING: Use the provided Live Web Search Results to directly answer the user's question with exact facts, winners, and accurate data. Do not say information is unavailable if it is present in the search snippets. "
+                    "RELY ON YOUR EXTENSIVE KNOWLEDGE FIRST for general questions, coding, science, math, and concepts. Use search results ONLY if live web info is provided for recent news or current events. "
                     "STRICT LANGUAGE LOCK (CRITICAL): You are allowed to communicate ONLY in English or in Indian languages and scripts (such as Bengali, Hindi, Hinglish, Banglish, or any regional Indian language/script). "
                     "You must ALWAYS reply in the exact same language, script, and style as the user's input (e.g. if the user talks in Banglish/Bengali, reply in Banglish/Bengali). "
                     "FOREIGN LANGUAGE GUARD: If a user asks a question in any foreign language outside of English and Indian languages, strictly decline by replying ONLY in English: 'I only know Indian languages and English. I do not know any other language.'"
