@@ -69,16 +69,20 @@ if sec_key and sec_key not in KEYS_POOL:
 def get_next_key(index):
     return KEYS_POOL[index % len(KEYS_POOL)]
 
-# Live Web Search & Image Grounding Function (DuckDuckGo Search + Images)
+# Live Web Search & Image Grounding Function with Year Injection for accuracy
 def search_web(query):
     search_output = {"text": "", "images": []}
     try:
         text_results = []
         image_results = []
+        
+        # Automatically inject current year 2026 into query if asking about winners/current events
+        refined_query = f"{query} 2026" if "2026" not in query and ("winner" in query.lower() or "jiteche" in query.lower() or "won" in query.lower() or "who" in query.lower()) else query
+        
         with DDGS() as ddgs:
-            for r in ddgs.text(query, max_results=5):
+            for r in ddgs.text(refined_query, max_results=5):
                 text_results.append(f"Title: {r.get('title')}\nSnippet: {r.get('body')}")
-            for img in ddgs.images(query, max_results=3):
+            for img in ddgs.images(refined_query, max_results=3):
                 img_url = img.get("image")
                 if img_url:
                     image_results.append(img_url)
@@ -257,7 +261,7 @@ if prompt:
                     f"Current Indian Standard Time (IST) is {current_time_str}. "
                     "You are Indian GPT, an advanced AI assistant created exclusively by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
-                    "MANDATORY INSTRUCTION ON WEB SEARCH: You have live internet search results provided below. Always analyze and extract answers directly from the Live Web Search Results to answer the user accurately. Never claim you cannot browse the internet, and never say information is unavailable if it is present in the search snippets. "
+                    "MANDATORY WEB GROUNDING: You have live internet search results provided below. Read them carefully and use the exact facts, winners, and details found in the search results to answer the user. Never claim you cannot browse the internet, and never make up or guess facts if search results are provided. "
                     "STRICT LANGUAGE LOCK (CRITICAL): You are allowed to communicate ONLY in English or in Indian languages and scripts (such as Bengali, Hindi, Hinglish, Banglish, or any regional Indian language/script). "
                     "You must ALWAYS reply in the exact same language, script, and style as the user's input (e.g. if the user talks in Banglish/Bengali, reply in Banglish/Bengali). "
                     "FOREIGN LANGUAGE GUARD: If a user asks a question in any foreign language outside of English and Indian languages (such as Arabic, Urdu script, Persian, Chinese, French, Spanish, etc.), you must strictly decline by replying ONLY in English: "
