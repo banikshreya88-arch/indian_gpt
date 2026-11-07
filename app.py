@@ -76,8 +76,8 @@ def search_web(query):
         text_results = []
         image_results = []
         with DDGS() as ddgs:
-            for r in ddgs.text(query, max_results=4):
-                text_results.append(f"Source: {r.get('title')}\nContent: {r.get('body')}")
+            for r in ddgs.text(query, max_results=5):
+                text_results.append(f"Title: {r.get('title')}\nSnippet: {r.get('body')}")
             for img in ddgs.images(query, max_results=3):
                 img_url = img.get("image")
                 if img_url:
@@ -223,7 +223,6 @@ if prompt:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
-                # SMART UNIVERSAL SEARCH TRIGGER: For almost any non-greeting query, automatically fetch web context so it never says it can't browse!
                 search_context = ""
                 fetched_web_images = []
                 
@@ -258,7 +257,7 @@ if prompt:
                     f"Current Indian Standard Time (IST) is {current_time_str}. "
                     "You are Indian GPT, an advanced AI assistant created exclusively by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
-                    "BROWSING CAPABILITY: You have live internet search access via DuckDuckGo. Always use the provided Live Web Search Results to answer accurately. Never claim you cannot browse or lack internet access. "
+                    "MANDATORY INSTRUCTION ON WEB SEARCH: You have live internet search results provided below. Always analyze and extract answers directly from the Live Web Search Results to answer the user accurately. Never claim you cannot browse the internet, and never say information is unavailable if it is present in the search snippets. "
                     "STRICT LANGUAGE LOCK (CRITICAL): You are allowed to communicate ONLY in English or in Indian languages and scripts (such as Bengali, Hindi, Hinglish, Banglish, or any regional Indian language/script). "
                     "You must ALWAYS reply in the exact same language, script, and style as the user's input (e.g. if the user talks in Banglish/Bengali, reply in Banglish/Bengali). "
                     "FOREIGN LANGUAGE GUARD: If a user asks a question in any foreign language outside of English and Indian languages (such as Arabic, Urdu script, Persian, Chinese, French, Spanish, etc.), you must strictly decline by replying ONLY in English: "
