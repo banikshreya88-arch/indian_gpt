@@ -56,7 +56,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Multiple API Keys Pool (Tor notun key + purono key)
+# Groq API Keys Pool
 KEYS_POOL = [
     "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",
     "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",
@@ -69,20 +69,37 @@ if sec_key and sec_key not in KEYS_POOL:
 def get_next_key(index):
     return KEYS_POOL[index % len(KEYS_POOL)]
 
-# Live Web Search & Image Grounding Function with Year Injection for accuracy
+# Tavily AI Search API Integration (100% Stable & Accurate)
+TAVILY_API_KEY = "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"
+
 def search_web(query):
     search_output = {"text": "", "images": []}
     try:
+        # Use Tavily AI Search
+        if TAVILY_API_KEY:
+            payload = {
+                "api_key": TAVILY_API_KEY,
+                "query": query,
+                "max_results": 5,
+                "include_images": True
+            }
+            resp = requests.post("https://api.tavily.com/search", json=payload, timeout=10)
+            if resp.status_code == 200:
+                data = resp.json()
+                results = data.get("results", [])
+                text_snippets = [f"Title: {r.get('title')}\nContent: {r.get('content')}" for r in results]
+                search_output["text"] = "\n\n".join(text_snippets)
+                search_output["images"] = data.get("images", [])
+                if search_output["text"]:
+                    return search_output
+        
+        # Fallback to DuckDuckGo if needed
         text_results = []
         image_results = []
-        
-        # Automatically inject current year 2026 into query if asking about winners/current events
-        refined_query = f"{query} 2026" if "2026" not in query and ("winner" in query.lower() or "jiteche" in query.lower() or "won" in query.lower() or "who" in query.lower()) else query
-        
         with DDGS() as ddgs:
-            for r in ddgs.text(refined_query, max_results=5):
+            for r in ddgs.text(query, max_results=4):
                 text_results.append(f"Title: {r.get('title')}\nSnippet: {r.get('body')}")
-            for img in ddgs.images(refined_query, max_results=3):
+            for img in ddgs.images(query, max_results=3):
                 img_url = img.get("image")
                 if img_url:
                     image_results.append(img_url)
@@ -94,7 +111,7 @@ def search_web(query):
         pass
     return search_output
 
-# Function to dynamically fetch and auto-find available models from Groq API
+# Function to dynamically fetch available models from Groq API
 def get_available_models(api_key):
     default_models = [
         "llama-3.3-70b-versatile",
@@ -118,7 +135,7 @@ def get_available_models(api_key):
         pass
     return default_models
 
-# Initialize Session States with a unique key
+# Initialize Session States
 if "chat_sessions_v12" not in st.session_state:
     st.session_state.chat_sessions_v12 = {
         "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or tell me to generate an image!"}]
@@ -149,7 +166,7 @@ with st.sidebar:
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ Live Web Search & Multi-Key Active")
+    st.caption("⚡ Tavily AI Search & Multi-Key Active")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
@@ -173,7 +190,7 @@ for message in current_messages:
                 with cols[idx]:
                     st.image(img_u, use_column_width=True)
 
-# Native Streamlit Chat Input (Clean & Full Width)
+# Native Streamlit Chat Input
 prompt = st.chat_input("Ask anything or type 'generate image of...' to create one...")
 
 if prompt:
@@ -233,7 +250,7 @@ if prompt:
                 if not is_simple_greeting:
                     search_loading_html = """
                     <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
-                        <span>🌐 searching in the google & gathering photos</span>
+                        <span>🌐 searching in the tavily & gathering info</span>
                         <span class="dot1" style="font-size: 20px;">.</span>
                         <span class="dot2" style="font-size: 20px;">.</span>
                         <span class="dot3" style="font-size: 20px;">.</span>
@@ -261,7 +278,7 @@ if prompt:
                     f"Current Indian Standard Time (IST) is {current_time_str}. "
                     "You are Indian GPT, an advanced AI assistant created exclusively by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
-                    "MANDATORY WEB GROUNDING: You have live internet search results provided below. Read them carefully and use the exact facts, winners, and details found in the search results to answer the user. Never claim you cannot browse the internet, and never make up or guess facts if search results are provided. "
+                    "MANDATORY WEB GROUNDING: You have live search results provided below. Read them carefully and use the exact facts, winners, and details found in the search results to answer the user accurately. Never claim you cannot browse the internet, and never make up or guess facts if search results are provided. "
                     "STRICT LANGUAGE LOCK (CRITICAL): You are allowed to communicate ONLY in English or in Indian languages and scripts (such as Bengali, Hindi, Hinglish, Banglish, or any regional Indian language/script). "
                     "You must ALWAYS reply in the exact same language, script, and style as the user's input (e.g. if the user talks in Banglish/Bengali, reply in Banglish/Bengali). "
                     "FOREIGN LANGUAGE GUARD: If a user asks a question in any foreign language outside of English and Indian languages (such as Arabic, Urdu script, Persian, Chinese, French, Spanish, etc.), you must strictly decline by replying ONLY in English: "
