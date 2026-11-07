@@ -56,13 +56,12 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Multiple API Keys Support (Tui ekhane aro key add korte paris list-er modhye)
+# Multiple API Keys Pool (Tor notun key + purono key)
 KEYS_POOL = [
+    "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",
     "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",
-    # "ekhane tor maane onno kono key thakle paste korte paris",
 ]
 
-# Streamlit secrets thekeo key tule nibe jodi thake
 sec_key = st.secrets.get("GROQ_API_KEY_2", "")
 if sec_key and sec_key not in KEYS_POOL:
     KEYS_POOL.append(sec_key)
@@ -70,22 +69,18 @@ if sec_key and sec_key not in KEYS_POOL:
 def get_next_key(index):
     return KEYS_POOL[index % len(KEYS_POOL)]
 
-# Live Web Search & Image Grounding Function (Enhanced for WBBSE & Accurate Data)
+# Live Web Search & Image Grounding Function (DuckDuckGo Search + Images)
 def search_web(query):
     search_output = {"text": "", "images": []}
     try:
         text_results = []
         image_results = []
-        
-        q_lower = query.lower()
-        search_query = query
-        if "class 8" in q_lower or "wb board" in q_lower or "wbbse" in q_lower or "syllabus" in q_lower or "bangla" in q_lower:
-            search_query = f"WBBSE West Bengal board class 8 {query} syllabus books"
-            
         with DDGS() as ddgs:
-            for r in ddgs.text(search_query, max_results=5):
+            # Fetch text snippets
+            for r in ddgs.text(query, max_results=3):
                 text_results.append(f"Source: {r.get('title')}\nContent: {r.get('body')}")
-            for img in ddgs.images(search_query, max_results=3):
+            # Fetch relevant web images
+            for img in ddgs.images(query, max_results=3):
                 img_url = img.get("image")
                 if img_url:
                     image_results.append(img_url)
@@ -230,12 +225,8 @@ if prompt:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
-                search_triggers = [
-                    "who won", "news", "score", "weather", "latest", "current", "price", 
-                    "who is", "what is happening", "syllabus", "board", "wbbse", "wb board", 
-                    "class 8", "class 9", "class 10", "exam routine", "result"
-                ]
-                needs_search = any(trig in p_lower for trig in search_triggers)
+                search_triggers = ["who won", "news", "score", "weather", "latest", "current", "price", "who is", "what is happening", "study", "syllabus", "board", "game", "code", "explain", "history", "science"]
+                needs_search = any(trig in p_lower for trig in search_triggers) or len(prompt.split()) > 2
                 
                 search_context = ""
                 if not is_simple_greeting and needs_search:
@@ -288,7 +279,6 @@ if prompt:
                 messages_payload.append({"role": "user", "content": prompt})
 
                 success = False
-                # Try multiple keys automatically if one hits rate limit
                 for key_idx in range(len(KEYS_POOL)):
                     if success:
                         break
