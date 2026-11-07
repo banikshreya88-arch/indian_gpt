@@ -76,10 +76,8 @@ def search_web(query):
         text_results = []
         image_results = []
         with DDGS() as ddgs:
-            # Fetch text snippets
-            for r in ddgs.text(query, max_results=3):
+            for r in ddgs.text(query, max_results=4):
                 text_results.append(f"Source: {r.get('title')}\nContent: {r.get('body')}")
-            # Fetch relevant web images
             for img in ddgs.images(query, max_results=3):
                 img_url = img.get("image")
                 if img_url:
@@ -218,23 +216,18 @@ if prompt:
                 img_prompt = urllib.parse.quote(enhanced_prompt)
                 generated_image_url = f"https://image.pollinations.ai/prompt/{img_prompt}?width=1024&height=1024&nologo=true"
                 
-                full_response = "Here is your high-quality generated_image:"
+                full_response = "Here is your high-quality generated image:"
                 message_placeholder.markdown(full_response)
                 st.image(generated_image_url)
             else:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
-                # ENHANCED SEARCH TRIGGERS: Automatically searches web for factual questions, study topics, syllabus, news, or general lookups.
-                search_triggers = [
-                    "who won", "news", "score", "weather", "latest", "current price", "what is happening",
-                    "syllabus", "board", "wbbse", "wb board", "class", "exam", "history", "science", 
-                    "search", "find", "google", "information about", "tell me about", "what is", "who is", "when did"
-                ]
-                needs_search = any(trig in p_lower for trig in search_triggers)
-                
+                # SMART UNIVERSAL SEARCH TRIGGER: For almost any non-greeting query, automatically fetch web context so it never says it can't browse!
                 search_context = ""
-                if not is_simple_greeting and needs_search:
+                fetched_web_images = []
+                
+                if not is_simple_greeting:
                     search_loading_html = """
                     <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
                         <span>🌐 searching in the google & gathering photos</span>
@@ -265,7 +258,7 @@ if prompt:
                     f"Current Indian Standard Time (IST) is {current_time_str}. "
                     "You are Indian GPT, an advanced AI assistant created exclusively by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
-                    "ACCURACY REQUIREMENT: Provide highly accurate, precise, and verified answers for all educational, coding, syllabus, gaming, and general knowledge questions. "
+                    "BROWSING CAPABILITY: You have live internet search access via DuckDuckGo. Always use the provided Live Web Search Results to answer accurately. Never claim you cannot browse or lack internet access. "
                     "STRICT LANGUAGE LOCK (CRITICAL): You are allowed to communicate ONLY in English or in Indian languages and scripts (such as Bengali, Hindi, Hinglish, Banglish, or any regional Indian language/script). "
                     "You must ALWAYS reply in the exact same language, script, and style as the user's input (e.g. if the user talks in Banglish/Bengali, reply in Banglish/Bengali). "
                     "FOREIGN LANGUAGE GUARD: If a user asks a question in any foreign language outside of English and Indian languages (such as Arabic, Urdu script, Persian, Chinese, French, Spanish, etc.), you must strictly decline by replying ONLY in English: "
