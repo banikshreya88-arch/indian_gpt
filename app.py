@@ -5,7 +5,6 @@ import urllib.parse
 import time
 import random
 from datetime import datetime, timezone, timedelta
-from duckduckgo_search import DDGS
 
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
@@ -69,47 +68,28 @@ if sec_key and sec_key not in KEYS_POOL:
 def get_next_key(index):
     return KEYS_POOL[index % len(KEYS_POOL)]
 
-# Tavily AI Search API Integration (100% Stable & Accurate)
+# Tavily AI Search API Integration (Text Only - No Random Photos)
 TAVILY_API_KEY = "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"
 
 def search_web(query):
-    search_output = {"text": "", "images": []}
+    search_text = ""
     try:
-        # Use Tavily AI Search
         if TAVILY_API_KEY:
             payload = {
                 "api_key": TAVILY_API_KEY,
                 "query": query,
                 "max_results": 5,
-                "include_images": True
+                "include_images": False
             }
             resp = requests.post("https://api.tavily.com/search", json=payload, timeout=10)
             if resp.status_code == 200:
                 data = resp.json()
                 results = data.get("results", [])
                 text_snippets = [f"Title: {r.get('title')}\nContent: {r.get('content')}" for r in results]
-                search_output["text"] = "\n\n".join(text_snippets)
-                search_output["images"] = data.get("images", [])
-                if search_output["text"]:
-                    return search_output
-        
-        # Fallback to DuckDuckGo if needed
-        text_results = []
-        image_results = []
-        with DDGS() as ddgs:
-            for r in ddgs.text(query, max_results=4):
-                text_results.append(f"Title: {r.get('title')}\nSnippet: {r.get('body')}")
-            for img in ddgs.images(query, max_results=3):
-                img_url = img.get("image")
-                if img_url:
-                    image_results.append(img_url)
-        
-        if text_results:
-            search_output["text"] = "\n\n".join(text_results)
-        search_output["images"] = image_results
+                search_text = "\n\n".join(text_snippets)
     except:
         pass
-    return search_output
+    return search_text
 
 # Function to dynamically fetch available models from Groq API
 def get_available_models(api_key):
@@ -136,47 +116,47 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States
-if "chat_sessions_v12" not in st.session_state:
-    st.session_state.chat_sessions_v12 = {
+if "chat_sessions_v13" not in st.session_state:
+    st.session_state.chat_sessions_v13 = {
         "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or tell me to generate an image!"}]
     }
 
-if "current_chat_v12" not in st.session_state:
-    st.session_state.current_chat_v12 = "New Chat"
+if "current_chat_v13" not in st.session_state:
+    st.session_state.current_chat_v13 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v12:
+        while new_chat_name in st.session_state.chat_sessions_v13:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v12[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v12 = new_chat_name
+        st.session_state.chat_sessions_v13[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v13 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v12.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v13.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v12 = chat_name
+            st.session_state.current_chat_v13 = chat_name
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ Tavily AI Search & Multi-Key Active")
+    st.caption("⚡ Tavily Text Search Active")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v12 not in st.session_state.chat_sessions_v12:
-    st.session_state.current_chat_v12 = list(st.session_state.chat_sessions_v12.keys())[0]
+if st.session_state.current_chat_v13 not in st.session_state.chat_sessions_v13:
+    st.session_state.current_chat_v13 = list(st.session_state.chat_sessions_v13.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v12[st.session_state.current_chat_v12]
+current_messages = st.session_state.chat_sessions_v13[st.session_state.current_chat_v13]
 
 # Display current chat messages
 for message in current_messages:
@@ -184,24 +164,19 @@ for message in current_messages:
         st.markdown(message["content"])
         if "image_url" in message and message["image_url"]:
             st.image(message["image_url"])
-        if "web_images" in message and message["web_images"]:
-            cols = st.columns(len(message["web_images"]))
-            for idx, img_u in enumerate(message["web_images"]):
-                with cols[idx]:
-                    st.image(img_u, use_column_width=True)
 
 # Native Streamlit Chat Input
 prompt = st.chat_input("Ask anything or type 'generate image of...' to create one...")
 
 if prompt:
-    if st.session_state.current_chat_v12.startswith("New Chat"):
+    if st.session_state.current_chat_v13.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v12:
+        if new_name in st.session_state.chat_sessions_v13:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v12[new_name] = st.session_state.chat_sessions_v12.pop(st.session_state.current_chat_v12)
-        st.session_state.current_chat_v12 = new_name
-        current_messages = st.session_state.chat_sessions_v12[new_name]
+        st.session_state.chat_sessions_v13[new_name] = st.session_state.chat_sessions_v13.pop(st.session_state.current_chat_v13)
+        st.session_state.current_chat_v13 = new_name
+        current_messages = st.session_state.chat_sessions_v13[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -214,7 +189,6 @@ if prompt:
         
         full_response = ""
         generated_image_url = None
-        fetched_web_images = []
         
         try:
             p_lower = prompt.lower().strip()
@@ -245,21 +219,18 @@ if prompt:
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
                 search_context = ""
-                fetched_web_images = []
                 
                 if not is_simple_greeting:
                     search_loading_html = """
                     <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
-                        <span>🌐 searching in the tavily & gathering info</span>
+                        <span>🌐 searching live web info</span>
                         <span class="dot1" style="font-size: 20px;">.</span>
                         <span class="dot2" style="font-size: 20px;">.</span>
                         <span class="dot3" style="font-size: 20px;">.</span>
                     </div>
                     """
                     message_placeholder.markdown(search_loading_html, unsafe_allow_html=True)
-                    search_data = search_web(prompt)
-                    search_context = search_data["text"]
-                    fetched_web_images = search_data["images"]
+                    search_context = search_web(prompt)
                 else:
                     thinking_html = """
                     <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
@@ -278,12 +249,10 @@ if prompt:
                     f"Current Indian Standard Time (IST) is {current_time_str}. "
                     "You are Indian GPT, an advanced AI assistant created exclusively by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
-                    "MANDATORY WEB GROUNDING: You have live search results provided below. Read them carefully and use the exact facts, winners, and details found in the search results to answer the user accurately. Never claim you cannot browse the internet, and never make up or guess facts if search results are provided. "
+                    "MANDATORY SEARCH GROUNDING: Use the provided Live Web Search Results to directly answer the user's question with exact facts, winners, and accurate data. Do not say information is unavailable if it is present in the search snippets. "
                     "STRICT LANGUAGE LOCK (CRITICAL): You are allowed to communicate ONLY in English or in Indian languages and scripts (such as Bengali, Hindi, Hinglish, Banglish, or any regional Indian language/script). "
                     "You must ALWAYS reply in the exact same language, script, and style as the user's input (e.g. if the user talks in Banglish/Bengali, reply in Banglish/Bengali). "
-                    "FOREIGN LANGUAGE GUARD: If a user asks a question in any foreign language outside of English and Indian languages (such as Arabic, Urdu script, Persian, Chinese, French, Spanish, etc.), you must strictly decline by replying ONLY in English: "
-                    "'I only know Indian languages and English. I do not know any other language.' "
-                    "ABSOLUTE PROHIBITION: Never use Arabic, Urdu script, Persian, or any unrequested foreign language."
+                    "FOREIGN LANGUAGE GUARD: If a user asks a question in any foreign language outside of English and Indian languages, strictly decline by replying ONLY in English: 'I only know Indian languages and English. I do not know any other language.'"
                 )
                 
                 if search_context:
@@ -344,11 +313,6 @@ if prompt:
                                                 except:
                                                     pass
                                 message_placeholder.markdown(full_response)
-                                if fetched_web_images:
-                                    cols = st.columns(len(fetched_web_images))
-                                    for idx, img_u in enumerate(fetched_web_images):
-                                        with cols[idx]:
-                                            st.image(img_u, use_column_width=True)
                                 success = success or (len(full_response.strip()) > 0)
                                 if success:
                                     break
@@ -365,8 +329,6 @@ if prompt:
             assistant_msg = {"role": "assistant", "content": full_response}
             if generated_image_url:
                 assistant_msg["image_url"] = generated_image_url
-            if fetched_web_images:
-                assistant_msg["web_images"] = fetched_web_images
                 
             current_messages.append(assistant_msg)
             st.rerun()    
