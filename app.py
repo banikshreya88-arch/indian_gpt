@@ -115,34 +115,34 @@ def get_available_models(api_key):
         pass
     return default_models
 
-# Initialize Session States
-if "chat_sessions_v14" not in st.session_state:
-    st.session_state.chat_sessions_v14 = {
+# Initialize Session States cleanly
+if "chat_sessions_v15" not in st.session_state:
+    st.session_state.chat_sessions_v15 = {
         "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or tell me to generate an image!"}]
     }
 
-if "current_chat_v14" not in st.session_state:
-    st.session_state.current_chat_v14 = "New Chat"
+if "current_chat_v15" not in st.session_state:
+    st.session_state.current_chat_v15 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v14:
+        while new_chat_name in st.session_state.chat_sessions_v15:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v14[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v14 = new_chat_name
+        st.session_state.chat_sessions_v15[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v15 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v14.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v15.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v14 = chat_name
+            st.session_state.current_chat_v15 = chat_name
             st.rerun()
 
     st.markdown("---")
@@ -153,10 +153,10 @@ with st.sidebar:
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v14 not in st.session_state.chat_sessions_v14:
-    st.session_state.current_chat_v14 = list(st.session_state.chat_sessions_v14.keys())[0]
+if st.session_state.current_chat_v15 not in st.session_state.chat_sessions_v15:
+    st.session_state.current_chat_v15 = list(st.session_state.chat_sessions_v15.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v14[st.session_state.current_chat_v14]
+current_messages = st.session_state.chat_sessions_v15[st.session_state.current_chat_v15]
 
 # Display current chat messages
 for message in current_messages:
@@ -169,14 +169,14 @@ for message in current_messages:
 prompt = st.chat_input("Ask anything or type 'generate image of...' to create one...")
 
 if prompt:
-    if st.session_state.current_chat_v14.startswith("New Chat"):
+    if st.session_state.current_chat_v15.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v14:
+        if new_name in st.session_state.chat_sessions_v15:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v14[new_name] = st.session_state.chat_sessions_v12.pop(st.session_state.current_chat_v14) if "chat_sessions_v12" in st.session_state else st.session_state.chat_sessions_v14.pop(st.session_state.current_chat_v14)
-        st.session_state.current_chat_v14 = new_name
-        current_messages = st.session_state.chat_sessions_v14[new_name]
+        st.session_state.chat_sessions_v15[new_name] = st.session_state.chat_sessions_v15.pop(st.session_state.current_chat_v15)
+        st.session_state.current_chat_v15 = new_name
+        current_messages = st.session_state.chat_sessions_v15[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -218,7 +218,7 @@ if prompt:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
-                # SMART CONDITION: Only search if query explicitly asks about current winners, live scores, 2026 events, or recent news!
+                # Smart search triggers for live facts/news
                 search_triggers = ["winner", "jiteche", "won", "match", "score", "news", "current", "ajke", "ekhon", "latest", "2026", "who won"]
                 needs_search = any(trigger in p_lower for trigger in search_triggers) and not is_simple_greeting
                 
