@@ -225,8 +225,9 @@ if prompt:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
-                search_triggers = ["who won", "news", "score", "weather", "latest", "current", "price", "who is", "what is happening", "study", "syllabus", "board", "game", "code", "explain", "history", "science"]
-                needs_search = any(trig in p_lower for trig in search_triggers) or len(prompt.split()) > 2
+                # STRICT SEARCH TRIGGERS: Only search when real-time info or specific news/scores are requested. Otherwise use model's internal memory.
+                search_triggers = ["who won", "news", "score", "weather", "latest", "current price", "what is happening today"]
+                needs_search = any(trig in p_lower for trig in search_triggers)
                 
                 search_context = ""
                 if not is_simple_greeting and needs_search:
@@ -262,8 +263,10 @@ if prompt:
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
                     "ACCURACY REQUIREMENT: Provide highly accurate, precise, and verified answers for all educational, coding, syllabus, gaming, and general knowledge questions. "
                     "STRICT LANGUAGE LOCK (CRITICAL): You are allowed to communicate ONLY in English or in Indian languages and scripts (such as Bengali, Hindi, Hinglish, Banglish, or any regional Indian language/script). "
-                    "You must ALWAYS reply in the exact same language, script, and style as the user's input. "
-                    "ABSOLUTE PROHIBITION: You are strictly forbidden from using Arabic, Urdu script, Persian, or any other unrequested foreign language under any circumstances whatsoever."
+                    "You must ALWAYS reply in the exact same language, script, and style as the user's input (e.g. if the user talks in Banglish/Bengali, reply in Banglish/Bengali). "
+                    "FOREIGN LANGUAGE GUARD: If a user asks a question in any foreign language outside of English and Indian languages (such as Arabic, Urdu script, Persian, Chinese, French, Spanish, etc.), you must strictly decline by replying ONLY in English: "
+                    "'I only know Indian languages and English. I do not know any other language.' "
+                    "ABSOLUTE PROHIBITION: Never use Arabic, Urdu script, Persian, or any unrequested foreign language."
                 )
                 
                 if search_context:
