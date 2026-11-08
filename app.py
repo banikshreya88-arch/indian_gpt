@@ -3,7 +3,6 @@ import requests
 import json
 import urllib.parse
 import time
-import random
 from datetime import datetime, timezone, timedelta
 
 # Page Config
@@ -68,7 +67,7 @@ if sec_key and sec_key not in KEYS_POOL:
 def get_next_key(index):
     return KEYS_POOL[index % len(KEYS_POOL)]
 
-# Tavily AI Search API Integration (Smartly used ONLY for current/live facts)
+# Tavily AI Search API Integration
 TAVILY_API_KEY = "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"
 
 def search_web(query):
@@ -218,7 +217,6 @@ if prompt:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
-                # Smart search triggers for live facts/news
                 search_triggers = ["winner", "jiteche", "won", "match", "score", "news", "current", "ajke", "ekhon", "latest", "2026", "who won"]
                 needs_search = any(trigger in p_lower for trigger in search_triggers) and not is_simple_greeting
                 
@@ -249,14 +247,16 @@ if prompt:
                 ist = timezone(timedelta(hours=5, minutes=30))
                 current_time_str = datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S")
                 
+                # ULTRA-STRICT SYSTEM PROMPT & ABSOLUTE LANGUAGE LOCK
                 system_content = (
                     f"Current Indian Standard Time (IST) is {current_time_str}. "
                     "You are Indian GPT, an advanced AI assistant created exclusively by Shubham. "
                     "If anyone asks who created you or made you, always proudly answer that you were created by Shubham. "
-                    "RELY ON YOUR EXTENSIVE KNOWLEDGE FIRST for general questions, coding, science, math, and concepts. Use search results ONLY if live web info is provided for recent news or current events. "
-                    "STRICT LANGUAGE LOCK (CRITICAL): You are allowed to communicate ONLY in English or in Indian languages and scripts (such as Bengali, Hindi, Hinglish, Banglish, or any regional Indian language/script). "
-                    "You must ALWAYS reply in the exact same language, script, and style as the user's input (e.g. if the user talks in Banglish/Bengali, reply in Banglish/Bengali). "
-                    "FOREIGN LANGUAGE GUARD: If a user asks a question in any foreign language outside of English and Indian languages, strictly decline by replying ONLY in English: 'I only know Indian languages and English. I do not know any other language.'"
+                    "ABSOLUTE IRON-CLAD LANGUAGE LOCK (CRITICAL & NON-NEGOTIABLE): "
+                    "1. You are strictly and permanently FORBIDDEN from generating any text in Arabic, Persian, Urdu script, French, Spanish, Chinese, Japanese, or any other foreign language outside of English and Indian languages. "
+                    "2. You are allowed to communicate ONLY in English or in Indian languages and scripts (such as Bengali, Hindi, Hinglish, Banglish, or any regional Indian language/script). "
+                    "3. If the user inputs text in Arabic or any unallowed foreign language, you must REFUSE immediately and reply ONLY in English: 'I only know Indian languages and English. I do not know any other language.' "
+                    "4. You must ALWAYS match and reply in the exact same language, script, and style as the user's input (e.g. if the user talks in Banglish or Bengali, reply strictly in Banglish or Bengali)."
                 )
                 
                 if search_context:
