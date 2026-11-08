@@ -3,12 +3,13 @@ import requests
 import json
 import urllib.parse
 import time
+import random
 from datetime import datetime, timezone, timedelta
 
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
 
-# Custom CSS for Cyberpunk Theme & Crystal Clear Text
+# Custom CSS for Cyberpunk Theme & High Brightness AI Chip Background with Crystal Clear Text
 st.markdown("""
     <style>
     .stApp {
@@ -56,15 +57,18 @@ st.markdown("""
 
 # Groq API Keys Pool
 KEYS_POOL = [
-    "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",
     "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",
     "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",
 ]
 
+sec_key = st.secrets.get("GROQ_API_KEY_2", "")
+if sec_key and sec_key not in KEYS_POOL:
+    KEYS_POOL.append(sec_key)
+
 def get_next_key(index):
     return KEYS_POOL[index % len(KEYS_POOL)]
 
-# Tavily AI Search API Integration
+# Tavily AI Search API Integration (Smartly used ONLY for current/live facts)
 TAVILY_API_KEY = "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"
 
 def search_web(query):
@@ -87,76 +91,72 @@ def search_web(query):
         pass
     return search_text
 
-# Function to transcribe audio using Groq Whisper API
-def transcribe_audio_with_groq(audio_file, api_key):
+# Function to dynamically fetch available models from Groq API
+def get_available_models(api_key):
+    default_models = [
+        "llama-3.3-70b-versatile",
+        "llama-3.1-8b-instant",
+        "mixtral-8x7b-32768",
+        "gemma2-9b-it"
+    ]
     try:
-        url = "https://api.groq.com/openai/v1/audio/transcriptions"
         headers = {"Authorization": f"Bearer {api_key}"}
-        files = {"file": ("audio.wav", audio_file.getvalue(), "audio/wav")}
-        data = {"model": "whisper-large-v3", "language": "en"}
-        
-        response = requests.post(url, headers=headers, files=files, data=data, timeout=15)
+        response = requests.get("https://api.groq.com/openai/v1/models", headers=headers, timeout=5)
         if response.status_code == 200:
-            return response.json().get("text", "")
+            data = response.json().get("data", [])
+            fetched = []
+            for m in data:
+                m_id = m.get("id", "")
+                if not any(k in m_id.lower() for k in ["whisper", "guard", "orpheus", "audio"]):
+                    fetched.append(m_id)
+            if fetched:
+                return fetched
     except:
         pass
-    return ""
+    return default_models
 
 # Initialize Session States cleanly
-if "chat_sessions_v20" not in st.session_state:
-    st.session_state.chat_sessions_v20 = {
-        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or upload an audio file to chat via voice!"}]
+if "chat_sessions_v15" not in st.session_state:
+    st.session_state.chat_sessions_v15 = {
+        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or tell me to generate an image!"}]
     }
 
-if "current_chat_v20" not in st.session_state:
-    st.session_state.current_chat_v20 = "New Chat"
+if "current_chat_v15" not in st.session_state:
+    st.session_state.current_chat_v15 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v20:
+        while new_chat_name in st.session_state.chat_sessions_v15:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v20[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v20 = new_chat_name
+        st.session_state.chat_sessions_v15[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v15 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v20.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v15.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v20 = chat_name
+            st.session_state.current_chat_v15 = chat_name
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ Smart Hybrid AI & Whisper Audio")
+    st.caption("⚡ Smart Hybrid AI Engine")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
 st.title("🇮🇳 Indian GPT")
 
-# Voice Audio Uploader Panel
-with st.expander("🎙️ Voice Audio Input (Groq Whisper Powered)", expanded=False):
-    uploaded_audio = st.file_uploader("Upload recorded audio file (.wav, .mp3)", type=["wav", "mp3", "m4a", "ogg"])
-    if uploaded_audio is not None:
-        if st.button("Transcribe & Send Voice"):
-            with st.spinner("Transcribing audio via Groq Whisper..."):
-                transcribed_text = transcribe_audio_with_groq(uploaded_audio, KEYS_POOL[0])
-                if transcribed_text:
-                    st.session_state.transcribed_voice_prompt = transcribed_text
-                    st.rerun()
-                else:
-                    st.error("Could not transcribe audio. Please try again.")
-
 # Get current messages safely
-if st.session_state.current_chat_v20 not in st.session_state.chat_sessions_v20:
-    st.session_state.current_chat_v20 = list(st.session_state.chat_sessions_v20.keys())[0]
+if st.session_state.current_chat_v15 not in st.session_state.chat_sessions_v15:
+    st.session_state.current_chat_v15 = list(st.session_state.chat_sessions_v15.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v20[st.session_state.current_chat_v20]
+current_messages = st.session_state.chat_sessions_v15[st.session_state.current_chat_v15]
 
 # Display current chat messages
 for message in current_messages:
@@ -165,23 +165,18 @@ for message in current_messages:
         if "image_url" in message and message["image_url"]:
             st.image(message["image_url"])
 
-# Determine prompt from text input or transcribed voice
-text_prompt = st.chat_input("Ask anything or type 'generate image of...' to create one...")
-prompt = text_prompt
-
-if "transcribed_voice_prompt" in st.session_state and st.session_state.transcribed_voice_prompt:
-    prompt = st.session_state.transcribed_voice_prompt
-    st.session_state.transcribed_voice_prompt = None
+# Native Streamlit Chat Input
+prompt = st.chat_input("Ask anything or type 'generate image of...' to create one...")
 
 if prompt:
-    if st.session_state.current_chat_v20.startswith("New Chat"):
+    if st.session_state.current_chat_v15.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v20:
+        if new_name in st.session_state.chat_sessions_v15:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v20[new_name] = st.session_state.chat_sessions_v20.pop(st.session_state.current_chat_v20)
-        st.session_state.current_chat_v20 = new_name
-        current_messages = st.session_state.chat_sessions_v20[new_name]
+        st.session_state.chat_sessions_v15[new_name] = st.session_state.chat_sessions_v15.pop(st.session_state.current_chat_v15)
+        st.session_state.current_chat_v15 = new_name
+        current_messages = st.session_state.chat_sessions_v15[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -223,6 +218,7 @@ if prompt:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
+                # Smart search triggers for live facts/news
                 search_triggers = ["winner", "jiteche", "won", "match", "score", "news", "current", "ajke", "ekhon", "latest", "2026", "who won"]
                 needs_search = any(trigger in p_lower for trigger in search_triggers) and not is_simple_greeting
                 
@@ -280,52 +276,55 @@ if prompt:
                     if success:
                         break
                     current_api_key = get_next_key(key_idx)
+                    models_to_test = get_available_models(current_api_key)
                     headers = {
                         "Authorization": f"Bearer {current_api_key}",
                         "Content-Type": "application/json"
                     }
                     
-                    # Using the ultra-stable model to prevent deprecation or busy errors
-                    payload = {
-                        "model": "llama-3.1-8b-instant",
-                        "messages": messages_payload,
-                        "stream": True
-                    }
-                    
-                    try:
-                        response = requests.post(
-                            "https://api.groq.com/openai/v1/chat/completions",
-                            headers=headers,
-                            json=payload,
-                            stream=True,
-                            timeout=15
-                        )
+                    for model_name in models_to_test:
+                        if success:
+                            break
+                        payload = {
+                            "model": model_name,
+                            "messages": messages_payload,
+                            "stream": True
+                        }
                         
-                        if response.status_code == 200:
-                            for line in response.iter_lines():
-                                if line:
-                                    line_str = line.decode("utf-8")
-                                    if line_str.startswith("data: "):
-                                        json_str = line_str[6:]
-                                        if json_str != "[DONE]":
-                                            try:
-                                                body = json.loads(json_str)
-                                                delta = body["choices"][0]["delta"]
-                                                if "content" in delta and delta["content"]:
-                                                    resp_chunk = delta["content"]
-                                                    full_response += resp_chunk
-                                                    message_placeholder.markdown(full_response + "▌")
-                                            except:
-                                                pass
-                            message_placeholder.markdown(full_response)
-                            success = success or (len(full_response.strip()) > 0)
-                            if success:
-                                break
-                        elif response.status_code == 429:
-                            time.sleep(1)
+                        try:
+                            response = requests.post(
+                                "https://api.groq.com/openai/v1/chat/completions",
+                                headers=headers,
+                                json=payload,
+                                stream=True,
+                                timeout=15
+                            )
+                            
+                            if response.status_code == 200:
+                                for line in response.iter_lines():
+                                    if line:
+                                        line_str = line.decode("utf-8")
+                                        if line_str.startswith("data: "):
+                                            json_str = line_str[6:]
+                                            if json_str != "[DONE]":
+                                                try:
+                                                    body = json.loads(json_str)
+                                                    delta = body["choices"][0]["delta"]
+                                                    if "content" in delta and delta["content"]:
+                                                        resp_chunk = delta["content"]
+                                                        full_response += resp_chunk
+                                                        message_placeholder.markdown(full_response + "▌")
+                                                except:
+                                                    pass
+                                message_placeholder.markdown(full_response)
+                                success = success or (len(full_response.strip()) > 0)
+                                if success:
+                                    break
+                            elif response.status_code == 429:
+                                time.sleep(1)
+                                continue
+                        except:
                             continue
-                    except:
-                        continue
                 
                 if not success:
                     full_response = "Server is currently busy or rate limited. Please click send again!"
