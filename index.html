@@ -4,50 +4,88 @@
     <meta charset="UTF-8">
     <title>Indian GPT - Shubham</title>
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; padding: 50px; }
-        #chat { width: 400px; height: 300px; background: #1e293b; margin: 20px auto; padding: 15px; border-radius: 10px; overflow-y: auto; text-align: left; border: 1px solid #4ade80; }
-        input { width: 280px; padding: 10px; border-radius: 5px; border: none; }
-        button { padding: 10px 15px; background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; padding: 30px; }
+        #chat { width: 450px; height: 350px; background: #1e293b; margin: 20px auto; padding: 15px; border-radius: 10px; overflow-y: auto; text-align: left; border: 1px solid #4ade80; box-shadow: 0px 4px 10px rgba(0,0,0,0.5); }
+        .msg-user { color: #60a5fa; margin: 8px 0; }
+        .msg-ai { color: #4ade80; margin: 8px 0; }
+        .input-box { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+        input { width: 280px; padding: 12px; border-radius: 5px; border: 1px solid #475569; background: #0f172a; color: white; outline: none; }
+        input:focus { border-color: #4ade80; }
+        button { padding: 10px 15px; background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #1d4ed8; }
+        #mic-btn { background: #dc2626; }
     </style>
 </head>
 <body>
     <h1>🇮🇳 Indian GPT</h1>
     <p>Created by Shubham</p>
     
-    <div id="chat"><b>AI:</b> Hello! Kotha bolun ba type korun.</div>
+    <div id="chat"><b>AI:</b> Hello! Ami Indian GPT, Shubham-er toiri kora AI. Kotha bolun ba type korun!</div>
     
-    <input type="text" id="msg" placeholder="Type or click speak..." />
-    <button onclick="send()">Send</button>
-    <button onclick="mic()">🎙️ Speak</button>
+    <div class="input-box">
+        <input type="text" id="msg" placeholder="Type or click speak..." onkeydown="if(event.key==='Enter') send();" />
+        <button onclick="send()">Send</button>
+        <button id="mic-btn" onclick="mic()">🎙️ Speak</button>
+    </div>
 
     <script>
         const KEY = "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";
 
         async function send() {
-            let txt = document.getElementById('msg').value;
+            let inputField = document.getElementById('msg');
+            let txt = inputField.value.trim();
             if(!txt) return;
-            let chat = document.getElementById('chat');
-            chat.innerHTML += `<br><b>You:</b> ${txt}`;
-            document.getElementById('msg').value = "";
-
-            let res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                method: "POST",
-                headers: { "Authorization": "Bearer " + KEY, "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    model: "llama-3.3-70b-versatile",
-                    messages: [{role: "system", content: "You are Indian GPT, created by Shubham."}, {role: "user", content: txt}]
-                })
-            });
-            let data = await res.json();
-            let reply = data.choices[0].message.content;
-            chat.innerHTML += `<br><b>AI:</b> ${reply}`;
-            chat.scrollTop = chat.scrollHeight;
             
-            let speech = new SpeechSynthesisUtterance(reply);
-            window.speechSynthesis.speak(speech);
+            let chat = document.getElementById('chat');
+            chat.innerHTML += `<div class="msg-user"><b>You:</b> ${txt}</div>`;
+            inputField.value = "";
+            chat.scrollTop = chat.scrollHeight;
+
+            let loadingId = 'load-' + Date.now();
+            chat.innerHTML += `<div id="${loadingId}" class="msg-ai"><b>AI:</b> Thinking...</div>`;
+            chat.scrollTop = chat.scrollHeight;
+
+            try {
+                let res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST",
+                    headers: { 
+                        "Authorization": "Bearer " + KEY, 
+                        "Content-Type": "application/json" 
+                    },
+                    body: JSON.stringify({
+                        model: "llama-3.1-8b-instant",
+                        messages: [
+                            {role: "system", content: "You are Indian GPT, an advanced AI assistant created exclusively by Shubham. If anyone asks who created you or made you, always proudly answer that you were created by Shubham. Reply in the exact same language or script as the user."}, 
+                            {role: "user", content: txt}
+                        ]
+                    })
+                });
+
+                let data = await res.json();
+                document.getElementById(loadingId).remove();
+
+                if(data.choices && data.choices.length > 0) {
+                    let reply = data.choices[0].message.content;
+                    chat.innerHTML += `<div class="msg-ai"><b>AI:</b> ${reply}</div>`;
+                    chat.scrollTop = chat.scrollHeight;
+                    
+                    let speech = new SpeechSynthesisUtterance(reply);
+                    speech.lang = 'hi-IN';
+                    window.speechSynthesis.speak(speech);
+                } else {
+                    chat.innerHTML += `<div class="msg-ai" style="color:#f87171;"><b>AI:</b> Server busy. Please try again.</div>`;
+                }
+            } catch (err) {
+                document.getElementById(loadingId).remove();
+                chat.innerHTML += `<div class="msg-ai" style="color:#f87171;"><b>AI:</b> Connection error. Check internet.</div>`;
+            }
         }
 
         function mic() {
+            if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+                alert("Speech recognition is not supported in this browser. Please use Google Chrome.");
+                return;
+            }
             let rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             rec.lang = 'bn-IN';
             rec.onresult = (e) => {
@@ -58,4 +96,4 @@
         }
     </script>
 </body>
-</html>
+</html>s
