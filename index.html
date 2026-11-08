@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Indian GPT - Shubham</title>
+    <style>
+        body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; padding: 50px; }
+        #chat { width: 400px; height: 300px; background: #1e293b; margin: 20px auto; padding: 15px; border-radius: 10px; overflow-y: auto; text-align: left; border: 1px solid #4ade80; }
+        input { width: 280px; padding: 10px; border-radius: 5px; border: none; }
+        button { padding: 10px 15px; background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🇮🇳 Indian GPT</h1>
+    <p>Created by Shubham</p>
+    
+    <div id="chat"><b>AI:</b> Hello! Kotha bolun ba type korun.</div>
+    
+    <input type="text" id="msg" placeholder="Type or click speak..." />
+    <button onclick="send()">Send</button>
+    <button onclick="mic()">🎙️ Speak</button>
+
+    <script>
+        const KEY = "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";
+
+        async function send() {
+            let txt = document.getElementById('msg').value;
+            if(!txt) return;
+            let chat = document.getElementById('chat');
+            chat.innerHTML += `<br><b>You:</b> ${txt}`;
+            document.getElementById('msg').value = "";
+
+            let res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: { "Authorization": "Bearer " + KEY, "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    model: "llama-3.3-70b-versatile",
+                    messages: [{role: "system", content: "You are Indian GPT, created by Shubham."}, {role: "user", content: txt}]
+                })
+            });
+            let data = await res.json();
+            let reply = data.choices[0].message.content;
+            chat.innerHTML += `<br><b>AI:</b> ${reply}`;
+            chat.scrollTop = chat.scrollHeight;
+            
+            let speech = new SpeechSynthesisUtterance(reply);
+            window.speechSynthesis.speak(speech);
+        }
+
+        function mic() {
+            let rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            rec.lang = 'bn-IN';
+            rec.onresult = (e) => {
+                document.getElementById('msg').value = e.results[0][0].transcript;
+                send();
+            };
+            rec.start();
+        }
+    </script>
+</body>
+</html>
