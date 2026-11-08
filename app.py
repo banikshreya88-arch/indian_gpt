@@ -9,7 +9,7 @@ from datetime import datetime, timezone, timedelta
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
 
-# Custom CSS for Cyberpunk Theme & High Brightness AI Chip Background with Crystal Clear Text
+# Custom CSS for Cyberpunk Theme & Floating Mic Button inside Chat area
 st.markdown("""
     <style>
     .stApp {
@@ -68,7 +68,7 @@ if sec_key and sec_key not in KEYS_POOL:
 def get_next_key(index):
     return KEYS_POOL[index % len(KEYS_POOL)]
 
-# Tavily AI Search API Integration (Smartly used ONLY for current/live facts)
+# Tavily AI Search API Integration
 TAVILY_API_KEY = "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"
 
 def search_web(query):
@@ -152,43 +152,56 @@ with st.sidebar:
 # Main Header
 st.title("🇮🇳 Indian GPT")
 
-# Voice Input HTML/JS Button Widget (Mic feature)
-voice_html = """
-<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-    <button onclick="startListening()" style="background-color: #2563eb; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0px 4px 6px rgba(0,0,0,0.3);">
-        🎙️ Click to Speak (Voice Input)
+# Floating Voice Mic Button Widget (Designed like screenshot)
+mic_html = """
+<div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: -15px; margin-bottom: 10px;">
+    <button id="micBtn" onclick="toggleMic()" style="background-color: #1e293b; color: #4ade80; border: 1px solid #4ade80; padding: 6px 12px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0px 2px 4px rgba(0,0,0,0.4);">
+        🎙️ Speak
     </button>
-    <span id="voiceStatus" style="font-style: italic; color: #a5b4fc; font-size: 14px;"></span>
+    <span id="micStatus" style="font-size: 13px; color: #94a3b8; font-style: italic;"></span>
 </div>
 
 <script>
-function startListening() {
+function toggleMic() {
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'bn-IN'; // Bengali / Indian support
+    recognition.lang = 'bn-IN';
     recognition.interimResults = false;
     
-    document.getElementById("voiceStatus").innerText = "Listening... kotha bolun...";
+    document.getElementById("micStatus").innerText = "Listening...";
+    document.getElementById("micBtn").style.backgroundColor = "#dc2626";
+    document.getElementById("micBtn").style.color = "#ffffff";
     
     recognition.onresult = function(event) {
-        const speechToText = event.results[0][0].transcript;
-        document.getElementById("voiceStatus").innerText = "You said: " + speechToText;
+        const text = event.results[0][0].transcript;
+        document.getElementById("micStatus").innerText = "Heard: " + text;
         
         const chatInput = document.querySelector('textarea[aria-label*="chat"]');
         if (chatInput) {
-            chatInput.value = speechToText;
+            chatInput.value = text;
             chatInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
+        resetMicBtn();
     };
     
-    recognition.onerror = function(event) {
-        document.getElementById("voiceStatus").innerText = "Voice error, please try again.";
+    recognition.onerror = function() {
+        document.getElementById("micStatus").innerText = "Error. Try again.";
+        resetMicBtn();
+    };
+    
+    recognition.onend = function() {
+        resetMicBtn();
     };
     
     recognition.start();
 }
+
+function resetMicBtn() {
+    document.getElementById("micBtn").style.backgroundColor = "#1e293b";
+    document.getElementById("micBtn").style.color = "#4ade80";
+}
 </script>
 """
-st.markdown(voice_html, unsafe_allow_html=True)
+st.markdown(mic_html, unsafe_allow_html=True)
 
 # Get current messages safely
 if st.session_state.current_chat_v15 not in st.session_state.chat_sessions_v15:
