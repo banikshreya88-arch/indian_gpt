@@ -9,7 +9,7 @@ from datetime import datetime, timezone, timedelta
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
 
-# Custom CSS for Cyberpunk Theme & Floating Mic Button inside Chat area
+# Custom CSS for Cyberpunk Theme & Crystal Clear Text
 st.markdown("""
     <style>
     .stApp {
@@ -55,8 +55,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Groq API Keys Pool
+# Groq API Keys Pool (including your new key)
 KEYS_POOL = [
+    "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",
     "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",
     "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",
 ]
@@ -91,6 +92,21 @@ def search_web(query):
         pass
     return search_text
 
+# Function to transcribe audio using Groq Whisper API
+def transcribe_audio_with_groq(audio_file, api_key):
+    try:
+        url = "https://api.groq.com/openai/v1/audio/transcriptions"
+        headers = {"Authorization": f"Bearer {api_key}"}
+        files = {"file": ("audio.wav", audio_file.getvalue(), "audio/wav")}
+        data = {"model": "whisper-large-v3", "language": "en"}
+        
+        response = requests.post(url, headers=headers, files=files, data=data, timeout=15)
+        if response.status_code == 200:
+            return response.json().get("text", "")
+    except:
+        pass
+    return ""
+
 # Function to dynamically fetch available models from Groq API
 def get_available_models(api_key):
     default_models = [
@@ -116,98 +132,60 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States cleanly
-if "chat_sessions_v15" not in st.session_state:
-    st.session_state.chat_sessions_v15 = {
-        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or tell me to generate an image!"}]
+if "chat_sessions_v20" not in st.session_state:
+    st.session_state.chat_sessions_v20 = {
+        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or upload an audio file to chat via voice!"}]
     }
 
-if "current_chat_v15" not in st.session_state:
-    st.session_state.current_chat_v15 = "New Chat"
+if "current_chat_v20" not in st.session_state:
+    st.session_state.current_chat_v20 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v15:
+        while new_chat_name in st.session_state.chat_sessions_v20:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v15[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v15 = new_chat_name
+        st.session_state.chat_sessions_v20[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v20 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v15.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v20.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v15 = chat_name
+            st.session_state.current_chat_v20 = chat_name
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ Smart Hybrid AI Engine")
+    st.caption("⚡ Smart Hybrid AI & Whisper Audio")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
 st.title("🇮🇳 Indian GPT")
 
-# Floating Voice Mic Button Widget (Designed like screenshot)
-mic_html = """
-<div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: -15px; margin-bottom: 10px;">
-    <button id="micBtn" onclick="toggleMic()" style="background-color: #1e293b; color: #4ade80; border: 1px solid #4ade80; padding: 6px 12px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0px 2px 4px rgba(0,0,0,0.4);">
-        🎙️ Speak
-    </button>
-    <span id="micStatus" style="font-size: 13px; color: #94a3b8; font-style: italic;"></span>
-</div>
-
-<script>
-function toggleMic() {
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'bn-IN';
-    recognition.interimResults = false;
-    
-    document.getElementById("micStatus").innerText = "Listening...";
-    document.getElementById("micBtn").style.backgroundColor = "#dc2626";
-    document.getElementById("micBtn").style.color = "#ffffff";
-    
-    recognition.onresult = function(event) {
-        const text = event.results[0][0].transcript;
-        document.getElementById("micStatus").innerText = "Heard: " + text;
-        
-        const chatInput = document.querySelector('textarea[aria-label*="chat"]');
-        if (chatInput) {
-            chatInput.value = text;
-            chatInput.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-        resetMicBtn();
-    };
-    
-    recognition.onerror = function() {
-        document.getElementById("micStatus").innerText = "Error. Try again.";
-        resetMicBtn();
-    };
-    
-    recognition.onend = function() {
-        resetMicBtn();
-    };
-    
-    recognition.start();
-}
-
-function resetMicBtn() {
-    document.getElementById("micBtn").style.backgroundColor = "#1e293b";
-    document.getElementById("micBtn").style.color = "#4ade80";
-}
-</script>
-"""
-st.markdown(mic_html, unsafe_allow_html=True)
+# Voice Audio Uploader Panel (100% Reliable without browser glitches)
+with st.expander("🎙️ Voice Audio Input (Groq Whisper Powered)", expanded=False):
+    uploaded_audio = st.file_uploader("Upload recorded audio file (.wav, .mp3)", type=["wav", "mp3", "m4a", "ogg"])
+    if uploaded_audio is not None:
+        if st.button("Transcribe & Send Voice"):
+            with st.spinner("Transcribing audio via Groq Whisper..."):
+                transcribed_text = transcribe_audio_with_groq(uploaded_audio, KEYS_POOL[0])
+                if transcribed_text:
+                    st.session_state.transcribed_voice_prompt = transcribed_text
+                    st.rerun()
+                else:
+                    st.error("Could not transcribe audio. Please try again.")
 
 # Get current messages safely
-if st.session_state.current_chat_v15 not in st.session_state.chat_sessions_v15:
-    st.session_state.current_chat_v15 = list(st.session_state.chat_sessions_v15.keys())[0]
+if st.session_state.current_chat_v20 not in st.session_state.chat_sessions_v20:
+    st.session_state.current_chat_v20 = list(st.session_state.chat_sessions_v20.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v15[st.session_state.current_chat_v15]
+current_messages = st.session_state.chat_sessions_v20[st.session_state.current_chat_v20]
 
 # Display current chat messages
 for message in current_messages:
@@ -216,18 +194,23 @@ for message in current_messages:
         if "image_url" in message and message["image_url"]:
             st.image(message["image_url"])
 
-# Native Streamlit Chat Input
-prompt = st.chat_input("Ask anything or type 'generate image of...' to create one...")
+# Determine prompt from text input or transcribed voice
+text_prompt = st.chat_input("Ask anything or type 'generate image of...' to create one...")
+prompt = text_prompt
+
+if "transcribed_voice_prompt" in st.session_state and st.session_state.transcribed_voice_prompt:
+    prompt = st.session_state.transcribed_voice_prompt
+    st.session_state.transcribed_voice_prompt = None
 
 if prompt:
-    if st.session_state.current_chat_v15.startswith("New Chat"):
+    if st.session_state.current_chat_v20.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v15:
+        if new_name in st.session_state.chat_sessions_v20:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v15[new_name] = st.session_state.chat_sessions_v15.pop(st.session_state.current_chat_v15)
-        st.session_state.current_chat_v15 = new_name
-        current_messages = st.session_state.chat_sessions_v15[new_name]
+        st.session_state.chat_sessions_v20[new_name] = st.session_state.chat_sessions_v20.pop(st.session_state.current_chat_v20)
+        st.session_state.current_chat_v20 = new_name
+        current_messages = st.session_state.chat_sessions_v20[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
