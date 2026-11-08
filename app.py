@@ -152,6 +152,44 @@ with st.sidebar:
 # Main Header
 st.title("🇮🇳 Indian GPT")
 
+# Voice Input HTML/JS Button Widget (Mic feature)
+voice_html = """
+<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+    <button onclick="startListening()" style="background-color: #2563eb; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0px 4px 6px rgba(0,0,0,0.3);">
+        🎙️ Click to Speak (Voice Input)
+    </button>
+    <span id="voiceStatus" style="font-style: italic; color: #a5b4fc; font-size: 14px;"></span>
+</div>
+
+<script>
+function startListening() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'bn-IN'; // Bengali / Indian support
+    recognition.interimResults = false;
+    
+    document.getElementById("voiceStatus").innerText = "Listening... kotha bolun...";
+    
+    recognition.onresult = function(event) {
+        const speechToText = event.results[0][0].transcript;
+        document.getElementById("voiceStatus").innerText = "You said: " + speechToText;
+        
+        const chatInput = document.querySelector('textarea[aria-label*="chat"]');
+        if (chatInput) {
+            chatInput.value = speechToText;
+            chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    };
+    
+    recognition.onerror = function(event) {
+        document.getElementById("voiceStatus").innerText = "Voice error, please try again.";
+    };
+    
+    recognition.start();
+}
+</script>
+"""
+st.markdown(voice_html, unsafe_allow_html=True)
+
 # Get current messages safely
 if st.session_state.current_chat_v15 not in st.session_state.chat_sessions_v15:
     st.session_state.current_chat_v15 = list(st.session_state.chat_sessions_v15.keys())[0]
@@ -218,7 +256,6 @@ if prompt:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
                 
-                # Smart search triggers for live facts/news
                 search_triggers = ["winner", "jiteche", "won", "match", "score", "news", "current", "ajke", "ekhon", "latest", "2026", "who won"]
                 needs_search = any(trigger in p_lower for trigger in search_triggers) and not is_simple_greeting
                 
