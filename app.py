@@ -3,7 +3,6 @@ import requests
 import json
 import urllib.parse
 import time
-import random
 from datetime import datetime, timezone, timedelta
 
 # Page Config
@@ -55,16 +54,12 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Groq API Keys Pool (including your new key)
+# Groq API Keys Pool
 KEYS_POOL = [
     "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",
     "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",
     "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",
 ]
-
-sec_key = st.secrets.get("GROQ_API_KEY_2", "")
-if sec_key and sec_key not in KEYS_POOL:
-    KEYS_POOL.append(sec_key)
 
 def get_next_key(index):
     return KEYS_POOL[index % len(KEYS_POOL)]
@@ -107,30 +102,6 @@ def transcribe_audio_with_groq(audio_file, api_key):
         pass
     return ""
 
-# Function to dynamically fetch available models from Groq API
-def get_available_models(api_key):
-    default_models = [
-        "llama-3.3-70b-versatile",
-        "llama-3.1-8b-instant",
-        "mixtral-8x7b-32768",
-        "gemma2-9b-it"
-    ]
-    try:
-        headers = {"Authorization": f"Bearer {api_key}"}
-        response = requests.get("https://api.groq.com/openai/v1/models", headers=headers, timeout=5)
-        if response.status_code == 200:
-            data = response.json().get("data", [])
-            fetched = []
-            for m in data:
-                m_id = m.get("id", "")
-                if not any(k in m_id.lower() for k in ["whisper", "guard", "orpheus", "audio"]):
-                    fetched.append(m_id)
-            if fetched:
-                return fetched
-    except:
-        pass
-    return default_models
-
 # Initialize Session States cleanly
 if "chat_sessions_v20" not in st.session_state:
     st.session_state.chat_sessions_v20 = {
@@ -168,7 +139,7 @@ with st.sidebar:
 # Main Header
 st.title("🇮🇳 Indian GPT")
 
-# Voice Audio Uploader Panel (100% Reliable without browser glitches)
+# Voice Audio Uploader Panel
 with st.expander("🎙️ Voice Audio Input (Groq Whisper Powered)", expanded=False):
     uploaded_audio = st.file_uploader("Upload recorded audio file (.wav, .mp3)", type=["wav", "mp3", "m4a", "ogg"])
     if uploaded_audio is not None:
@@ -309,55 +280,52 @@ if prompt:
                     if success:
                         break
                     current_api_key = get_next_key(key_idx)
-                    models_to_test = get_available_models(current_api_key)
                     headers = {
                         "Authorization": f"Bearer {current_api_key}",
                         "Content-Type": "application/json"
                     }
                     
-                    for model_name in models_to_test:
-                        if success:
-                            break
-                        payload = {
-                            "model": model_name,
-                            "messages": messages_payload,
-                            "stream": True
-                        }
+                    # Using the ultra-stable model to prevent deprecation or busy errors
+                    payload = {
+                        "model": "llama-3.1-8b-instant",
+                        "messages": messages_payload,
+                        "stream": True
+                    }
+                    
+                    try:
+                        response = requests.post(
+                            "https://api.groq.com/openai/v1/chat/completions",
+                            headers=headers,
+                            json=payload,
+                            stream=True,
+                            timeout=15
+                        )
                         
-                        try:
-                            response = requests.post(
-                                "https://api.groq.com/openai/v1/chat/completions",
-                                headers=headers,
-                                json=payload,
-                                stream=True,
-                                timeout=15
-                            )
-                            
-                            if response.status_code == 200:
-                                for line in response.iter_lines():
-                                    if line:
-                                        line_str = line.decode("utf-8")
-                                        if line_str.startswith("data: "):
-                                            json_str = line_str[6:]
-                                            if json_str != "[DONE]":
-                                                try:
-                                                    body = json.loads(json_str)
-                                                    delta = body["choices"][0]["delta"]
-                                                    if "content" in delta and delta["content"]:
-                                                        resp_chunk = delta["content"]
-                                                        full_response += resp_chunk
-                                                        message_placeholder.markdown(full_response + "▌")
-                                                except:
-                                                    pass
-                                message_placeholder.markdown(full_response)
-                                success = success or (len(full_response.strip()) > 0)
-                                if success:
-                                    break
-                            elif response.status_code == 429:
-                                time.sleep(1)
-                                continue
-                        except:
+                        if response.status_code == 200:
+                            for line in response.iter_lines():
+                                if line:
+                                    line_str = line.decode("utf-8")
+                                    if line_str.startswith("data: "):
+                                        json_str = line_str[6:]
+                                        if json_str != "[DONE]":
+                                            try:
+                                                body = json.loads(json_str)
+                                                delta = body["choices"][0]["delta"]
+                                                if "content" in delta and delta["content"]:
+                                                    resp_chunk = delta["content"]
+                                                    full_response += resp_chunk
+                                                    message_placeholder.markdown(full_response + "▌")
+                                            except:
+                                                pass
+                            message_placeholder.markdown(full_response)
+                            success = success or (len(full_response.strip()) > 0)
+                            if success:
+                                break
+                        elif response.status_code == 429:
+                            time.sleep(1)
                             continue
+                    except:
+                        continue
                 
                 if not success:
                     full_response = "Server is currently busy or rate limited. Please click send again!"
