@@ -54,8 +54,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Groq API Keys Pool
+# Groq API Keys Pool (Updated with your fresh key)
 KEYS_POOL = [
+    "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",
     "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",
     "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",
 ]
