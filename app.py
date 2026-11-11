@@ -54,7 +54,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Groq API Keys Pool (Updated with your fresh key)
+# Groq API Keys Pool
 KEYS_POOL = [
     "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",
     "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",
@@ -91,7 +91,7 @@ def search_web(query):
         pass
     return search_text
 
-# Function to dynamically fetch available models from Groq API
+# Function to fetch available models from Groq API
 def get_available_models(api_key):
     default_models = [
         "llama-3.3-70b-versatile",
@@ -116,67 +116,67 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States cleanly
-if "chat_sessions_v15" not in st.session_state:
-    st.session_state.chat_sessions_v15 = {
-        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or tell me to generate an image!"}]
+if "chat_sessions_v30" not in st.session_state:
+    st.session_state.chat_sessions_v30 = {
+        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or type 'generate image of...' to create a high-quality photo!"}]
     }
 
-if "current_chat_v15" not in st.session_state:
-    st.session_state.current_chat_v15 = "New Chat"
+if "current_chat_v30" not in st.session_state:
+    st.session_state.current_chat_v30 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v15:
+        while new_chat_name in st.session_state.chat_sessions_v30:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v15[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v15 = new_chat_name
+        st.session_state.chat_sessions_v30[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v30 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v15.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v30.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v15 = chat_name
+            st.session_state.current_chat_v30 = chat_name
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ Smart Hybrid AI Engine")
+    st.caption("⚡ Hugging Face & Hybrid AI Engine")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v15 not in st.session_state.chat_sessions_v15:
-    st.session_state.current_chat_v15 = list(st.session_state.chat_sessions_v15.keys())[0]
+if st.session_state.current_chat_v30 not in st.session_state.chat_sessions_v30:
+    st.session_state.current_chat_v30 = list(st.session_state.chat_sessions_v30.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v15[st.session_state.current_chat_v15]
+current_messages = st.session_state.chat_sessions_v30[st.session_state.current_chat_v30]
 
 # Display current chat messages
 for message in current_messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-        if "image_url" in message and message["image_url"]:
-            st.image(message["image_url"])
+        if "image_bytes" in message and message["image_bytes"]:
+            st.image(message["image_bytes"])
 
 # Native Streamlit Chat Input
 prompt = st.chat_input("Ask anything or type 'generate image of...' to create one...")
 
 if prompt:
-    if st.session_state.current_chat_v15.startswith("New Chat"):
+    if st.session_state.current_chat_v30.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v15:
+        if new_name in st.session_state.chat_sessions_v30:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v15[new_name] = st.session_state.chat_sessions_v15.pop(st.session_state.current_chat_v15)
-        st.session_state.current_chat_v15 = new_name
-        current_messages = st.session_state.chat_sessions_v15[new_name]
+        st.session_state.chat_sessions_v30[new_name] = st.session_state.chat_sessions_v30.pop(st.session_state.current_chat_v30)
+        st.session_state.current_chat_v30 = new_name
+        current_messages = st.session_state.chat_sessions_v30[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -188,7 +188,7 @@ if prompt:
         message_placeholder = st.empty()
         
         full_response = ""
-        generated_image_url = None
+        generated_image_bytes = None
         
         try:
             p_lower = prompt.lower().strip()
@@ -198,22 +198,32 @@ if prompt:
             if is_image_request:
                 thinking_html = """
                 <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
-                    <span>🎨 creating high-quality masterpiece</span>
+                    <span>🎨 Generating High-Quality Image via Hugging Face...</span>
                     <span class="dot1" style="font-size: 20px;">.</span>
                     <span class="dot2" style="font-size: 20px;">.</span>
                     <span class="dot3" style="font-size: 20px;">.</span>
                 </div>
                 """
                 message_placeholder.markdown(thinking_html, unsafe_allow_html=True)
-                time.sleep(1)
                 
-                enhanced_prompt = f"{prompt}, highly detailed, cinematic lighting, 8k resolution, masterpiece, professional digital art, sharp focus"
-                img_prompt = urllib.parse.quote(enhanced_prompt)
-                generated_image_url = f"https://image.pollinations.ai/prompt/{img_prompt}?width=1024&height=1024&nologo=true"
+                # Hugging Face Free Public API Endpoint for Stable Diffusion XL
+                hf_url = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
+                hf_headers = {"Content-Type": "application/json"}
+                hf_payload = {"inputs": prompt}
                 
-                full_response = "Here is your high-quality generated image:"
+                try:
+                    img_resp = requests.post(hf_url, headers=hf_headers, json=hf_payload, timeout=30)
+                    if img_resp.status_code == 200:
+                        generated_image_bytes = img_resp.content
+                        full_response = "Here is your generated image using Hugging Face SDXL:"
+                    else:
+                        full_response = "Image model is currently loading on Hugging Face servers. Please try again in 10 seconds!"
+                except:
+                    full_response = "Image generation request timed out. Please try again!"
+                
                 message_placeholder.markdown(full_response)
-                st.image(generated_image_url)
+                if generated_image_bytes:
+                    st.image(generated_image_bytes)
             else:
                 greetings = ["hi", "hello", "hey", "hii", "hola", "sup", "good morning", "good evening", "bye"]
                 is_simple_greeting = prompt.lower().strip() in greetings
@@ -332,8 +342,8 @@ if prompt:
                     message_placeholder.markdown(full_response)
             
             assistant_msg = {"role": "assistant", "content": full_response}
-            if generated_image_url:
-                assistant_msg["image_url"] = generated_image_url
+            if generated_image_bytes:
+                assistant_msg["image_bytes"] = generated_image_bytes
                 
             current_messages.append(assistant_msg)
             st.rerun()    
