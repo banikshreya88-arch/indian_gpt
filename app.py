@@ -115,33 +115,33 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States cleanly
-if "chat_sessions_v35" not in st.session_state:
-    st.session_state.chat_sessions_v35 = {
-        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or type 'generate image of...' to create a hyper-realistic masterpiece!"}]
+if "chat_sessions_v40" not in st.session_state:
+    st.session_state.chat_sessions_v40 = {
+        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or type 'generate image of...' or 'make a ... style photo' to create a masterpiece!"}]
     }
 
-if "current_chat_v35" not in st.session_state:
-    st.session_state.current_chat_v35 = "New Chat"
+if "current_chat_v40" not in st.session_state:
+    st.session_state.current_chat_v40 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v35:
+        while new_chat_name in st.session_state.chat_sessions_v40:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v35[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v35 = new_chat_name
+        st.session_state.chat_sessions_v40[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v40 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v35.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v40.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v35 = chat_name
+            st.session_state.current_chat_v40 = chat_name
             st.rerun()
 
     st.markdown("---")
@@ -152,10 +152,10 @@ with st.sidebar:
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v35 not in st.session_state.chat_sessions_v35:
-    st.session_state.current_chat_v35 = list(st.session_state.chat_sessions_v35.keys())[0]
+if st.session_state.current_chat_v40 not in st.session_state.chat_sessions_v40:
+    st.session_state.current_chat_v40 = list(st.session_state.chat_sessions_v40.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v35[st.session_state.current_chat_v35]
+current_messages = st.session_state.chat_sessions_v40[st.session_state.current_chat_v40]
 
 # Display current chat messages
 for message in current_messages:
@@ -168,14 +168,14 @@ for message in current_messages:
 prompt = st.chat_input("Ask anything or type 'generate image of...' to create a hyper-realistic photo...")
 
 if prompt:
-    if st.session_state.current_chat_v35.startswith("New Chat"):
+    if st.session_state.current_chat_v40.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v35:
+        if new_name in st.session_state.chat_sessions_v40:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v35[new_name] = st.session_state.chat_sessions_v35.pop(st.session_state.current_chat_v35)
-        st.session_state.current_chat_v35 = new_name
-        current_messages = st.session_state.chat_sessions_v35[new_name]
+        st.session_state.chat_sessions_v40[new_name] = st.session_state.chat_sessions_v40.pop(st.session_state.current_chat_v40)
+        st.session_state.current_chat_v40 = new_name
+        current_messages = st.session_state.chat_sessions_v40[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -191,8 +191,9 @@ if prompt:
         
         try:
             p_lower = prompt.lower().strip()
-            image_starters = ["generate image", "genarate image", "draw image", "create image", "make an image", "chobi banao", "chobi toiri koro", "draw a", "generate a picture", "create a picture", "banao ekta chobi"]
-            is_image_request = any(p_lower.startswith(starter) or f" {starter}" in p_lower for starter in image_starters)
+            # Expanded image starters to catch "make a...", "ghibli", "draw", "create", etc.
+            image_starters = ["generate", "genarate", "draw", "create", "make", "chobi", "banao", "toiri", "pic", "photo", "image", "ghibli"]
+            is_image_request = any(starter in p_lower for starter in image_starters)
             
             if is_image_request:
                 # ChatGPT Style Multi-Step Realistic Progress Simulation
@@ -213,21 +214,20 @@ if prompt:
                     </div>
                     """
                     message_placeholder.markdown(step_html, unsafe_allow_html=True)
-                    time.sleep(1.2) # Real AI thinking pause effect like ChatGPT
+                    time.sleep(1.0)
                 
                 # Hugging Face Free Public API Endpoint with Hyper-Realistic SDXL Enhanced Prompt
                 hf_url = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
                 hf_headers = {"Content-Type": "application/json"}
                 
-                # Enhancing prompt automatically for hyper-realistic / photographic output
-                enhanced_prompt = f"{prompt}, hyper-realistic, highly detailed, 8k resolution, photorealistic, cinematic lighting, masterpiece"
+                enhanced_prompt = f"{prompt}, hyper-realistic, highly detailed, 8k resolution, photorealistic, masterpiece"
                 hf_payload = {"inputs": enhanced_prompt}
                 
                 try:
-                    img_resp = requests.post(hf_url, headers=hf_headers, json=hf_payload, timeout=35)
-                    if img_resp.status_code == 200:
+                    img_resp = requests.post(hf_url, headers=hf_headers, json=hf_payload, timeout=40)
+                    if img_resp.status_code == 200 and len(img_resp.content) > 500:
                         generated_image_bytes = img_resp.content
-                        full_response = "Here is your hyper-realistic ChatGPT-grade masterpiece:"
+                        full_response = "Here is your generated masterpiece:"
                     else:
                         full_response = "Neural servers are warming up. Please click send again to render!"
                 except:
