@@ -116,33 +116,33 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States cleanly
-if "chat_sessions_v45" not in st.session_state:
-    st.session_state.chat_sessions_v45 = {
+if "chat_sessions_v50" not in st.session_state:
+    st.session_state.chat_sessions_v50 = {
         "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or type 'generate image of...' to create a masterpiece!"}]
     }
 
-if "current_chat_v45" not in st.session_state:
-    st.session_state.current_chat_v45 = "New Chat"
+if "current_chat_v50" not in st.session_state:
+    st.session_state.current_chat_v50 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v45:
+        while new_chat_name in st.session_state.chat_sessions_v50:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v45[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v45 = new_chat_name
+        st.session_state.chat_sessions_v50[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v50 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v45.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v50.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v45 = chat_name
+            st.session_state.current_chat_v50 = chat_name
             st.rerun()
 
     st.markdown("---")
@@ -153,10 +153,10 @@ with st.sidebar:
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v45 not in st.session_state.chat_sessions_v45:
-    st.session_state.current_chat_v45 = list(st.session_state.chat_sessions_v45.keys())[0]
+if st.session_state.current_chat_v50 not in st.session_state.chat_sessions_v50:
+    st.session_state.current_chat_v50 = list(st.session_state.chat_sessions_v50.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v45[st.session_state.current_chat_v45]
+current_messages = st.session_state.chat_sessions_v50[st.session_state.current_chat_v50]
 
 # Display current chat messages
 for message in current_messages:
@@ -169,14 +169,14 @@ for message in current_messages:
 prompt = st.chat_input("Ask anything or type 'generate image of...' to create a hyper-realistic photo...")
 
 if prompt:
-    if st.session_state.current_chat_v45.startswith("New Chat"):
+    if st.session_state.current_chat_v50.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v45:
+        if new_name in st.session_state.chat_sessions_v50:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v45[new_name] = st.session_state.chat_sessions_v45.pop(st.session_state.current_chat_v45)
-        st.session_state.current_chat_v45 = new_name
-        current_messages = st.session_state.chat_sessions_v45[new_name]
+        st.session_state.chat_sessions_v50[new_name] = st.session_state.chat_sessions_v50.pop(st.session_state.current_chat_v50)
+        st.session_state.current_chat_v50 = new_name
+        current_messages = st.session_state.chat_sessions_v50[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -214,12 +214,12 @@ if prompt:
                     </div>
                     """
                     message_placeholder.markdown(step_html, unsafe_allow_html=True)
-                    time.sleep(0.8)
+                    time.sleep(0.7)
                 
-                # Using Super-Fast Free Pollinations AI Image Endpoint (Zero Timeout, 100% Reliable)
-                enhanced_prompt = f"{prompt}, hyper-realistic, highly detailed, 8k resolution, photorealistic, cinematic lighting, masterpiece"
+                # Using FLUX model endpoint for superior, high-detail realism via Pollinations
+                enhanced_prompt = f"{prompt}, highly detailed, professional photography, perfect anatomy, 8k resolution, masterpiece"
                 encoded_prompt = urllib.parse.quote(enhanced_prompt)
-                pollinations_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1024&height=1024&nologo=true"
+                pollinations_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1024&height=1024&model=flux&nologo=true"
                 
                 try:
                     img_resp = requests.get(pollinations_url, timeout=30)
@@ -333,7 +333,7 @@ if prompt:
                                                     delta = body["choices"][0]["delta"]
                                                     if "content" in delta and delta["content"]:
                                                         resp_chunk = delta["content"]
-                                                        full_response += resp_chunk
+                                                      full_response += resp_chunk
                                                         message_placeholder.markdown(full_response + "▌")
                                                 except:
                                                     pass
