@@ -1,14 +1,13 @@
 import streamlit as st
 import requests
 import json
-import urllib.parse
 import time
 from datetime import datetime, timezone, timedelta
 
 # Page Config
 st.set_page_config(page_title="Indian GPT", page_icon="🇮🇳", layout="wide")
 
-# Custom CSS for Cyberpunk Theme & High Brightness AI Chip Background with Crystal Clear Text
+# Custom CSS for Cyberpunk Theme & Crystal Clear Text
 st.markdown("""
     <style>
     .stApp {
@@ -116,47 +115,47 @@ def get_available_models(api_key):
     return default_models
 
 # Initialize Session States cleanly
-if "chat_sessions_v30" not in st.session_state:
-    st.session_state.chat_sessions_v30 = {
-        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or type 'generate image of...' to create a high-quality photo!"}]
+if "chat_sessions_v35" not in st.session_state:
+    st.session_state.chat_sessions_v35 = {
+        "New Chat": [{"role": "assistant", "content": "Hello! I am Indian GPT, your personal AI assistant created by Shubham. Ask me anything or type 'generate image of...' to create a hyper-realistic masterpiece!"}]
     }
 
-if "current_chat_v30" not in st.session_state:
-    st.session_state.current_chat_v30 = "New Chat"
+if "current_chat_v35" not in st.session_state:
+    st.session_state.current_chat_v35 = "New Chat"
 
 # Sidebar Controls
 with st.sidebar:
     if st.button("➕ New Chat", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v30:
+        while new_chat_name in st.session_state.chat_sessions_v35:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v30[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
-        st.session_state.current_chat_v30 = new_chat_name
+        st.session_state.chat_sessions_v35[new_chat_name] = [{"role": "assistant", "content": "Hello! New chat session started."}]
+        st.session_state.current_chat_v35 = new_chat_name
         st.rerun()
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v30.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v35.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v30 = chat_name
+            st.session_state.current_chat_v35 = chat_name
             st.rerun()
 
     st.markdown("---")
-    st.caption("⚡ Hugging Face & Hybrid AI Engine")
+    st.caption("⚡ ChatGPT-Style Realistic Studio")
     st.caption("Indian GPT - Cloud Edition by Shubham")
 
 # Main Header
 st.title("🇮🇳 Indian GPT")
 
 # Get current messages safely
-if st.session_state.current_chat_v30 not in st.session_state.chat_sessions_v30:
-    st.session_state.current_chat_v30 = list(st.session_state.chat_sessions_v30.keys())[0]
+if st.session_state.current_chat_v35 not in st.session_state.chat_sessions_v35:
+    st.session_state.current_chat_v35 = list(st.session_state.chat_sessions_v35.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v30[st.session_state.current_chat_v30]
+current_messages = st.session_state.chat_sessions_v35[st.session_state.current_chat_v35]
 
 # Display current chat messages
 for message in current_messages:
@@ -166,17 +165,17 @@ for message in current_messages:
             st.image(message["image_bytes"])
 
 # Native Streamlit Chat Input
-prompt = st.chat_input("Ask anything or type 'generate image of...' to create one...")
+prompt = st.chat_input("Ask anything or type 'generate image of...' to create a hyper-realistic photo...")
 
 if prompt:
-    if st.session_state.current_chat_v30.startswith("New Chat"):
+    if st.session_state.current_chat_v35.startswith("New Chat"):
         new_name = prompt[:25] + ("..." if len(prompt) > 25 else "")
-        if new_name in st.session_state.chat_sessions_v30:
+        if new_name in st.session_state.chat_sessions_v35:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v30[new_name] = st.session_state.chat_sessions_v30.pop(st.session_state.current_chat_v30)
-        st.session_state.current_chat_v30 = new_name
-        current_messages = st.session_state.chat_sessions_v30[new_name]
+        st.session_state.chat_sessions_v35[new_name] = st.session_state.chat_sessions_v35.pop(st.session_state.current_chat_v35)
+        st.session_state.current_chat_v35 = new_name
+        current_messages = st.session_state.chat_sessions_v35[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -196,30 +195,43 @@ if prompt:
             is_image_request = any(p_lower.startswith(starter) or f" {starter}" in p_lower for starter in image_starters)
             
             if is_image_request:
-                thinking_html = """
-                <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
-                    <span>🎨 Generating High-Quality Image via Hugging Face...</span>
-                    <span class="dot1" style="font-size: 20px;">.</span>
-                    <span class="dot2" style="font-size: 20px;">.</span>
-                    <span class="dot3" style="font-size: 20px;">.</span>
-                </div>
-                """
-                message_placeholder.markdown(thinking_html, unsafe_allow_html=True)
+                # ChatGPT Style Multi-Step Realistic Progress Simulation
+                steps = [
+                    "🎨 Analyzing prompt and conceptualizing visual depth...",
+                    "📐 Constructing high-resolution composition layout...",
+                    "✨ Rendering hyper-realistic lighting, textures & details...",
+                    "🚀 Finalizing ultra-HD polish via Neural Engine..."
+                ]
                 
-                # Hugging Face Free Public API Endpoint for Stable Diffusion XL
+                for step_text in steps:
+                    step_html = f"""
+                    <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
+                        <span>{step_text}</span>
+                        <span class="dot1" style="font-size: 20px;">.</span>
+                        <span class="dot2" style="font-size: 20px;">.</span>
+                        <span class="dot3" style="font-size: 20px;">.</span>
+                    </div>
+                    """
+                    message_placeholder.markdown(step_html, unsafe_allow_html=True)
+                    time.sleep(1.2) # Real AI thinking pause effect like ChatGPT
+                
+                # Hugging Face Free Public API Endpoint with Hyper-Realistic SDXL Enhanced Prompt
                 hf_url = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
                 hf_headers = {"Content-Type": "application/json"}
-                hf_payload = {"inputs": prompt}
+                
+                # Enhancing prompt automatically for hyper-realistic / photographic output
+                enhanced_prompt = f"{prompt}, hyper-realistic, highly detailed, 8k resolution, photorealistic, cinematic lighting, masterpiece"
+                hf_payload = {"inputs": enhanced_prompt}
                 
                 try:
-                    img_resp = requests.post(hf_url, headers=hf_headers, json=hf_payload, timeout=30)
+                    img_resp = requests.post(hf_url, headers=hf_headers, json=hf_payload, timeout=35)
                     if img_resp.status_code == 200:
                         generated_image_bytes = img_resp.content
-                        full_response = "Here is your generated image using Hugging Face SDXL:"
+                        full_response = "Here is your hyper-realistic ChatGPT-grade masterpiece:"
                     else:
-                        full_response = "Image model is currently loading on Hugging Face servers. Please try again in 10 seconds!"
+                        full_response = "Neural servers are warming up. Please click send again to render!"
                 except:
-                    full_response = "Image generation request timed out. Please try again!"
+                    full_response = "Image generation took longer than expected. Please try again!"
                 
                 message_placeholder.markdown(full_response)
                 if generated_image_bytes:
