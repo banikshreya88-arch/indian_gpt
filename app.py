@@ -333,7 +333,7 @@ if prompt:
                                                     delta = body["choices"][0]["delta"]
                                                     if "content" in delta and delta["content"]:
                                                         resp_chunk = delta["content"]
-                                                      full_response += resp_chunk
+                                                        full_response += resp_chunk
                                                         message_placeholder.markdown(full_response + "▌")
                                                 except:
                                                     pass
