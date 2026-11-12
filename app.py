@@ -91,6 +91,21 @@ def search_web(query):
         pass
     return search_text
 
+# Local Cultural & Heritage Knowledge Corpus (Built-in Fallback & Proprietary Layer)
+LOCAL_CORPUS = {
+    "who made you": "I am Indian GPT, an advanced conversational AI assistant designed and developed exclusively by Shubham.",
+    "who created you": "I was created and built by Shubham as a high-performance indigenous AI system.",
+    "tui ke": "Ami Indian GPT, ekta AI assistant jake Shubham toiri koreche!",
+    "amar nam ki": "Tor nam Shubham! Tui amake baniyechis.",
+}
+
+def get_local_fallback(query_str):
+    q_lower = query_str.lower().strip()
+    for key, ans in LOCAL_CORPUS.items():
+        if key in q_lower:
+            return ans
+    return None
+
 # Function to fetch available models from Groq API
 def get_available_models(api_key):
     default_models = [
@@ -144,6 +159,21 @@ with st.sidebar:
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
             st.session_state.current_chat_v70 = chat_name
             st.rerun()
+
+    st.markdown("---")
+    # Export Chat Feature
+    current_msgs = st.session_state.chat_sessions_v70[st.session_state.current_chat_v70]
+    chat_export_text = ""
+    for m in current_msgs:
+        chat_export_text += f"{m['role'].upper()}: {m['content']}\n\n"
+    
+    st.download_button(
+        label="📥 Export Chat (TXT)",
+        data=chat_export_text,
+        file_name="indian_gpt_chat.txt",
+        mime="text/plain",
+        use_container_width=True
+    )
 
     st.markdown("---")
     st.caption("⚡ ChatGPT-Style Studio & HD Image Engine")
@@ -349,8 +379,14 @@ if prompt:
                         except:
                             continue
                 
+                # If API fails completely, use Local Corpus Fallback
                 if not success:
-                    full_response = "Server is currently busy or rate limited. Please click send again!"
+                    local_ans = get_local_fallback(prompt)
+                    if local_ans:
+                        full_response = local_ans
+                        success = True
+                    else:
+                        full_response = "Namaste! Server is currently experiencing high traffic. Please click send again!"
                     message_placeholder.markdown(full_response)
             
             assistant_msg = {"role": "assistant", "content": full_response}
