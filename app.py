@@ -54,7 +54,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Groq API Keys Pool (Updated with your fresh key!)
+# Groq API Keys Pool (Primary Key + Backup Pool)
 KEYS_POOL = [
     "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",
     "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",
@@ -91,12 +91,19 @@ def search_web(query):
         pass
     return search_text
 
-# Local Cultural & Heritage Knowledge Corpus (Built-in Fallback & Proprietary Layer)
+# Expanded Local Knowledge Corpus (Built-in Knowledge Engine & Emergency Offline Fallback)
 LOCAL_CORPUS = {
-    "who made you": "I am Indian GPT, an advanced conversational AI assistant designed and developed exclusively by Shubham.",
-    "who created you": "I was created and built by Shubham as a high-performance indigenous AI system.",
+    "who made you": "I am Indian GPT, an advanced conversational AI assistant designed, developed, and deployed exclusively by Shubham.",
+    "who created you": "I was created, coded, and built by Shubham as a high-performance indigenous AI system.",
     "tui ke": "Ami Indian GPT, ekta AI assistant jake Shubham toiri koreche!",
     "amar nam ki": "Tor nam Shubham! Tui amake baniyechis.",
+    "india capital": "New Delhi is the capital of India.",
+    "capital of india": "New Delhi is the capital of India.",
+    "national bird of india": "The Indian Peafowl (Pavo cristatus), commonly known as the peacock, is the national bird of India.",
+    "national animal of india": "The Royal Bengal Tiger is the national animal of India.",
+    "python": "Python is a high-level, interpreted programming language known for its clear syntax and dynamic typing, widely used in AI, web development, and automation.",
+    "streamlit": "Streamlit is an open-source Python framework that allows developers to build interactive web applications rapidly using pure Python.",
+    "artificial intelligence": "Artificial Intelligence (AI) refers to the simulation of human intelligence in machines programmed to think, learn, reason, and solve complex problems."
 }
 
 def get_local_fallback(query_str):
@@ -379,14 +386,14 @@ if prompt:
                         except:
                             continue
                 
-                # If API fails completely, use Local Corpus Fallback
+                # If API fails, fallback to Local Knowledge Corpus
                 if not success:
                     local_ans = get_local_fallback(prompt)
                     if local_ans:
                         full_response = local_ans
                         success = True
                     else:
-                        full_response = "Namaste! Server is currently experiencing high traffic. Please click send again!"
+                        full_response = "Namaste! Server is currently handling high traffic. Please click send again!"
                     message_placeholder.markdown(full_response)
             
             assistant_msg = {"role": "assistant", "content": full_response}
