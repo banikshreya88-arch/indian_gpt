@@ -54,11 +54,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Groq API Keys Pool
+# Groq API Keys Pool (Updated with your fresh key!)
 KEYS_POOL = [
+    "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",
     "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",
     "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",
-    "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",
 ]
 
 sec_key = st.secrets.get("GROQ_API_KEY_2", "")
@@ -360,5 +360,4 @@ if prompt:
             current_messages.append(assistant_msg)
             st.rerun()    
         except Exception as e:
-            
             st.error(f"Error: {e}")
