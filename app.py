@@ -23,14 +23,15 @@ st.set_page_config(
 )
 
 # ==============================================================================
-# 1. CYBERPUNK & HIGH-CONTRAST GLASSMORPHISM UI STYLING (WITH YOUR AI CHIP BG)
+# 1. CYBERPUNK & HIGH-CONTRAST GLASSMORPHISM UI STYLING (HIGH BRIGHTNESS BG)
 # ==============================================================================
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(135deg, rgba(5, 10, 25, 0.88) 0%, rgba(15, 23, 42, 0.88) 50%, rgba(9, 21, 38, 0.88) 100%),
+        background: linear-gradient(135deg, rgba(5, 10, 25, 0.35) 0%, rgba(15, 23, 42, 0.35) 50%, rgba(9, 21, 38, 0.35) 100%),
                     url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
         background-size: cover;
+        filter: brightness(1.25) contrast(1.1);
         color: #ffffff !important;
     }
     .stSidebar {
@@ -70,26 +71,6 @@ st.markdown("""
     .stButton button:hover {
         border-color: #4ade80 !important;
         transform: translateY(-1px);
-    }
-    .status-badge-online {
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 20px;
-        background: rgba(34, 197, 94, 0.2);
-        border: 1px solid #4ade80;
-        color: #4ade80 !important;
-        font-weight: 700;
-        font-size: 0.85rem;
-    }
-    .status-badge-offline {
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 20px;
-        background: rgba(245, 158, 11, 0.2);
-        border: 1px solid #fbbf24;
-        color: #fbbf24 !important;
-        font-weight: 700;
-        font-size: 0.85rem;
     }
     @keyframes bounce {
         0%, 80%, 100% { transform: translateY(0); }
@@ -789,24 +770,19 @@ if "current_chat_v110" not in st.session_state:
     st.session_state.current_chat_v110 = "New Chat"
 
 # ==============================================================================
-# 11. SIDEBAR CONTROLS, MODE SELECTOR, DIAGNOSTICS & EXPORT SUITE
+# 11. SIDEBAR CONTROLS (CLEANED OF UNNECESSARY STATS/BADGES)
 # ==============================================================================
 internet_available = check_internet_online()
 
 with st.sidebar:
-    st.markdown("### 🇮🇳 Indian GPT Control Center")
+    st.markdown("### 🇮🇳 Indian GPT Control")
 
     operation_mode = st.radio(
         "⚡ Execution Mode",
-        options=["Auto Hybrid (Online + Local Knowledge)", "100% Offline Mode (Zero Internet)"],
+        options=["Auto Hybrid", "100% Offline Mode"],
         index=0 if internet_available else 1
     )
     is_online_mode = (operation_mode.startswith("Auto Hybrid") and internet_available)
-
-    if is_online_mode:
-        st.markdown('<span class="status-badge-online">🟢 ONLINE • Hybrid Cloud + Local Brain</span>', unsafe_allow_html=True)
-    else:
-        st.markdown('<span class="status-badge-offline">🟡 OFFLINE • 100% Local Sovereign Brain</span>', unsafe_allow_html=True)
 
     st.markdown("")
     if st.button("➕ New Chat Session", use_container_width=True):
@@ -817,7 +793,7 @@ with st.sidebar:
             counter += 1
         
         st.session_state.chat_sessions_v110[new_chat_name] = [
-            {"role": "assistant", "content": "Namaste! New hybrid chat session started."}
+            {"role": "assistant", "content": "Namaste! New chat session started."}
         ]
         st.session_state.current_chat_v110 = new_chat_name
         st.rerun()
@@ -834,10 +810,9 @@ with st.sidebar:
     st.subheader("📥 Export & Backup")
     current_msgs = st.session_state.chat_sessions_v110[st.session_state.current_chat_v110]
     
-    chat_export_text = f"INDIAN GPT - TRANSCRIPT ({st.session_state.current_chat_v110})\n"
-    chat_export_text += "=" * 55 + "\n\n"
+    chat_export_text = f"INDIAN GPT - TRANSCRIPT ({st.session_state.current_chat_v110})\n\n"
     for m in current_msgs:
-        chat_export_text += f"[{m['role'].upper()}]:\n{m['content']}\n\n"
+        chat_export_text += f"[{m['role'].upper()}]: {m['content']}\n\n"
     
     st.download_button(
         label="📄 Export Transcript (TXT)",
@@ -847,44 +822,6 @@ with st.sidebar:
         use_container_width=True
     )
     
-    exportable_json = [
-        {"role": m["role"], "content": m["content"]}
-        for m in current_msgs
-    ]
-    st.download_button(
-        label="🗂️ Export Session Data (JSON)",
-        data=json.dumps(exportable_json, indent=2, ensure_ascii=False),
-        file_name="indian_gpt_session.json",
-        mime="application/json",
-        use_container_width=True
-    )
-
-    st.markdown("---")
-    with st.expander("📚 Offline & Online Test Prompts"):
-        st.markdown(
-            "**1. Offline & Online Knowledge:**\n"
-            "- `Tell me about Netaji Subhash Chandra Bose`\n"
-            "- `What is Chandrayaan 3?`\n"
-            "- `Explain Indus Valley Civilization`\n"
-            "- `Capital of Japan` / `West Bengal`\n\n"
-            "**2. Offline Math & Geometry:**\n"
-            "- `solve quadratic a=1 b=-5 c=6`\n"
-            "- `solve linear a=3 b=4 c=19`\n"
-            "- `is 97 prime` | `factorial of 12`\n"
-            "- `ncr 10 3` | `gcd 24 36` | `trig 45`\n"
-            "- `circle r=7` | `stats 10, 20, 30, 40`\n"
-            "- `compound interest p=10000 r=8 t=5`\n\n"
-            "**3. All 22 Indian Languages:**\n"
-            "- Write in বাংলা, हिन्दी, தமிழ், తెలుగు, मराठी, ગુજરાતી, ਪੰਜਾਬੀ, etc."
-        )
-
-    st.markdown("---")
-    st.subheader("⚙️ Sovereign Engine Stats")
-    st.caption(f"• Local Knowledge Entries: **{len(LOCAL_CORPUS)}**")
-    st.caption(f"• Supported Indian Scripts: **{len(UNICODE_SCRIPT_RANGES)}**")
-    st.caption(f"• Cloud API Key Pool: **{len(KEYS_POOL)} Keys**")
-    st.caption("• Offline Math Solvers: **15 Symbolic Modules**")
-    st.caption("• Offline Art Engine: **Procedural SVG Synthesizer**")
     st.markdown("---")
     st.caption("Created & Architected by **Shubham**")
 
@@ -907,7 +844,7 @@ for message in current_messages:
         if "svg_art" in message and message["svg_art"]:
             st.markdown(message["svg_art"], unsafe_allow_html=True)
 
-# Updated prompt placeholder to "Ask anything" as requested
+# Chat input with placeholder set strictly to "Ask anything"
 prompt = st.chat_input("Ask anything")
 
 if prompt:
