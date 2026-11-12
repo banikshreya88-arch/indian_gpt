@@ -23,12 +23,12 @@ st.set_page_config(
 )
 
 # ==============================================================================
-# 1. CYBERPUNK & HIGH-CONTRAST GLASSMORPHISM UI STYLING
+# 1. CYBERPUNK & HIGH-CONTRAST GLASSMORPHISM UI STYLING (WITH YOUR AI CHIP BG)
 # ==============================================================================
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(135deg, #050a19 0%, #0f172a 50%, #091526 100%),
+        background: linear-gradient(135deg, rgba(5, 10, 25, 0.88) 0%, rgba(15, 23, 42, 0.88) 50%, rgba(9, 21, 38, 0.88) 100%),
                     url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
         background-size: cover;
         color: #ffffff !important;
@@ -187,7 +187,6 @@ def detect_indian_script(text: str) -> str:
 # 4. MASSIVE SOVEREIGN KNOWLEDGE CORPUS (200+ OFFLINE & HYBRID ENTRIES)
 # ==============================================================================
 LOCAL_CORPUS = {
-    # Creator & Identity
     "who made you": "I am Indian GPT, a sovereign hybrid online/offline AI ecosystem designed, architected, and programmed exclusively by Shubham.",
     "who created you": "I was created, engineered, and deployed by Shubham as an indigenous AI platform that functions seamlessly online with cloud LLMs and live web search, and 100% offline with its massive built-in knowledge and math solvers.",
     "who is your creator": "My creator, developer, and sole architect is Shubham.",
@@ -908,7 +907,8 @@ for message in current_messages:
         if "svg_art" in message and message["svg_art"]:
             st.markdown(message["svg_art"], unsafe_allow_html=True)
 
-prompt = st.chat_input("Ask anything (Online Hybrid or 100% Offline) — History, Math, Science, Indian Languages, or 'generate image of...'")
+# Updated prompt placeholder to "Ask anything" as requested
+prompt = st.chat_input("Ask anything")
 
 if prompt:
     if st.session_state.current_chat_v110.startswith("New Chat"):
