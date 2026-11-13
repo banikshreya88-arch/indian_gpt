@@ -86,7 +86,7 @@ st.markdown("""
 # 2. CONNECTIVITY DETECTION & API KEY POOL
 # ==============================================================================
 KEYS_POOL = [
-    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
+    "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",
     "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",
     "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",
 ]
