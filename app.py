@@ -12,7 +12,7 @@ from datetime import datetime, timezone, timedelta
 # ==============================================================================
 # INDIAN GPT - TRUE HYBRID ONLINE/OFFLINE SOVEREIGN AI ECOSYSTEM
 # Architect & Developer: Shubham
-# Version: 11.0 Enterprise Sovereign Edition
+# Version: 12.0 Ultimate Sovereign Mega-Knowledge Edition
 # ==============================================================================
 
 st.set_page_config(
@@ -165,9 +165,10 @@ def detect_indian_script(text: str) -> str:
     return "Latin / English / Hinglish / Banglish"
 
 # ==============================================================================
-# 4. MASSIVE SOVEREIGN KNOWLEDGE CORPUS (200+ OFFLINE & HYBRID ENTRIES)
+# 4. HUGE SOVEREIGN KNOWLEDGE CORPUS (ALL PREVIOUS + MASSIVE SCIENCE & WORLD HISTORY)
 # ==============================================================================
 LOCAL_CORPUS = {
+    # Creator & Identity
     "who made you": "I am Indian GPT, a sovereign hybrid online/offline AI ecosystem designed, architected, and programmed exclusively by Shubham.",
     "who created you": "I was created, engineered, and deployed by Shubham as an indigenous AI platform that functions seamlessly online with cloud LLMs and live web search, and 100% offline with its massive built-in knowledge and math solvers.",
     "who is your creator": "My creator, developer, and sole architect is Shubham.",
@@ -178,6 +179,15 @@ LOCAL_CORPUS = {
     "namaste": "Namaste! Welcome to Indian GPT. How can I assist you today in Indian languages, history, science, mathematics, or general knowledge?",
     "nomoskar": "Nomoskar! Indian GPT-te shagoto. Ami apnake ki bhabe sahajyo korte pari?",
     "hello": "Hello! I am Indian GPT, created by Shubham. Ask me any question—online or offline!",
+
+    # Constitution & Governance
+    "constitution of india": "Drafted by the Constituent Assembly chaired by Dr. B. R. Ambedkar, adopted on November 26, 1949, and enforced on January 26, 1950, the Constitution of India is the world's longest written constitution, establishing a sovereign, socialist, secular, democratic republic.",
+    "fundamental rights": "Enshrined in Part III (Articles 12–35) of the Indian Constitution, Fundamental Rights include the Right to Equality, Right to Freedom, Right against Exploitation, Right to Freedom of Religion, Cultural & Educational Rights, and Right to Constitutional Remedies.",
+    "fundamental duties": "Added to Part IV-A (Article 51A) of the Constitution by the 42nd Amendment (1976) upon the recommendation of the Swaran Singh Committee, outlining moral obligations of citizens to uphold India's unity and heritage.",
+    "dpsps": "Directive Principles of State Policy (DPSPs), contained in Part IV (Articles 36–51) of the Indian Constitution, provide guidelines for framing laws and establishing a social and economic democracy.",
+    "parliament of india": "India's bicameral Parliament consists of the President of India and two houses: the Lok Sabha (House of the People) and the Rajya Sabha (Council of States).",
+    "supreme court of india": "Established under Article 124, the Supreme Court in New Delhi is the apex judicial court and final constitutional interpreter, headed by the Chief Justice of India.",
+    "election commission of india": "An autonomous constitutional authority responsible for administering election processes in India under Article 324, ensuring free and fair elections.",
 
     # All 28 States
     "andhra pradesh": "Amaravati is the capital of Andhra Pradesh, known for Kuchipudi classical dance, Tirupati temple, Visakhapatnam port, and a 974 km Bay of Bengal coastline.",
@@ -211,7 +221,7 @@ LOCAL_CORPUS = {
 
     # 8 Union Territories
     "andaman and nicobar": "Port Blair (Sri Vijaya Puram) is the capital of the Andaman and Nicobar Islands in the Bay of Bengal, home to historic Cellular Jail and Barren Island volcano.",
-    "chandigarh": "Chandigarh is a Union Territory and the planned shared capital of Punjab and Haryana, designed by Swiss-French architect Le Corbusier.",
+    "chandigarh ut": "Chandigarh is a Union Territory and the planned shared capital of Punjab and Haryana, designed by Swiss-French architect Le Corbusier.",
     "dadra and nagar haveli": "Daman is the capital of the Union Territory of Dadra and Nagar Haveli and Daman and Diu on India's western Arabian Sea coast.",
     "delhi": "New Delhi is the National Capital Territory (NCT) of India, housing Rashtrapati Bhavan, Parliament House, Supreme Court, India Gate, and Red Fort.",
     "jammu and kashmir": "Srinagar (summer) and Jammu (winter) are the capitals of Jammu and Kashmir, famed for Dal Lake, Mughal gardens, Gulmarg, and Vaishno Devi.",
@@ -219,7 +229,7 @@ LOCAL_CORPUS = {
     "lakshadweep": "Kavaratti is the capital of Lakshadweep, India's smallest Union Territory comprising 36 coral atolls and islands in the Arabian Sea.",
     "puducherry": "Puducherry is a Union Territory on the Coromandel Coast renowned for its French Quarter, Promenade Beach, Auroville, and Sri Aurobindo Ashram.",
 
-    # National Symbols & Constitutional Facts
+    # National Symbols
     "capital of india": "New Delhi is the capital of India.",
     "national bird": "The Indian Peafowl (Pavo cristatus / Peacock) is the national bird of India.",
     "national animal": "The Royal Bengal Tiger (Panthera tigris tigris) is the national animal of India.",
@@ -228,7 +238,6 @@ LOCAL_CORPUS = {
     "national fruit": "The Mango (Mangifera indica) is the national fruit of India.",
     "national river": "The Ganga (Ganges) is the national river of India.",
     "national anthem": "Jana Gana Mana, composed in Bengali by Rabindranath Tagore and adopted on January 24, 1950, is the national anthem of India.",
-    "constitution of india": "Drafted by the Constituent Assembly chaired by Dr. B. R. Ambedkar, adopted on November 26, 1949, and enforced on January 26, 1950, the Constitution of India is the world's longest written constitution.",
 
     # Indian History & Freedom Struggle
     "indus valley civilization": "The Indus Valley Civilization (c. 3300–1300 BCE), also called the Harappan Civilization, was one of the world's earliest urban civilizations, famed for Harappa, Mohenjo-daro, Lothal dockyard, grid city planning, and covered drainage.",
@@ -236,12 +245,10 @@ LOCAL_CORPUS = {
     "maurya empire": "Founded by Chandragupta Maurya in 322 BCE with Chanakya's statecraft (Arthashastra), the Maurya Empire peaked under Ashoka the Great, who embraced Buddhism and non-violence after the Kalinga War (261 BCE).",
     "gupta empire": "The Gupta Empire (c. 319–550 CE) is celebrated as the Golden Age of India, producing Aryabhata (zero, decimal place value, $\pi$), Varahamihira, Sushruta/Charaka medical traditions, and poet Kalidasa.",
     "chola dynasty": "The Chola Dynasty of Tamilakam (under Rajaraja Chola I and Rajendra Chola I) ruled a vast maritime empire extending to Sri Lanka and Southeast Asia and built the Brihadeeswarar Temple at Thanjavur.",
-    "delhi sultanate": "The Delhi Sultanate (1206–1526 CE) spanned five dynasties: Mamluk (Slave), Khalji, Tughlaq, Sayyid, and Lodi, repelling Mongol invasions and introducing Indo-Islamic architecture.",
     "mughal empire": "Established by Babur in 1526 after the First Battle of Panipat, the Mughal Empire flourished under Akbar the Great, Jahangir, Shah Jahan (Taj Mahal, Red Fort), and Aurangzeb.",
     "maratha empire": "Founded by Chhatrapati Shivaji Maharaj in 1674, the Maratha Empire dismantled Mughal hegemony across India through agile guerrilla tactics (Ganimi Kava) and a strong Konkan navy.",
     "battle of plassey": "On June 23, 1757, British East India Company forces under Robert Clive defeated Nawab Siraj-ud-Daulah of Bengal, laying the foundation of British colonial rule in India.",
     "revolt of 1857": "The Indian Rebellion of 1857 (First War of Independence) erupted in Meerut on May 10, 1857, led by Mangal Pandey, Rani Lakshmibai of Jhansi, Tatya Tope, Nana Sahib, and Bahadur Shah Zafar.",
-    "partition of bengal": "Enacted in 1905 by Viceroy Lord Curzon, the Partition of Bengal ignited the Swadeshi and Boycott movements and Rabindranath Tagore's Raksha Bandhan unity campaign until annulled in 1911.",
     "jallianwala bagh": "On April 13, 1919 (Baisakhi), Brigadier-General Reginald Dyer ordered troops to fire on unarmed civilians at Jallianwala Bagh in Amritsar, prompting Rabindranath Tagore to renounce his British knighthood.",
     "non cooperation movement": "Launched by Mahatma Gandhi in 1920, the Non-Cooperation Movement called for peaceful boycott of British institutions, foreign cloth, and courts to attain Swaraj.",
     "dandi march": "From March 12 to April 6, 1930, Mahatma Gandhi marched 240 miles from Sabarmati Ashram to Dandi to make salt from seawater, launching the Civil Disobedience Movement.",
@@ -250,51 +257,44 @@ LOCAL_CORPUS = {
     "independence day": "India won independence from British rule at midnight on August 15, 1947, with Jawaharlal Nehru delivering his iconic 'Tryst with Destiny' speech.",
     "republic day": "India became a Sovereign Democratic Republic on January 26, 1950, when the Constitution of India came into effect and Dr. Rajendra Prasad took office as India's first President.",
 
-    # World History & Global Civilizations
-    "mesopotamia": "Mesopotamia (between the Tigris and Euphrates rivers in modern Iraq) is the 'Cradle of Civilization', home to Sumerians, Babylonians, cuneiform script, the wheel, and Hammurabi's Code.",
-    "ancient egypt": "Ancient Egypt flourished along the Nile for over 3,000 years, famed for the Pyramids of Giza, Sphinx, Pharaohs, hieroglyphics, papyrus, and mummification.",
-    "ancient greece": "Ancient Greece birthed Athenian democracy, classical philosophy (Socrates, Plato, Aristotle), Euclidean geometry, Hippocratic medicine, and the Olympic Games.",
-    "roman empire": "The Roman Empire (27 BCE–476 CE in the West) governed the Mediterranean basin, leaving a lasting legacy in civil law, Latin, concrete domes, aqueducts, and the Colosseum.",
-    "silk road": "The Silk Road was a vast trans-Eurasian trade network linking China and India with Persia, Arabia, and Europe, exchanging silk, spices, paper, gunpowder, and philosophies.",
-    "renaissance": "The Renaissance (14th–17th century) was a European cultural and scientific revival starting in Florence, Italy, led by Leonardo da Vinci, Michelangelo, Raphael, Galileo, and Copernicus.",
-    "industrial revolution": "Starting in Britain around 1760, the Industrial Revolution mechanized manufacturing via steam engines, textile mills, iron smelting, and railways.",
-    "world war 1": "World War I (1914–1918) pitted the Allied Powers against the Central Powers across trench-warfare fronts in Europe, ending with the 1918 Armistice and 1919 Treaty of Versailles.",
-    "world war 2": "World War 2 (1939–1945) was the deadliest conflict in human history, fought between the Allies and the Axis powers, ending in 1945 and leading to the founding of the United Nations.",
+    # --------------------------------------------------------------------------
+    # EXPANDED WORLD HISTORY KNOWLEDGE MODULE
+    # --------------------------------------------------------------------------
+    "mesopotamia": "Mesopotamia (between Tigris and Euphrates rivers, modern Iraq) is the cradle of civilization, credited with inventing writing (cuneiform around 3200 BCE), the wheel, the plow, and establishing the Babylonian Code of Hammurabi.",
+    "ancient egypt": "Ancient Egypt flourished along the Nile river valley for over 3000 years, renowned for monumental architecture including the Giza Pyramids and Sphinx, hieroglyphic writing, pharaohs, and advanced mummification sciences.",
+    "ancient greece": "Ancient Greece laid foundational pillars of Western civilization through Athenian democracy, classical philosophy (Socrates, Plato, Aristotle), Euclidean geometry, Olympic Games, and epic poetry by Homer.",
+    "roman empire": "The Roman Empire (27 BCE–476 CE in the West) dominated the Mediterranean basin and Europe, establishing enduring legacies in civil law, Latin language, advanced engineering (aqueducts, concrete domes, roads), and military governance.",
+    "silk road": "The Silk Road was an expansive network of Eurasian trade routes active from the Han dynasty (130 BCE) until the Ottoman boycott (1453 CE), facilitating cultural, commercial, and technological exchange between China, India, Persia, and Europe.",
+    "renaissance": "The Renaissance (14th to 17th century) was a fervent period of European cultural, artistic, and scientific rebirth originating in Florence, Italy, spearheaded by luminaries like Leonardo da Vinci, Michelangelo, Galileo, and Copernicus.",
+    "industrial revolution": "Beginning in Great Britain around 1760, the Industrial Revolution transitioned human society from agrarian handicraft economies to mechanized industrial production powered by steam engines, coal, iron, and textile factories.",
+    "french revolution": "The French Revolution (1789–1799) radically dismantled the absolute monarchy and feudal privileges in France under the rallying cry 'Liberty, Equality, Fraternity', culminating in the Declaration of the Rights of Man.",
+    "american revolution": "The American Revolution (1775–1783) enabled Thirteen British Colonies in North America to secure independence through the Declaration of Independence, establishing the United States of America.",
+    "world war 1": "World War I (1914–1918) was a devastating global conflict fought between the Allied Powers (Britain, France, Russia, USA) and Central Powers (Germany, Austria-Hungary, Ottoman Empire), ending with the 1919 Treaty of Versailles.",
+    "world war 2": "World War 2 (1939–1945) was the deadliest conflict in human history, fought between the Allies and Axis powers (Nazi Germany, Japan, Italy), concluding with the defeat of fascism and the dawn of the atomic age.",
+    "cold war": "The Cold War (1947–1991) was a prolonged geopolitical and ideological standoff between the Western Bloc (led by the United States) and the Eastern Bloc (led by the Soviet Union), characterized by the nuclear arms race and space race.",
 
-    # Science, Space & Physics
+    # --------------------------------------------------------------------------
+    # EXPANDED SCIENCE & TECHNOLOGY KNOWLEDGE MODULE
+    # --------------------------------------------------------------------------
+    "physics": "Physics is the fundamental natural science studying matter, motion, energy, force, and spacetime. Key domains include classical mechanics, electromagnetism, thermodynamics, relativity, and quantum mechanics.",
+    "chemistry": "Chemistry is the scientific study of the properties, composition, structure of elements and compounds, how substances interact, combine, and change, governed by atomic theory and the periodic table.",
+    "biology": "Biology is the scientific study of life and living organisms, encompassing cellular structure, genetics, evolution, ecology, metabolism, and physiological systems.",
     "isro": "The Indian Space Research Organisation (ISRO), founded in 1969 by Dr. Vikram Sarabhai and headquartered in Bengaluru, is India's premier space agency famous for PSLV, GSLV, Chandrayaan, Mangalyaan, and Aditya-L1.",
     "chandrayaan 3": "Launched by ISRO on July 14, 2023, Chandrayaan-3's Vikram lander and Pragyan rover successfully soft-landed near the Moon's south pole on August 23, 2023 (celebrated as National Space Day in India).",
-    "mangalyaan": "ISRO's Mars Orbiter Mission (Mangalyaan), launched on November 5, 2013, made India the first Asian country to reach Mars orbit and the first nation globally to succeed on its very first attempt.",
-    "aditya l1": "Aditya-L1 is India's first solar space observatory mission placed in a halo orbit around the Sun-Earth Lagrange Point 1 (L1) to study solar coronal mass ejections and space weather.",
-    "speed of light": "The speed of light in vacuum is an exact universal physical constant: $c = 299,792,458 \text{ m/s}$ ($\approx 3 \times 10^8 \text{ m/s}$).",
-    "newton laws": "Newton's Three Laws of Motion: (1) An object remains at rest or uniform motion unless acted upon by a net external force; (2) $F = ma$; (3) Every action has an equal and opposite reaction.",
-    "relativity": "Einstein's Special Relativity (1905) established $E = mc^2$ and time dilation, while General Relativity (1915) explained gravity as the geometric curvature of four-dimensional spacetime.",
-    "quantum mechanics": "Quantum Mechanics governs matter and energy at atomic scales, featuring Planck's quantization ($E = h\nu$), wave-particle duality, and Heisenberg's Uncertainty Principle.",
-    "dna": "Deoxyribonucleic Acid (DNA) is a double-stranded helical polymer of nucleotides encoding genetic instructions for all living organisms.",
-    "mitochondria": "Mitochondria are double-membraned eukaryotic organelles known as the 'powerhouse of the cell' because they synthesize ATP via oxidative phosphorylation.",
-    "periodic table": "The Modern Periodic Table arranges all 118 chemical elements in order of increasing atomic number ($Z$) across 18 groups and 7 periods.",
-
-    # Computer Science & AI
+    "drdo": "Defence Research and Development Organisation (DRDO) is India's premier agency under the Ministry of Defence charged with military's R&D, developing missiles (Agni, Prithvi), radars, and combat systems.",
     "python": "Python is a high-level, interpreted programming language created by Guido van Rossum in 1991, celebrated for readable syntax and dominant ecosystems in AI, machine learning, web apps (Streamlit, Django, FastAPI), and automation.",
     "artificial intelligence": "Artificial Intelligence (AI) is the branch of computer science focused on building systems capable of reasoning, natural language understanding, perception, learning, and autonomous decision-making.",
-    "machine learning": "Machine Learning (ML) enables algorithms to learn statistical patterns from training data without hard-coded rules.",
-    "deep learning": "Deep Learning uses multi-layered artificial neural networks—including Transformers and CNNs—to achieve state-of-the-art performance in language and vision.",
-    "large language model": "A Large Language Model (LLM) is a Transformer-based neural network trained on massive multilingual text corpora to perform reasoning, coding, translation, and text generation.",
+    "machine learning": "Machine Learning (ML) is a subset of AI enabling computers to learn statistical patterns from data without explicit human programming.",
+    "quantum computing": "Quantum computing leverages quantum mechanical phenomena such as superposition and entanglement to process complex data using qubits exponentially faster than classical computers.",
 
-    # World Capitals
-    "afghanistan capital": "Kabul is the capital of Afghanistan.",
-    "australia capital": "Canberra is the capital of Australia.",
-    "bangladesh capital": "Dhaka is the capital of Bangladesh.",
-    "brazil capital": "Brasília is the capital of Brazil.",
-    "canada capital": "Ottawa is the capital of Canada.",
-    "china capital": "Beijing is the capital of China.",
-    "egypt capital": "Cairo is the capital of Egypt.",
-    "france capital": "Paris is the capital of France.",
-    "germany capital": "Berlin is the capital of Germany.",
-    "japan capital": "Tokyo is the capital of Japan.",
-    "russia capital": "Moscow is the capital of Russia.",
-    "uk capital": "London is the capital of the United Kingdom.",
-    "usa capital": "Washington, D.C. is the capital of the United States of America.",
+    # Indian Economy & Banking
+    "rbi": "Reserve Bank of India (RBI), established on April 1, 1935, under the RBI Act of 1934, is India's central banking institution which controls monetary policy, currency issuance, and financial stability.",
+    "indian economy": "India is one of the world's fastest-growing major economies, driven by services, manufacturing, agriculture, digital public infrastructure (UPI), and rapid startup ecosystems.",
+    "digital india": "A flagship programme of the Government of India launched in 2015 to transform India into a digitally empowered society and knowledge economy, pioneering UPI payments and Aadhaar.",
+
+    # Culture, Heritage & Languages
+    "indian culture": "India's culture is rooted in deep spiritual traditions, classical music (Hindustani and Carnatic), diverse dances (Bharatanatyam, Kathak, Kathakali, Odissi), architecture, and vibrant festivals like Diwali, Eid, Durga Puja, and Pongal.",
+    "22 languages": "The Eighth Schedule of the Indian Constitution recognizes 22 scheduled languages: Assamese, Bengali, Bodo, Dogri, Gujarati, Hindi, Kannada, Kashmiri, Konkani, Maithili, Malayalam, Manipuri, Marathi, Nepali, Odia, Punjabi, Sanskrit, Santhali, Sindhi, Tamil, Telugu, and Urdu.",
 
     # Great Personalities & Scientists
     "aryabhata": "Aryabhata (476–550 CE) was India's pioneering mathematician-astronomer who authored the Aryabhatiya, formalized place-value arithmetic, approximated $\pi \approx 3.1416$, and explained solar and lunar eclipses.",
@@ -303,27 +303,18 @@ LOCAL_CORPUS = {
     "cv raman": "Sir C. V. Raman (1888–1970) won the 1930 Nobel Prize in Physics—the first Asian scientist to win a science Nobel—for discovering the Raman Effect.",
     "rabindranath tagore": "Rabindranath Tagore (1861–1941) won the 1913 Nobel Prize in Literature for Gitanjali, founded Visva-Bharati University at Santiniketan, and composed the national anthems of India and Bangladesh.",
     "apj abdul kalam": "Dr. A. P. J. Abdul Kalam (1931–2015), the 'Missile Man of India' and 11th President of India, spearheaded India's SLV-III, Agni, and Prithvi programmes and inspired millions of students.",
-    "homi bhabha": "Dr. Homi Jehangir Bhabha (1909–1966) was the visionary architect of India's three-stage nuclear power programme and founding director of TIFR and BARC.",
-    "vikram sarabhai": "Dr. Vikram Sarabhai (1919–1971) is celebrated as the Father of the Indian Space Programme and founder of ISRO.",
     "swami vivekananda": "Swami Vivekananda (1863–1902) introduced Vedanta and Yoga to the Western world at the 1893 Parliament of the World's Religions in Chicago and founded the Ramakrishna Mission.",
     "mahatma gandhi": "Mohandas Karamchand Gandhi (1869–1948), the 'Father of the Nation', led India's non-violent freedom struggle through Satyagraha, Non-Cooperation, Dandi Salt March, and Quit India movements.",
     "dr br ambedkar": "Dr. Bhimrao Ramji Ambedkar (1891–1956) served as Chairman of the Constitution Drafting Committee and independent India's first Law Minister.",
-    "sardar vallabhbhai patel": "Sardar Vallabhbhai Patel (1875–1950), the 'Iron Man of India' and first Deputy Prime Minister & Home Minister, unified 562 princely states into the Union of India.",
-    "isaac newton": "Sir Isaac Newton (1643–1727) formulated classical mechanics, universal gravitation, and differential/integral calculus in his Principia Mathematica.",
-    "albert einstein": "Albert Einstein (1879–1955) revolutionized modern physics with Special and General Relativity and won the 1921 Nobel Prize in Physics.",
-    "nikola tesla": "Nikola Tesla (1856–1943) pioneered alternating current (AC) electrical power systems, induction motors, and wireless transmission experiments.",
-    "alan turing": "Alan Turing (1912–1954) conceptualized the universal Turing Machine, broke the Enigma cipher during WWII, and proposed the Turing Test for artificial intelligence.",
 
     # Mathematics Formulas
     "quadratic formula": "For any quadratic equation $ax^2 + bx + c = 0$ ($a \neq 0$), the roots are:\n$$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$",
     "pythagorean theorem": "In any right-angled triangle with legs $a, b$ and hypotenuse $c$:\n$$a^2 + b^2 = c^2$$",
-    "euler identity": "Euler's Identity unites five fundamental mathematical constants:\n$$e^{i\pi} + 1 = 0$$",
-    "calculus derivative": "The derivative measures instantaneous rate of change:\n$$f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}, \quad \frac{d}{dx}(x^n) = nx^{n-1}$$",
-    "calculus integration": "Indefinite integral power rule:\n$$\int x^n \, dx = \frac{x^{n+1}}{n+1} + C \quad (n \neq -1)$$"
+    "euler identity": "Euler's Identity unites five fundamental mathematical constants:\n$$e^{i\pi} + 1 = 0$$"
 }
 
 # ==============================================================================
-# 5. SMART TOKEN-SCORED OFFLINE RETRIEVAL ENGINE
+# 5. SMART TOKEN-SCORED OFFLINE RETRIEVAL ENGINE & RAG PIPELINE
 # ==============================================================================
 STOPWORDS = {
     "what", "is", "the", "of", "in", "on", "at", "to", "for", "a", "an", "and",
@@ -337,7 +328,7 @@ def tokenize_query(text: str) -> set:
     words = re.findall(r"[a-z0-9]+", text.lower())
     return {w for w in words if w not in STOPWORDS and len(w) > 1}
 
-def retrieve_from_local_corpus(query_str: str, top_k: int = 2) -> list:
+def retrieve_from_local_corpus(query_str: str, top_k: int = 3) -> list:
     """Retrieves relevant knowledge entries from LOCAL_CORPUS using token overlap scoring."""
     q_lower = query_str.lower().strip()
     q_tokens = tokenize_query(q_lower)
@@ -357,14 +348,14 @@ def retrieve_from_local_corpus(query_str: str, top_k: int = 2) -> list:
             key_coverage = len(overlap) / len(key_tokens)
             jaccard = len(overlap) / len(q_tokens.union(key_tokens))
             score = (key_coverage * 3.0) + (jaccard * 2.0)
-            if key_coverage >= 0.5 and score >= 1.8:
+            if key_coverage >= 0.4 and score >= 1.5:
                 scored_matches.append((key, ans, score))
 
     scored_matches.sort(key=lambda x: x[2], reverse=True)
     return scored_matches[:top_k]
 
 # ==============================================================================
-# 6. OFFLINE SYMBOLIC & NUMERICAL MATH & GEOMETRY ENGINE
+# 6. EXTENDED OFFLINE SYMBOLIC & NUMERICAL MATH & GEOMETRY ENGINE
 # ==============================================================================
 def solve_quadratic_equation(a: float, b: float, c: float) -> str:
     """Solves ax^2 + bx + c = 0 with full step-by-step discriminant analysis."""
@@ -667,20 +658,20 @@ def generate_offline_svg_art(prompt_text: str) -> str:
     ]
     bg, c1, c2, c3 = palettes[seed_val % len(palettes)]
     circles = []
-    for _ in range(14):
-        cx = rng.randint(60, 740)
-        cy = rng.randint(60, 440)
-        r = rng.randint(25, 110)
+    for _ in range(16):
+        cx = rng.randint(40, 760)
+        cy = rng.randint(40, 460)
+        r = rng.randint(20, 120)
         col = rng.choice([c1, c2, c3])
-        op = round(rng.uniform(0.18, 0.55), 2)
+        op = round(rng.uniform(0.15, 0.50), 2)
         circles.append(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{col}" fill-opacity="{op}" />')
     safe_label = prompt_text[:45].replace("<", "").replace(">", "").replace("&", "")
     svg = f"""
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" style="border-radius:14px; border:1px solid #4ade80;">
         <rect width="800" height="500" fill="{bg}" />
         {''.join(circles)}
-        <rect x="40" y="390" width="720" height="75" rx="12" fill="rgba(15,23,42,0.82)" stroke="{c1}" stroke-width="1.5"/>
-        <text x="60" y="423" fill="#ffffff" font-family="sans-serif" font-size="18" font-weight="bold">Indian GPT • Offline Procedural Art Engine</text>
+        <rect x="40" y="390" width="720" height="75" rx="12" fill="rgba(15,23,42,0.85)" stroke="{c1}" stroke-width="1.5"/>
+        <text x="60" y="423" fill="#ffffff" font-family="sans-serif" font-size="18" font-weight="bold">Indian GPT • Sovereign Procedural Graphics Engine</text>
         <text x="60" y="448" fill="{c1}" font-family="sans-serif" font-size="14">Prompt: {safe_label}</text>
     </svg>
     """
@@ -706,11 +697,11 @@ def answer_completely_offline(prompt_str: str, detected_script: str) -> str:
     if math_result:
         return f"🔌 *[Offline Sovereign Math Engine]*\n\n{math_result}"
 
-    corpus_hits = retrieve_from_local_corpus(prompt_str, top_k=2)
+    corpus_hits = retrieve_from_local_corpus(prompt_str, top_k=3)
     if corpus_hits:
         best_key, best_ans, best_score = corpus_hits[0]
         response_blocks = [f"🔌 *[Offline Sovereign Knowledge Base — Topic: {best_key.title()}]*\n\n{best_ans}"]
-        if len(corpus_hits) > 1 and corpus_hits[1][2] >= 2.5:
+        if len(corpus_hits) > 1 and corpus_hits[1][2] >= 2.0:
             sec_key, sec_ans, _ = corpus_hits[1]
             response_blocks.append(f"**Related Context ({sec_key.title()}):**\n{sec_ans}")
         return "\n\n---\n\n".join(response_blocks)
@@ -718,11 +709,11 @@ def answer_completely_offline(prompt_str: str, detected_script: str) -> str:
     return (
         f"🔌 **[Offline Sovereign Mode Active]**\n\n"
         f"I am currently running **100% offline without internet** (Detected Script: *{detected_script}*). "
-        f"My built-in offline corpus and math engines can immediately answer queries on Indian States, UTs, History, Science, Capitals, and Mathematics!"
+        f"My built-in sovereign corpus and math engines can immediately answer queries on Indian States, UTs, Constitution, History, Science, World History, and Mathematics!"
     )
 
 # ==============================================================================
-# 9. GROQ CLOUD MODEL DISCOVERY
+# 9. GROQ CLOUD MODEL DISCOVERY & ADVANCED FALLBACKS
 # ==============================================================================
 def get_available_models(api_key: str) -> list:
     """Dynamically queries available text-generation LLMs from Groq Cloud."""
@@ -749,28 +740,28 @@ def get_available_models(api_key: str) -> list:
     return default_models
 
 # ==============================================================================
-# 10. SESSION STATE INITIALIZATION
+# 10. SESSION STATE INITIALIZATION & PERSISTENCE
 # ==============================================================================
-if "chat_sessions_v110" not in st.session_state:
-    st.session_state.chat_sessions_v110 = {
+if "chat_sessions_v120" not in st.session_state:
+    st.session_state.chat_sessions_v120 = {
         "New Chat": [
             {
                 "role": "assistant",
                 "content": (
                     "Namaste! I am **Indian GPT**, a true **Hybrid Online + Offline Sovereign AI Ecosystem** "
                     "created exclusively by **Shubham**.\n\n"
-                    "• **When Online:** I combine my built-in Sovereign Knowledge Base with Cloud LLMs, API keys, Live Web Search, and 1024×1024 FLUX HD Art.\n"
-                    "• **When Offline (No Internet):** I automatically switch to 100% Offline Mode—answering Indian & World History, Geography, Science, Complex Math, and generating procedural vector art without needing any API key or internet!"
+                    "• **When Online:** I combine my massive Mega-Knowledge Base with Cloud LLMs, API keys, Live Web Search, and HD Art.\n"
+                    "• **When Offline (No Internet):** I automatically switch to 100% Offline Mode—answering Indian Constitution, World History, Science, Geography, Complex Math, and generating procedural vector art without needing any API key or internet!"
                 )
             }
         ]
     }
 
-if "current_chat_v110" not in st.session_state:
-    st.session_state.current_chat_v110 = "New Chat"
+if "current_chat_v120" not in st.session_state:
+    st.session_state.current_chat_v120 = "New Chat"
 
 # ==============================================================================
-# 11. SIDEBAR CONTROLS (CLEANED OF UNNECESSARY STATS/BADGES)
+# 11. SIDEBAR CONTROLS & ADVANCED KNOWLEDGE MANAGEMENT PANEL
 # ==============================================================================
 internet_available = check_internet_online()
 
@@ -788,29 +779,41 @@ with st.sidebar:
     if st.button("➕ New Chat Session", use_container_width=True):
         new_chat_name = "New Chat"
         counter = 1
-        while new_chat_name in st.session_state.chat_sessions_v110:
+        while new_chat_name in st.session_state.chat_sessions_v120:
             new_chat_name = f"New Chat {counter}"
             counter += 1
         
-        st.session_state.chat_sessions_v110[new_chat_name] = [
+        st.session_state.chat_sessions_v120[new_chat_name] = [
             {"role": "assistant", "content": "Namaste! New chat session started."}
         ]
-        st.session_state.current_chat_v110 = new_chat_name
+        st.session_state.current_chat_v120 = new_chat_name
         st.rerun()
+
+    st.markdown("---")
+    st.subheader("📚 Knowledge Admin Panel")
+    with st.expander("➕ Add Custom Knowledge"):
+        new_k_topic = st.text_input("Topic / Keyword")
+        new_k_content = st.text_area("Detailed Information / Answer")
+        if st.button("Save to Local Corpus"):
+            if new_k_topic and new_k_content:
+                LOCAL_CORPUS[new_k_topic.lower().strip()] = new_k_content.strip()
+                st.success(f"Successfully added '{new_k_topic}' to Sovereign Corpus!")
+            else:
+                st.error("Please fill in both fields.")
 
     st.markdown("---")
     st.subheader("💬 Chat History")
     
-    for chat_name in list(st.session_state.chat_sessions_v110.keys()):
+    for chat_name in list(st.session_state.chat_sessions_v120.keys()):
         if st.button(chat_name, use_container_width=True, key=f"btn_{chat_name}"):
-            st.session_state.current_chat_v110 = chat_name
+            st.session_state.current_chat_v120 = chat_name
             st.rerun()
 
     st.markdown("---")
     st.subheader("📥 Export & Backup")
-    current_msgs = st.session_state.chat_sessions_v110[st.session_state.current_chat_v110]
+    current_msgs = st.session_state.chat_sessions_v120[st.session_state.current_chat_v120]
     
-    chat_export_text = f"INDIAN GPT - TRANSCRIPT ({st.session_state.current_chat_v110})\n\n"
+    chat_export_text = f"INDIAN GPT - TRANSCRIPT ({st.session_state.current_chat_v120})\n\n"
     for m in current_msgs:
         chat_export_text += f"[{m['role'].upper()}]: {m['content']}\n\n"
     
@@ -831,10 +834,10 @@ with st.sidebar:
 st.title("🇮🇳 Indian GPT")
 st.markdown("##### *Hybrid Online & 100% Offline Sovereign AI Ecosystem • Created by Shubham*")
 
-if st.session_state.current_chat_v110 not in st.session_state.chat_sessions_v110:
-    st.session_state.current_chat_v110 = list(st.session_state.chat_sessions_v110.keys())[0]
+if st.session_state.current_chat_v120 not in st.session_state.chat_sessions_v120:
+    st.session_state.current_chat_v120 = list(st.session_state.chat_sessions_v120.keys())[0]
 
-current_messages = st.session_state.chat_sessions_v110[st.session_state.current_chat_v110]
+current_messages = st.session_state.chat_sessions_v120[st.session_state.current_chat_v120]
 
 for message in current_messages:
     with st.chat_message(message["role"]):
@@ -848,14 +851,14 @@ for message in current_messages:
 prompt = st.chat_input("Ask anything")
 
 if prompt:
-    if st.session_state.current_chat_v110.startswith("New Chat"):
+    if st.session_state.current_chat_v120.startswith("New Chat"):
         new_name = prompt[:28] + ("..." if len(prompt) > 28 else "")
-        if new_name in st.session_state.chat_sessions_v110:
+        if new_name in st.session_state.chat_sessions_v120:
             new_name = f"{new_name} (2)"
         
-        st.session_state.chat_sessions_v110[new_name] = st.session_state.chat_sessions_v110.pop(st.session_state.current_chat_v110)
-        st.session_state.current_chat_v110 = new_name
-        current_messages = st.session_state.chat_sessions_v110[new_name]
+        st.session_state.chat_sessions_v120[new_name] = st.session_state.chat_sessions_v120.pop(st.session_state.current_chat_v120)
+        st.session_state.current_chat_v120 = new_name
+        current_messages = st.session_state.chat_sessions_v120[new_name]
 
     user_msg = {"role": "user", "content": prompt}
     current_messages.append(user_msg)
@@ -885,7 +888,7 @@ if prompt:
                         "🎨 Analyzing prompt semantics and depth layers...",
                         "📐 Constructing 1024×1024 high-resolution composition...",
                         "✨ Rendering photorealistic lighting, shadows & textures...",
-                        "🚀 Finalizing ultra-HD polish via FLUX Neural Engine..."
+                        "🚀 Finalizing ultra-HD polish via Neural Engine..."
                     ]
                     for step_text in steps:
                         step_html = f"""
@@ -937,7 +940,7 @@ if prompt:
                     ]
                     needs_search = any(trigger in p_lower for trigger in search_triggers) and not is_simple_greeting
                     
-                    local_hits = retrieve_from_local_corpus(prompt, top_k=2)
+                    local_hits = retrieve_from_local_corpus(prompt, top_k=3)
                     local_math_hint = solve_math_locally(prompt)
                     
                     local_knowledge_context = ""
@@ -968,7 +971,7 @@ if prompt:
                         </div>
                         """
                         message_placeholder.markdown(thinking_html, unsafe_allow_html=True)
-                    
+
                     ist = timezone(timedelta(hours=5, minutes=30))
                     current_time_str = datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S")
                     
