@@ -83,29 +83,26 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. CONNECTIVITY DETECTION & SECURE API KEY POOL
+# 2. CONNECTIVITY DETECTION & API KEY POOL
 # ==============================================================================
-KEYS_POOL = []
+KEYS_POOL = [
+    "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",
+    "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",
+    "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",
+]
 
-# Securely load API keys from Streamlit secrets
 try:
-    sec_key_main = st.secrets.get("GROQ_API_KEY", "")
-    if sec_key_main:
-        KEYS_POOL.append(sec_key_main)
-    
-    sec_key_alt = st.secrets.get("GROQ_API_KEY_2", "")
-    if sec_key_alt and sec_key_alt not in KEYS_POOL:
-        KEYS_POOL.append(sec_key_alt)
+    sec_key = st.secrets.get("GROQ_API_KEY_2", "")
+    if sec_key and sec_key not in KEYS_POOL:
+        KEYS_POOL.append(sec_key)
 except Exception:
     pass
 
 def get_next_key(index: int) -> str:
     """Rotates cleanly through the configured API key pool."""
-    if not KEYS_POOL:
-        return ""
     return KEYS_POOL[index % len(KEYS_POOL)]
 
-TAVILY_API_KEY = st.secrets.get("TAVILY_API_KEY", "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")
+TAVILY_API_KEY = "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"
 
 def check_internet_online(timeout: float = 2.0) -> bool:
     """Fast socket check to verify whether active internet connectivity exists."""
@@ -841,7 +838,7 @@ if prompt:
                 if is_online_mode:
                     steps = [
                         "🎨 Analyzing prompt semantics and depth layers...",
-                        "📐 Constructing 1024x1024 high-resolution composition...",
+                        "📐 Constructing 1024×1024 high-resolution composition...",
                         "✨ Rendering photorealistic lighting, shadows & textures...",
                         "🚀 Finalizing ultra-HD polish via Neural Engine..."
                     ]
@@ -960,8 +957,6 @@ if prompt:
                         if success:
                             break
                         current_api_key = get_next_key(key_idx)
-                        if not current_api_key:
-                            continue
                         models_to_test = get_available_models(current_api_key)
                         headers = {
                             "Authorization": f"Bearer {current_api_key}",
