@@ -9,13 +9,13 @@ import socket
 from datetime import datetime, timezone, timedelta
 
 # ==============================================================================
-# INDIAN GPT - DEEP AI SOVEREIGN HYBRID ECOSYSTEM
+# INDIAN GPT - CLOUDFLARE AI SOVEREIGN HYBRID ECOSYSTEM
 # Architect & Developer: Shubham
-# Version: 15.5 Pure DeepAI Image Edition
+# Version: 16.0 Cloudflare Workers AI Edition
 # ==============================================================================
 
 st.set_page_config(
-    page_title="Indian GPT - DeepAI Sovereign Hybrid AI",
+    page_title="Indian GPT - Cloudflare Sovereign Hybrid AI",
     page_icon="🇮🇳",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -90,7 +90,9 @@ KEYS_POOL = [
     "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",
 ]
 
-DEEPAI_API_KEY = "ec0adc69-c22e-47b2-860f-79f833d0a271"
+# Cloudflare Workers AI Credentials
+CLOUDFLARE_API_TOKEN = "Cfat_lDtCAoKqZNQaCxPOu9999gDgWSDdsu3QUZcM1QLM0d464d71"
+CLOUDFLARE_ACCOUNT_ID = "17d0994c1d10b66064f49ea61fa32701" # Your Account ID from your Cloudflare dashboard URL
 
 try:
     sec_key = st.secrets.get("GROQ_API_KEY_2", "")
@@ -651,7 +653,7 @@ if "chat_sessions_v130" not in st.session_state:
             {
                 "role": "assistant",
                 "content": (
-                    "Namaste! I am **Indian GPT**, powered by **DeepAI Image Engine** "
+                    "Namaste! I am **Indian GPT**, powered by **Cloudflare Workers AI** "
                     "and created exclusively by **Shubham**.\n\n"
                     "Ask me anything or ask me to generate images!"
                 )
@@ -731,7 +733,7 @@ with st.sidebar:
     st.caption("Created & Architected by **Shubham**")
 
 # ==============================================================================
-# 11. MAIN CONVERSATION VIEWPORT & PURE DEEP-AI PIPELINE
+# 11. MAIN CONVERSATION VIEWPORT & CLOUDFLARE AI PIPELINE
 # ==============================================================================
 st.title("🇮🇳 Indian GPT")
 st.markdown("##### *Hybrid Online & 100% Offline Sovereign AI Ecosystem • Created by Shubham*")
@@ -783,9 +785,9 @@ if prompt:
             if is_image_request:
                 if is_online_mode:
                     steps = [
-                        "🎨 Connecting to DeepAI Engine...",
-                        "📐 Generating image composition...",
-                        "🚀 Finalizing output via DeepAI API..."
+                        "🎨 Connecting to Cloudflare Workers AI...",
+                        "📐 Generating image composition via Stable Diffusion...",
+                        "🚀 Finalizing output..."
                     ]
                     for step_text in steps:
                         step_html = f"""
@@ -800,31 +802,24 @@ if prompt:
                         time.sleep(0.4)
                     
                     try:
-                        deepai_resp = requests.post(
-                            "https://api.deepai.org/api/text2img",
-                            data={'text': prompt},
-                            headers={'api-key': DEEPAI_API_KEY},
-                            timeout=35
-                        )
+                        cf_url = f"https://api.cloudflare.com/client/v4/accounts/{CLOUDFLARE_ACCOUNT_ID}/ai/run/@cf/stabilityai/stable-diffusion-xl-base-1.0"
+                        cf_headers = {
+                            "Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}",
+                            "Content-Type": "application/json"
+                        }
+                        cf_payload = {"prompt": prompt}
                         
-                        if deepai_resp.status_code == 200:
-                            res_json = deepai_resp.json()
-                            img_url = res_json.get("output_url")
-                            if img_url:
-                                img_data_resp = requests.get(img_url, timeout=20)
-                                if img_data_resp.status_code == 200:
-                                    generated_image_bytes = img_data_resp.content
-                                    full_response = "Here is your generated image via **DeepAI**:"
-                                else:
-                                    full_response = "⚠️ **Error:** DeepAI image download failed. Please try again."
-                            else:
-                                full_response = "⚠️ **Error:** DeepAI server did not return an image URL. Please try again."
+                        cf_resp = requests.post(cf_url, headers=cf_headers, json=cf_payload, timeout=45)
+                        
+                        if cf_resp.status_code == 200:
+                            generated_image_bytes = cf_resp.content
+                            full_response = "Here is your generated image via **Cloudflare Workers AI**:"
                         else:
-                            full_response = f"⚠️ **API Error:** DeepAI returned status code {deepai_resp.status_code}."
+                            full_response = f"⚠️ **Cloudflare API Error:** Status code {cf_resp.status_code}. Response: {cf_resp.text}"
                     except Exception as err:
-                        full_response = f"⚠️ **Connection Error:** Could not reach DeepAI server. ({err})"
+                        full_response = f"⚠️ **Connection Error:** Could not reach Cloudflare AI server. ({err})"
                 else:
-                    full_response = "⚠️ **Offline Mode:** Image generation requires an active internet connection to reach DeepAI."
+                    full_response = "⚠️ **Offline Mode:** Image generation requires an active internet connection to reach Cloudflare AI."
                 
                 message_placeholder.markdown(full_response)
                 if generated_image_bytes:
