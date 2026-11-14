@@ -8,11 +8,13 @@ import re
 import socket
 import random
 from datetime import datetime, timezone, timedelta
+from streamlit_mic_recorder import mic_recorder
+import streamlit.components.v1 as components
 
 # ==============================================================================
 # INDIAN GPT - TRUE HYBRID ONLINE/OFFLINE SOVEREIGN AI ECOSYSTEM
 # Architect & Developer: Shubham
-# Version: 15.0 Ultimate Mega-Scale Sovereign Knowledge Edition
+# Version: 15.2 Full Voice-Enabled Sovereign Knowledge Edition
 # ==============================================================================
 
 st.set_page_config(
@@ -83,7 +85,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. CONNECTIVITY DETECTION & API KEY POOL
+# 2. CONNECTIVITY DETECTION, VOICE TRANSCRIPTION & API KEY POOL
 # ==============================================================================
 KEYS_POOL = [
     "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",
@@ -113,6 +115,28 @@ def check_internet_online(timeout: float = 2.0) -> bool:
         except Exception:
             continue
     return False
+
+def transcribe_voice_with_groq(audio_bytes: bytes) -> str:
+    """Converts recorded voice audio into text using Groq Whisper API."""
+    for idx in range(len(KEYS_POOL)):
+        api_key = get_next_key(idx)
+        headers = {"Authorization": f"Bearer {api_key}"}
+        files = {
+            "file": ("voice_input.wav", audio_bytes, "audio/wav"),
+            "model": (None, "whisper-large-v3-turbo"),
+        }
+        try:
+            resp = requests.post(
+                "https://api.groq.com/openai/v1/audio/transcriptions",
+                headers=headers,
+                files=files,
+                timeout=15
+            )
+            if resp.status_code == 200:
+                return resp.json().get("text", "").strip()
+        except Exception:
+            continue
+    return ""
 
 def search_web(query: str) -> str:
     """Performs live internet retrieval via Tavily Search API when online."""
@@ -710,6 +734,9 @@ if "chat_sessions_v130" not in st.session_state:
 if "current_chat_v130" not in st.session_state:
     st.session_state.current_chat_v130 = "New Chat"
 
+if "last_processed_audio_id" not in st.session_state:
+    st.session_state.last_processed_audio_id = None
+
 # ==============================================================================
 # 11. SIDEBAR CONTROLS & ADVANCED KNOWLEDGE MANAGEMENT PANEL
 # ==============================================================================
@@ -779,7 +806,7 @@ with st.sidebar:
     st.caption("Created & Architected by **Shubham**")
 
 # ==============================================================================
-# 12. MAIN CONVERSATION VIEWPORT & HYBRID ROUTING PIPELINE
+# 12. MAIN CONVERSATION VIEWPORT & HYBRID ROUTING PIPELINE (WITH FULL VOICE IN/OUT)
 # ==============================================================================
 st.title("🇮🇳 Indian GPT")
 st.markdown("##### *Hybrid Online & 100% Offline Sovereign AI Ecosystem • Created by Shubham*")
@@ -797,8 +824,35 @@ for message in current_messages:
         if "svg_art" in message and message["svg_art"]:
             st.markdown(message["svg_art"], unsafe_allow_html=True)
 
-# Chat input with placeholder set strictly to "Ask anything"
-prompt = st.chat_input("Ask anything")
+# Voice Input Bar above chat input
+voice_col1, voice_col2 = st.columns([1, 4])
+with voice_col1:
+    recorded_audio = mic_recorder(
+        start_prompt="🎤 Speak",
+        stop_prompt="⏹️ Send Voice",
+        key="indian_gpt_voice_recorder"
+    )
+with voice_col2:
+    st.caption("Tap **🎤 Speak** to ask questions with your voice (Powered by Groq Whisper AI)")
+
+typed_prompt = st.chat_input("Ask anything")
+voice_prompt = None
+
+if recorded_audio and recorded_audio.get("bytes"):
+    audio_id = recorded_audio.get("id")
+    if audio_id != st.session_state.last_processed_audio_id:
+        st.session_state.last_processed_audio_id = audio_id
+        if is_online_mode:
+            with st.spinner("🎧 Listening & transcribing voice..."):
+                transcribed_text = transcribe_voice_with_groq(recorded_audio["bytes"])
+                if transcribed_text:
+                    voice_prompt = transcribed_text
+                else:
+                    st.warning("Could not hear clearly. Please try speaking again.")
+        else:
+            st.warning("🔌 Voice transcription requires internet connection (Auto Hybrid Mode).")
+
+prompt = typed_prompt or voice_prompt
 
 if prompt:
     if st.session_state.current_chat_v130.startswith("New Chat"):
@@ -1016,6 +1070,32 @@ if prompt:
                 assistant_msg["svg_art"] = generated_svg_art
                 
             current_messages.append(assistant_msg)
+
+            # --- Text-to-Speech Voice Output Engine ---
+            clean_speech_text = full_response.replace("*", "").replace("#", "").replace("`", "").replace("$$", "").replace("🔌", "")
+            tts_html = f"""
+            <div>
+                <button onclick="speakText()" style="background-color: #4ade80; color: #0f172a; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 8px; margin-bottom: 10px;">
+                    🔊 উত্তরটি মুখে শুনুন (Listen Voice)
+                </button>
+                <script>
+                    function speakText() {{
+                        if ('speechSynthesis' in window) {{
+                            window.speechSynthesis.cancel();
+                            let text = {json.dumps(clean_speech_text)};
+                            let utterance = new SpeechSynthesisUtterance(text);
+                            utterance.rate = 1.0;
+                            utterance.pitch = 1.0;
+                            utterance.lang = 'bn-IN';
+                            window.speechSynthesis.speak(utterance);
+                        }}
+                    }}
+                    setTimeout(speakText, 400);
+                </script>
+            </div>
+            """
+            components.html(tts_html, height=50)
+
             st.rerun()
         except Exception as e:
             st.error(f"System Notice: {e}")
