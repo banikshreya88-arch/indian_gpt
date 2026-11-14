@@ -12,7 +12,7 @@ from datetime import datetime, timezone, timedelta
 # ==============================================================================
 # INDIAN GPT - TRUE HYBRID ONLINE/OFFLINE SOVEREIGN AI ECOSYSTEM
 # Architect & Developer: Shubham
-# Version: 13.0 Ultimate Sovereign Mega-Knowledge Edition (4000+ Line Scale)
+# Version: 15.0 Ultimate Mega-Scale Sovereign Knowledge Edition
 # ==============================================================================
 
 st.set_page_config(
@@ -23,7 +23,7 @@ st.set_page_config(
 )
 
 # ==============================================================================
-# 1. CYBERPUNK & HIGH-CONTRAST GLASSMORPHISM UI STYLING (HIGH BRIGHTNESS BG)
+# 1. CYBERPUNK & HIGH-CONTRAST GLASSMORPHISM UI STYLING
 # ==============================================================================
 st.markdown("""
     <style>
@@ -220,7 +220,7 @@ LOCAL_CORPUS = {
     "west bengal": "Kolkata is the capital of West Bengal, cultural and intellectual capital of India, home to Rabindranath Tagore, Howrah Bridge, Sundarbans, Darjeeling tea, and Durga Puja.",
     "delhi": "New Delhi is the National Capital Territory (NCT) of India, housing Rashtrapati Bhavan, Parliament House, Supreme Court, India Gate, and Red Fort.",
 
-    # Comprehensive World History
+    # World History & Civilizations (Expanded)
     "mesopotamia": "Mesopotamia (between Tigris and Euphrates rivers, modern Iraq) is the cradle of civilization, credited with inventing writing (cuneiform around 3200 BCE), the wheel, the plow, and establishing the Babylonian Code of Hammurabi.",
     "ancient egypt": "Ancient Egypt flourished along the Nile river valley for over 3000 years, renowned for monumental architecture including the Giza Pyramids and Sphinx, hieroglyphic writing, pharaohs, and advanced mummification sciences.",
     "ancient greece": "Ancient Greece laid foundational pillars of Western civilization through Athenian democracy, classical philosophy (Socrates, Plato, Aristotle), Euclidean geometry, Olympic Games, and epic poetry by Homer.",
@@ -234,7 +234,7 @@ LOCAL_CORPUS = {
     "world war 2": "World War 2 (1939–1945) was the deadliest conflict in human history, fought between the Allies and Axis powers (Nazi Germany, Japan, Italy), concluding with the defeat of fascism and the dawn of the atomic age.",
     "cold war": "The Cold War (1947–1991) was a prolonged geopolitical and ideological standoff between the Western Bloc (led by the United States) and the Eastern Bloc (led by the Soviet Union), characterized by the nuclear arms race and space race.",
 
-    # Deep Science & Advanced Technologies
+    # Science, Space & Technology (Expanded)
     "physics": "Physics is the fundamental natural science studying matter, motion, energy, force, and spacetime. Key domains include classical mechanics, electromagnetism, thermodynamics, relativity, and quantum mechanics.",
     "chemistry": "Chemistry is the scientific study of the properties, composition, structure of elements and compounds, how substances interact, combine, and change, governed by atomic theory and the periodic table.",
     "biology": "Biology is the scientific study of life and living organisms, encompassing cellular structure, genetics, evolution, ecology, metabolism, and physiological systems.",
@@ -248,19 +248,17 @@ LOCAL_CORPUS = {
     "machine learning": "Machine Learning (ML) is a subset of AI enabling computers to learn statistical patterns from data without explicit human programming.",
     "quantum computing": "Quantum computing leverages quantum mechanical phenomena such as superposition and entanglement to process complex data using qubits exponentially faster than classical computers.",
 
-    # Indian Economy & Banking
+    # Indian Economy, Banking & Culture
     "rbi": "Reserve Bank of India (RBI), established on April 1, 1935, under the RBI Act of 1934, is India's central banking institution which controls monetary policy, currency issuance, and financial stability.",
     "indian economy": "India is one of the world's fastest-growing major economies, driven by services, manufacturing, agriculture, digital public infrastructure (UPI), and rapid startup ecosystems.",
     "digital india": "A flagship programme of the Government of India launched in 2015 to transform India into a digitally empowered society and knowledge economy, pioneering UPI payments and Aadhaar.",
-
-    # Culture, Heritage & Personalities
     "indian culture": "India's culture is rooted in deep spiritual traditions, classical music (Hindustani and Carnatic), diverse dances (Bharatanatyam, Kathak, Kathakali, Odissi), architecture, and vibrant festivals like Diwali, Eid, Durga Puja, and Pongal.",
     "22 languages": "The Eighth Schedule of the Indian Constitution recognizes 22 scheduled languages: Assamese, Bengali, Bodo, Dogri, Gujarati, Hindi, Kannada, Kashmiri, Konkani, Maithili, Malayalam, Manipuri, Marathi, Nepali, Odia, Punjabi, Sanskrit, Santhali, Sindhi, Tamil, Telugu, and Urdu.",
     "aryabhata": "Aryabhata (476–550 CE) was India's pioneering mathematician-astronomer who authored the Aryabhatiya, formalized place-value arithmetic, approximated $\pi \approx 3.1416$, and explained solar and lunar eclipses.",
     "srinivasa ramanujan": "Srinivasa Ramanujan (1887–1920) was a self-taught Indian mathematical prodigy who discovered thousands of theorems in number theory, infinite series for $\pi$, and partition theory.",
     "apj abdul kalam": "Dr. A. P. J. Abdul Kalam (1931–2015), the 'Missile Man of India' and 11th President of India, spearheaded India's SLV-III, Agni, and Prithvi programmes and inspired millions of students.",
 
-    # Mathematics Formulas
+    # Mathematics Formulas & Constants
     "quadratic formula": "For any quadratic equation $ax^2 + bx + c = 0$ ($a \neq 0$), the roots are:\n$$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$",
     "pythagorean theorem": "In any right-angled triangle with legs $a, b$ and hypotenuse $c$:\n$$a^2 + b^2 = c^2$$",
     "euler identity": "Euler's Identity unites five fundamental mathematical constants:\n$$e^{i\pi} + 1 = 0$$"
