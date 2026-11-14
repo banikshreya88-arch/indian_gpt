@@ -8,13 +8,11 @@ import re
 import socket
 import random
 from datetime import datetime, timezone, timedelta
-from streamlit_mic_recorder import mic_recorder
-import streamlit.components.v1 as components
 
 # ==============================================================================
 # INDIAN GPT - TRUE HYBRID ONLINE/OFFLINE SOVEREIGN AI ECOSYSTEM
 # Architect & Developer: Shubham
-# Version: 15.2 Full Voice-Enabled Sovereign Knowledge Edition
+# Version: 15.0 Ultimate Mega-Scale Sovereign Knowledge Edition
 # ==============================================================================
 
 st.set_page_config(
@@ -85,7 +83,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. CONNECTIVITY DETECTION, VOICE TRANSCRIPTION & API KEY POOL
+# 2. CONNECTIVITY DETECTION & API KEY POOL
 # ==============================================================================
 KEYS_POOL = [
     "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",
@@ -115,28 +113,6 @@ def check_internet_online(timeout: float = 2.0) -> bool:
         except Exception:
             continue
     return False
-
-def transcribe_voice_with_groq(audio_bytes: bytes) -> str:
-    """Converts recorded voice audio into text using Groq Whisper API."""
-    for idx in range(len(KEYS_POOL)):
-        api_key = get_next_key(idx)
-        headers = {"Authorization": f"Bearer {api_key}"}
-        files = {
-            "file": ("voice_input.wav", audio_bytes, "audio/wav"),
-            "model": (None, "whisper-large-v3-turbo"),
-        }
-        try:
-            resp = requests.post(
-                "https://api.groq.com/openai/v1/audio/transcriptions",
-                headers=headers,
-                files=files,
-                timeout=15
-            )
-            if resp.status_code == 200:
-                return resp.json().get("text", "").strip()
-        except Exception:
-            continue
-    return ""
 
 def search_web(query: str) -> str:
     """Performs live internet retrieval via Tavily Search API when online."""
@@ -192,6 +168,7 @@ def detect_indian_script(text: str) -> str:
 # 4. MASSIVE MEGA-SCALE SOVEREIGN KNOWLEDGE CORPUS (EXPANDED KNOWLEDGE BASE)
 # ==============================================================================
 LOCAL_CORPUS = {
+    # Creator & Identity
     "who made you": "I am Indian GPT, a sovereign hybrid online/offline AI ecosystem designed, architected, and programmed exclusively by Shubham.",
     "who created you": "I was created, engineered, and deployed by Shubham as an indigenous AI platform that functions seamlessly online with cloud LLMs and live web search, and 100% offline with its massive built-in knowledge and math solvers.",
     "who is your creator": "My creator, developer, and sole architect is Shubham.",
@@ -332,6 +309,7 @@ def retrieve_from_local_corpus(query_str: str, top_k: int = 3) -> list:
 # 6. EXTENDED OFFLINE SYMBOLIC & NUMERICAL MATH & GEOMETRY ENGINE
 # ==============================================================================
 def solve_quadratic_equation(a: float, b: float, c: float) -> str:
+    """Solves ax^2 + bx + c = 0 with full step-by-step discriminant analysis."""
     if a == 0:
         if b == 0:
             return "Invalid equation: both $a$ and $b$ cannot be zero."
@@ -369,6 +347,7 @@ def solve_quadratic_equation(a: float, b: float, c: float) -> str:
     return "\n\n".join(steps)
 
 def solve_linear_equation(a: float, b: float, c: float) -> str:
+    """Solves linear equation ax + b = c step by step."""
     if a == 0:
         return "Invalid linear equation: coefficient $a$ cannot be zero."
     x = (c - b) / a
@@ -380,6 +359,7 @@ def solve_linear_equation(a: float, b: float, c: float) -> str:
     )
 
 def check_prime_and_factors(n: int) -> str:
+    """Checks primality and computes full prime factorization."""
     if n <= 1:
         return f"**{n}** is neither prime nor composite."
     if n <= 3:
@@ -409,6 +389,7 @@ def check_prime_and_factors(n: int) -> str:
     )
 
 def compute_factorial(n: int) -> str:
+    """Computes n! safely up to n = 100."""
     if n < 0:
         return "Factorial is not defined for negative integers."
     if n > 100:
@@ -417,6 +398,7 @@ def compute_factorial(n: int) -> str:
     return f"The factorial of **{n}** is:\n$${n}! = {val}$$"
 
 def compute_combinatorics(n: int, r: int) -> str:
+    """Computes Permutation nPr and Combination nCr."""
     if n < 0 or r < 0 or r > n:
         return "Invalid inputs: ensure $0 \le r \le n$."
     npr = math.perm(n, r)
@@ -428,6 +410,7 @@ def compute_combinatorics(n: int, r: int) -> str:
     )
 
 def compute_gcd_lcm(a: int, b: int) -> str:
+    """Computes GCD and LCM."""
     if a == 0 and b == 0:
         return "GCD and LCM are undefined when both integers are zero."
     g = math.gcd(a, b)
@@ -439,6 +422,7 @@ def compute_gcd_lcm(a: int, b: int) -> str:
     )
 
 def generate_fibonacci(n: int) -> str:
+    """Generates the first n terms of the Fibonacci sequence."""
     if n <= 0:
         return "Please specify a positive integer $n \ge 1$."
     if n > 50:
@@ -451,6 +435,7 @@ def generate_fibonacci(n: int) -> str:
     return f"**First {n} Fibonacci Numbers:**\n`{', '.join(seq)}`"
 
 def compute_trig_degrees(deg: float) -> str:
+    """Computes trigonometric ratios in degrees."""
     rad = math.radians(deg)
     s = math.sin(rad)
     c = math.cos(rad)
@@ -463,6 +448,7 @@ def compute_trig_degrees(deg: float) -> str:
     )
 
 def compute_compound_interest(p: float, r: float, t: float, n: int = 1) -> str:
+    """Computes Compound Interest and Final Amount."""
     if p < 0 or r < 0 or t < 0 or n <= 0:
         return "Invalid inputs: Principal, Rate, and Time must be non-negative."
     amount = p * ((1 + (r / (100 * n))) ** (n * t))
@@ -476,6 +462,7 @@ def compute_compound_interest(p: float, r: float, t: float, n: int = 1) -> str:
     )
 
 def compute_statistics_summary(numbers: list) -> str:
+    """Computes Mean, Median, Variance, and Standard Deviation."""
     if not numbers:
         return "No valid numbers provided for statistical analysis."
     sorted_nums = sorted(numbers)
@@ -497,6 +484,7 @@ def compute_statistics_summary(numbers: list) -> str:
     )
 
 def compute_geometry_metrics(shape: str, nums: list) -> str:
+    """Computes area, perimeter, and volume for geometric shapes."""
     if shape == "circle" and len(nums) >= 1:
         r = nums[0]
         area = math.pi * (r ** 2)
@@ -516,6 +504,7 @@ def compute_geometry_metrics(shape: str, nums: list) -> str:
     return ""
 
 def evaluate_safe_arithmetic(expr: str):
+    """Safely evaluates arithmetic expressions."""
     cleaned = (
         expr.lower()
         .replace("calculate", "")
@@ -541,6 +530,7 @@ def evaluate_safe_arithmetic(expr: str):
     return None
 
 def solve_math_locally(query_str: str):
+    """Routes mathematical queries to specialized offline solvers."""
     q = query_str.lower().strip()
     arith = evaluate_safe_arithmetic(q)
     if arith:
@@ -609,6 +599,7 @@ def solve_math_locally(query_str: str):
 # 7. OFFLINE PROCEDURAL VECTOR ART ENGINE
 # ==============================================================================
 def generate_offline_svg_art(prompt_text: str) -> str:
+    """Generates procedural SVG artwork offline."""
     seed_val = sum(ord(ch) for ch in prompt_text)
     rng = random.Random(seed_val)
     palettes = [
@@ -641,6 +632,7 @@ def generate_offline_svg_art(prompt_text: str) -> str:
 # 8. UNIFIED OFFLINE ANSWER SYNTHESIZER
 # ==============================================================================
 def answer_completely_offline(prompt_str: str, detected_script: str) -> str:
+    """Generates authoritative answers using 100% local engines."""
     p_lower = prompt_str.lower().strip()
 
     if any(k in p_lower for k in ["time", "date", "ajke", "somoy", "tarikh", "today"]):
@@ -675,6 +667,7 @@ def answer_completely_offline(prompt_str: str, detected_script: str) -> str:
 # 9. GROQ CLOUD MODEL DISCOVERY & ADVANCED FALLBACKS
 # ==============================================================================
 def get_available_models(api_key: str) -> list:
+    """Dynamically queries available text-generation LLMs from Groq Cloud."""
     default_models = [
         "llama-3.3-70b-versatile",
         "llama-3.1-8b-instant",
@@ -708,7 +701,7 @@ if "chat_sessions_v130" not in st.session_state:
                 "content": (
                     "Namaste! I am **Indian GPT**, a true **Hybrid Online + Offline Sovereign AI Ecosystem** "
                     "created exclusively by **Shubham**.\n\n"
-                    "Ask me anything by typing or speaking using the microphone!"
+                    "Ask me anything across Indian Constitution, World History, Science, Mathematics, Geography, or General Knowledge!"
                 )
             }
         ]
@@ -716,9 +709,6 @@ if "chat_sessions_v130" not in st.session_state:
 
 if "current_chat_v130" not in st.session_state:
     st.session_state.current_chat_v130 = "New Chat"
-
-if "last_processed_audio_id" not in st.session_state:
-    st.session_state.last_processed_audio_id = None
 
 # ==============================================================================
 # 11. SIDEBAR CONTROLS & ADVANCED KNOWLEDGE MANAGEMENT PANEL
@@ -789,7 +779,7 @@ with st.sidebar:
     st.caption("Created & Architected by **Shubham**")
 
 # ==============================================================================
-# 12. MAIN CONVERSATION VIEWPORT & HYBRID ROUTING PIPELINE (WITH VOICE IN & OUT)
+# 12. MAIN CONVERSATION VIEWPORT & HYBRID ROUTING PIPELINE
 # ==============================================================================
 st.title("🇮🇳 Indian GPT")
 st.markdown("##### *Hybrid Online & 100% Offline Sovereign AI Ecosystem • Created by Shubham*")
@@ -807,35 +797,8 @@ for message in current_messages:
         if "svg_art" in message and message["svg_art"]:
             st.markdown(message["svg_art"], unsafe_allow_html=True)
 
-# Voice Input Bar above chat input
-voice_col1, voice_col2 = st.columns([1, 4])
-with voice_col1:
-    recorded_audio = mic_recorder(
-        start_prompt="🎤 Speak",
-        stop_prompt="⏹️ Send Voice",
-        key="indian_gpt_voice_recorder"
-    )
-with voice_col2:
-    st.caption("Tap **🎤 Speak** to ask questions with your voice (Powered by Groq Whisper AI)")
-
-typed_prompt = st.chat_input("Ask anything")
-voice_prompt = None
-
-if recorded_audio and recorded_audio.get("bytes"):
-    audio_id = recorded_audio.get("id")
-    if audio_id != st.session_state.last_processed_audio_id:
-        st.session_state.last_processed_audio_id = audio_id
-        if is_online_mode:
-            with st.spinner("🎧 Listening & transcribing voice..."):
-                transcribed_text = transcribe_voice_with_groq(recorded_audio["bytes"])
-                if transcribed_text:
-                    voice_prompt = transcribed_text
-                else:
-                    st.warning("Could not hear clearly. Please try speaking again.")
-        else:
-            st.warning("🔌 Voice transcription requires internet connection (Auto Hybrid Mode).")
-
-prompt = typed_prompt or voice_prompt
+# Chat input with placeholder set strictly to "Ask anything"
+prompt = st.chat_input("Ask anything")
 
 if prompt:
     if st.session_state.current_chat_v130.startswith("New Chat"):
@@ -1053,27 +1016,6 @@ if prompt:
                 assistant_msg["svg_art"] = generated_svg_art
                 
             current_messages.append(assistant_msg)
-
-            # --- Text-to-Speech Voice Output Engine ---
-            clean_speech_text = full_response.replace("*", "").replace("#", "").replace("`", "").replace("$$", "")
-            tts_html = f"""
-            <script>
-                function speakResponse() {{
-                    if ('speechSynthesis' in window) {{
-                        window.speechSynthesis.cancel();
-                        let text = {json.dumps(clean_speech_text)};
-                        let utterance = new SpeechSynthesisUtterance(text);
-                        utterance.rate = 1.0;
-                        utterance.pitch = 1.0;
-                        utterance.lang = 'bn-IN';
-                        window.speechSynthesis.speak(utterance);
-                    }}
-                }}
-                speakResponse();
-            </script>
-            """
-            components.html(tts_html, height=0, width=0)
-
             st.rerun()
         except Exception as e:
             st.error(f"System Notice: {e}")
