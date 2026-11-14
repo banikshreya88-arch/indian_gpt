@@ -16,10 +16,10 @@ from datetime import datetime, timezone, timedelta
 # ==============================================================================
 
 st.set_page_config(
-    page_title="Indian GPT - Sovereign Hybrid AI Ecosystem",
-    page_icon="🇮🇳",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    page_title="Indian GPT - Sovereign Hybrid AI Ecosystem",
+    page_icon="🇮🇳",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # ==============================================================================
