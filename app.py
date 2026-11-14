@@ -82,6 +82,18 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 def generate_safe_image_url(prompt_text: str) -> str:
+    def generate_safe_image_url(prompt_text: str) -> str:
+    """Generates a clean, family-friendly image URL with strict safety modifiers."""
+    # Safety filter: block unwanted NSFW keywords instantly
+    clean_prompt = prompt_text.lower()
+    unsafe_words = ["nsfw", "nude", "naked", "sex", "sexy", "adult", "bikini", "boob"]
+    if any(word in clean_prompt for word in unsafe_words):
+        return None # Block unsafe prompts completely
+        
+    # Add strict family-friendly modifiers to every prompt
+    safe_enhanced = f"{prompt_text}, safe for work, fully clothed, cinematic lighting, high quality"
+    encoded = urllib.parse.quote(safe_enhanced)
+    return f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&model=flux&nologo=true"
     """Generates a clean, family-friendly image URL with strict safety modifiers."""
     # Safety filter: block unwanted NSFW keywords instantly
     clean_prompt = prompt_text.lower()
