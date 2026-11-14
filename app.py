@@ -81,30 +81,6 @@ st.markdown("""
     .dot3 { animation: bounce 1.4s infinite ease-in-out both; }
     </style>
 """, unsafe_allow_html=True)
-def generate_safe_image_url(prompt_text: str) -> str:
-    def generate_safe_image_url(prompt_text: str) -> str:
-    """Generates a clean, family-friendly image URL with strict safety modifiers."""
-    # Safety filter: block unwanted NSFW keywords instantly
-    clean_prompt = prompt_text.lower()
-    unsafe_words = ["nsfw", "nude", "naked", "sex", "sexy", "adult", "bikini", "boob"]
-    if any(word in clean_prompt for word in unsafe_words):
-        return None # Block unsafe prompts completely
-        
-    # Add strict family-friendly modifiers to every prompt
-    safe_enhanced = f"{prompt_text}, safe for work, fully clothed, cinematic lighting, high quality"
-    encoded = urllib.parse.quote(safe_enhanced)
-    return f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&model=flux&nologo=true"
-    """Generates a clean, family-friendly image URL with strict safety modifiers."""
-    # Safety filter: block unwanted NSFW keywords instantly
-    clean_prompt = prompt_text.lower()
-    unsafe_words = ["nsfw", "nude", "naked", "sex", "sexy", "adult", "bikini", "boob"]
-    if any(word in clean_prompt for word in unsafe_words):
-        return None # Block unsafe prompts completely
-        
-    # Add strict family-friendly modifiers to every prompt
-    safe_enhanced = f"{prompt_text}, safe for work, fully clothed, cinematic lighting, high quality"
-    encoded = urllib.parse.quote(safe_enhanced)
-    return f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&model=flux&nologo=true"
 
 # ==============================================================================
 # 2. CONNECTIVITY DETECTION & API KEY POOL
@@ -112,7 +88,7 @@ def generate_safe_image_url(prompt_text: str) -> str:
 KEYS_POOL = [
     "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",
     "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",
-    "AQ.Ab8RN6IpernDRYsxp469A7y7nFGRUwLB9_LJ6EE7PZDxvDpfYQ",
+    "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",
 ]
 
 try:
@@ -126,7 +102,7 @@ def get_next_key(index: int) -> str:
     """Rotates cleanly through the configured API key pool."""
     return KEYS_POOL[index % len(KEYS_POOL)]
 
-TAVILY_API_KEY = "AQ.Ab8RN6IpernDRYsxp469A7y7nFGRUwLB9_LJ6EE7PZDxvDpfYQ"
+TAVILY_API_KEY = "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"
 
 def check_internet_online(timeout: float = 2.0) -> bool:
     """Fast socket check to verify whether active internet connectivity exists."""
