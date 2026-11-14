@@ -102,7 +102,7 @@ def get_next_key(index: int) -> str:
     """Rotates cleanly through the configured API key pool."""
     return KEYS_POOL[index % len(KEYS_POOL)]
 
-TAVILY_API_KEY = "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"
+TAVILY_API_KEY = "AQ.Ab8RN6IpernDRYsxp469A7y7nFGRUwLB9_LJ6EE7PZDxvDpfYQ"
 
 def check_internet_online(timeout: float = 2.0) -> bool:
     """Fast socket check to verify whether active internet connectivity exists."""
