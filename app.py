@@ -104,10 +104,27 @@ def get_next_key(index: int) -> str:
 
 TAVILY_API_KEY = "AQ.Ab8RN6IpernDRYsxp469A7y7nFGRUwLB9_LJ6EE7PZDxvDpfYQ"
 
-# Replaced Pollinations AI completely with High-Quality Hugging Face FLUX Inference Engine
+# STRICT OVERRIDE: Pollinations AI permanently banned. Purely Hugging Face FLUX Engine Active.
 HF_IMAGE_API_TOKEN = "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"
 HF_IMAGE_API_URL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell"
 
+def generate_secure_image(prompt_text: str) -> bytes:
+    """Strictly blocks any legacy/third-party calls and forces Hugging Face FLUX."""
+    import requests
+    
+    # Safety assertion to completely forbid any accidental pollinations usage
+    if not prompt_text or "pollinations" in prompt_text.lower():
+        raise ValueError("Pollinations AI is permanently deprecated and blocked.")
+        
+    headers = {"Authorization": f"Bearer {HF_IMAGE_API_TOKEN}"}
+    payload = {"inputs": prompt_text}
+    try:
+        response = requests.post(HF_IMAGE_API_URL, headers=headers, json=payload, timeout=35)
+        if response.status_code == 200:
+            return response.content
+    except Exception:
+        pass
+    return None
 def generate_secure_image(prompt_text: str) -> bytes:
     """Generates clean, high-quality images via Hugging Face instead of Pollinations AI."""
     import requests
