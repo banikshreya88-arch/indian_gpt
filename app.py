@@ -12,7 +12,7 @@ from datetime import datetime, timezone, timedelta
 # ==============================================================================
 # INDIAN GPT - DEEP AI SOVEREIGN HYBRID ECOSYSTEM
 # Architect & Developer: Shubham
-# Version: 15.3 DeepAI Secure Image Edition
+# Version: 15.4 Unrestricted DeepAI Image Edition
 # ==============================================================================
 
 st.set_page_config(
@@ -170,7 +170,6 @@ def detect_indian_script(text: str) -> str:
 # 4. MASSIVE MEGA-SCALE SOVEREIGN KNOWLEDGE CORPUS (EXPANDED KNOWLEDGE BASE)
 # ==============================================================================
 LOCAL_CORPUS = {
-    # Creator & Identity
     "who made you": "I am Indian GPT, a sovereign hybrid online/offline AI ecosystem designed, architected, and programmed exclusively by Shubham.",
     "who created you": "I was created, engineered, and deployed by Shubham as an indigenous AI platform that functions seamlessly online with cloud LLMs and live web search, and 100% offline with its massive built-in knowledge and math solvers.",
     "who is your creator": "My creator, developer, and sole architect is Shubham.",
@@ -685,9 +684,9 @@ if "chat_sessions_v130" not in st.session_state:
             {
                 "role": "assistant",
                 "content": (
-                    "Namaste! I am **Indian GPT**, powered by **DeepAI Secure Image Engine** "
+                    "Namaste! I am **Indian GPT**, powered by **DeepAI Image Engine** "
                     "and created exclusively by **Shubham**.\n\n"
-                    "Ask me anything or ask me to generate safe, high-definition images!"
+                    "Ask me anything or ask me to generate images!"
                 )
             }
         ]
@@ -765,7 +764,7 @@ with st.sidebar:
     st.caption("Created & Architected by **Shubham**")
 
 # ==============================================================================
-# 12. MAIN CONVERSATION VIEWPORT & DEEP-AI HYBRID PIPELINE
+# 12. MAIN CONVERSATION VIEWPORT & DEEP-AI UNRESTRICTED PIPELINE
 # ==============================================================================
 st.title("🇮🇳 Indian GPT")
 st.markdown("##### *Hybrid Online & 100% Offline Sovereign AI Ecosystem • Created by Shubham*")
@@ -818,70 +817,62 @@ if prompt:
             is_image_request = any(starter in p_lower for starter in image_starters)
             
             if is_image_request:
-                # ----------------- STRICT SAFETY FILTER FOR DEEPAI -----------------
-                unsafe_keywords = ["nsfw", "sensual", "nude", "adult", "private", "18+", "sexy", "hot", "explicit"]
-                if any(bad in p_lower for bad in unsafe_keywords):
-                    full_response = "⚠️ **Safety Notice:** এই ধরণের প্রম্পট দিয়ে ছবি তৈরি করা সম্ভব নয়। দয়া করে একটি শালীন এবং সুন্দর প্রম্পট দিন।"
-                    message_placeholder.markdown(full_response)
-                else:
-                    if is_online_mode:
-                        steps = [
-                            "🎨 Connecting to DeepAI Neural Engine...",
-                            "📐 Rendering high-resolution composition...",
-                            "✨ Polishing details & lighting via DeepAI API...",
-                            "🚀 Finalizing masterpiece..."
-                        ]
-                        for step_text in steps:
-                            step_html = f"""
-                            <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
-                                <span>{step_text}</span>
-                                <span class="dot1" style="font-size: 20px;">.</span>
-                                <span class="dot2" style="font-size: 20px;">.</span>
-                                <span class="dot3" style="font-size: 20px;">.</span>
-                            </div>
-                            """
-                            message_placeholder.markdown(step_html, unsafe_allow_html=True)
-                            time.sleep(0.5)
+                if is_online_mode:
+                    steps = [
+                        "🎨 Connecting to DeepAI Engine...",
+                        "📐 Generating image composition...",
+                        "🚀 Finalizing output via DeepAI API..."
+                    ]
+                    for step_text in steps:
+                        step_html = f"""
+                        <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
+                            <span>{step_text}</span>
+                            <span class="dot1" style="font-size: 20px;">.</span>
+                            <span class="dot2" style="font-size: 20px;">.</span>
+                            <span class="dot3" style="font-size: 20px;">.</span>
+                        </div>
+                        """
+                        message_placeholder.markdown(step_html, unsafe_allow_html=True)
+                        time.sleep(0.4)
+                    
+                    # Direct user prompt sent to DeepAI without safety blocks
+                    try:
+                        deepai_resp = requests.post(
+                            "https://api.deepai.org/api/text2img",
+                            data={'text': prompt},
+                            headers={'api-key': DEEPAI_API_KEY},
+                            timeout=35
+                        )
                         
-                        # DeepAI Text2Img API Request
-                        safe_prompt = f"{prompt}, safe for work, highly detailed, professional photography, 8k resolution"
-                        try:
-                            deepai_resp = requests.post(
-                                "https://api.deepai.org/api/text2img",
-                                data={'text': safe_prompt},
-                                headers={'api-key': DEEPAI_API_KEY},
-                                timeout=35
-                            )
-                            
-                            if deepai_resp.status_code == 200:
-                                res_json = deepai_resp.json()
-                                img_url = res_json.get("output_url")
-                                if img_url:
-                                    img_data_resp = requests.get(img_url, timeout=20)
-                                    if img_data_resp.status_code == 200:
-                                        generated_image_bytes = img_data_resp.content
-                                        full_response = "Here is your generated masterpiece via **DeepAI**:"
-                                    else:
-                                        generated_svg_art = generate_offline_svg_art(prompt)
-                                        full_response = "DeepAI image download failed — generated via **Offline Procedural Vector Art Engine**:"
+                        if deepai_resp.status_code == 200:
+                            res_json = deepai_resp.json()
+                            img_url = res_json.get("output_url")
+                            if img_url:
+                                img_data_resp = requests.get(img_url, timeout=20)
+                                if img_data_resp.status_code == 200:
+                                    generated_image_bytes = img_data_resp.content
+                                    full_response = "Here is your generated image via **DeepAI**:"
                                 else:
                                     generated_svg_art = generate_offline_svg_art(prompt)
-                                    full_response = "DeepAI server busy — generated via **Offline Procedural Vector Art Engine**:"
+                                    full_response = "DeepAI image download failed — generated via **Offline Procedural Vector Art Engine**:"
                             else:
                                 generated_svg_art = generate_offline_svg_art(prompt)
-                                full_response = "DeepAI API error — generated via **Offline Procedural Vector Art Engine**:"
-                        except Exception:
+                                full_response = "DeepAI server busy — generated via **Offline Procedural Vector Art Engine**:"
+                        else:
                             generated_svg_art = generate_offline_svg_art(prompt)
-                            full_response = "Switched to **Offline Procedural Vector Art Engine**:"
-                    else:
+                            full_response = "DeepAI API error — generated via **Offline Procedural Vector Art Engine**:"
+                    except Exception:
                         generated_svg_art = generate_offline_svg_art(prompt)
-                        full_response = "🔌 *[Offline Procedural Vector Art Engine]* — Generated locally with zero internet:"
-                    
-                    message_placeholder.markdown(full_response)
-                    if generated_image_bytes:
-                        st.image(generated_image_bytes)
-                    if generated_svg_art:
-                        st.markdown(generated_svg_art, unsafe_allow_html=True)
+                        full_response = "Switched to **Offline Procedural Vector Art Engine**:"
+                else:
+                    generated_svg_art = generate_offline_svg_art(prompt)
+                    full_response = "🔌 *[Offline Procedural Vector Art Engine]* — Generated locally with zero internet:"
+                
+                message_placeholder.markdown(full_response)
+                if generated_image_bytes:
+                    st.image(generated_image_bytes)
+                if generated_svg_art:
+                    st.markdown(generated_svg_art, unsafe_allow_html=True)
             else:
                 if not is_online_mode:
                     full_response = answer_completely_offline(prompt, detected_script)
