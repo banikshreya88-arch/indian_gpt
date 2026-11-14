@@ -83,7 +83,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. CONNECTIVITY DETECTION & API KEY POOL
+# 2. CONNECTIVITY DETECTION & API KEY POOL (GROQ, TAVILY & HUGGING FACE IMAGE ENGINE)
 # ==============================================================================
 KEYS_POOL = [
     "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",
@@ -102,8 +102,24 @@ def get_next_key(index: int) -> str:
     """Rotates cleanly through the configured API key pool."""
     return KEYS_POOL[index % len(KEYS_POOL)]
 
-TAVILY_API_KEY = "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"
+TAVILY_API_KEY = "AQ.Ab8RN6IpernDRYsxp469A7y7nFGRUwLB9_LJ6EE7PZDxvDpfYQ"
 
+# Replaced Pollinations AI completely with High-Quality Hugging Face FLUX Inference Engine
+HF_IMAGE_API_TOKEN = "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"
+HF_IMAGE_API_URL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell"
+
+def generate_secure_image(prompt_text: str) -> bytes:
+    """Generates clean, high-quality images via Hugging Face instead of Pollinations AI."""
+    import requests
+    headers = {"Authorization": f"Bearer {HF_IMAGE_API_TOKEN}"}
+    payload = {"inputs": prompt_text}
+    try:
+        response = requests.post(HF_IMAGE_API_URL, headers=headers, json=payload, timeout=35)
+        if response.status_code == 200:
+            return response.content
+    except Exception:
+        pass
+    return None
 def check_internet_online(timeout: float = 2.0) -> bool:
     """Fast socket check to verify whether active internet connectivity exists."""
     for host in [("8.8.8.8", 53), ("1.1.1.1", 53), ("api.groq.com", 443)]:
