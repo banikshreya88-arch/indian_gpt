@@ -6,13 +6,12 @@ import time
 import math
 import re
 import socket
-import random
 from datetime import datetime, timezone, timedelta
 
 # ==============================================================================
 # INDIAN GPT - DEEP AI SOVEREIGN HYBRID ECOSYSTEM
 # Architect & Developer: Shubham
-# Version: 15.4 Unrestricted DeepAI Image Edition
+# Version: 15.5 Pure DeepAI Image Edition
 # ==============================================================================
 
 st.set_page_config(
@@ -584,39 +583,7 @@ def solve_math_locally(query_str: str):
     return None
 
 # ==============================================================================
-# 7. OFFLINE PROCEDURAL VECTOR ART ENGINE
-# ==============================================================================
-def generate_offline_svg_art(prompt_text: str) -> str:
-    seed_val = sum(ord(ch) for ch in prompt_text)
-    rng = random.Random(seed_val)
-    palettes = [
-        ("#0f172a", "#38bdf8", "#818cf8", "#f472b6"),
-        ("#090d16", "#4ade80", "#22d3ee", "#facc15"),
-        ("#1e1b4b", "#fb923c", "#f43f5e", "#a78bfa"),
-    ]
-    bg, c1, c2, c3 = palettes[seed_val % len(palettes)]
-    circles = []
-    for _ in range(16):
-        cx = rng.randint(40, 760)
-        cy = rng.randint(40, 460)
-        r = rng.randint(20, 120)
-        col = rng.choice([c1, c2, c3])
-        op = round(rng.uniform(0.15, 0.50), 2)
-        circles.append(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{col}" fill-opacity="{op}" />')
-    safe_label = prompt_text[:45].replace("<", "").replace(">", "").replace("&", "")
-    svg = f"""
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" style="border-radius:14px; border:1px solid #4ade80;">
-        <rect width="800" height="500" fill="{bg}" />
-        {''.join(circles)}
-        <rect x="40" y="390" width="720" height="75" rx="12" fill="rgba(15,23,42,0.85)" stroke="{c1}" stroke-width="1.5"/>
-        <text x="60" y="423" fill="#ffffff" font-family="sans-serif" font-size="18" font-weight="bold">Indian GPT • Sovereign Procedural Graphics Engine</text>
-        <text x="60" y="448" fill="{c1}" font-family="sans-serif" font-size="14">Prompt: {safe_label}</text>
-    </svg>
-    """
-    return svg
-
-# ==============================================================================
-# 8. UNIFIED OFFLINE ANSWER SYNTHESIZER
+# 7. UNIFIED OFFLINE ANSWER SYNTHESIZER
 # ==============================================================================
 def answer_completely_offline(prompt_str: str, detected_script: str) -> str:
     p_lower = prompt_str.lower().strip()
@@ -650,7 +617,7 @@ def answer_completely_offline(prompt_str: str, detected_script: str) -> str:
     )
 
 # ==============================================================================
-# 9. GROQ CLOUD MODEL DISCOVERY & ADVANCED FALLBACKS
+# 8. GROQ CLOUD MODEL DISCOVERY & ADVANCED FALLBACKS
 # ==============================================================================
 def get_available_models(api_key: str) -> list:
     default_models = [
@@ -676,7 +643,7 @@ def get_available_models(api_key: str) -> list:
     return default_models
 
 # ==============================================================================
-# 10. SESSION STATE INITIALIZATION & PERSISTENCE
+# 9. SESSION STATE INITIALIZATION & PERSISTENCE
 # ==============================================================================
 if "chat_sessions_v130" not in st.session_state:
     st.session_state.chat_sessions_v130 = {
@@ -696,7 +663,7 @@ if "current_chat_v130" not in st.session_state:
     st.session_state.current_chat_v130 = "New Chat"
 
 # ==============================================================================
-# 11. SIDEBAR CONTROLS & ADVANCED KNOWLEDGE MANAGEMENT PANEL
+# 10. SIDEBAR CONTROLS & ADVANCED KNOWLEDGE MANAGEMENT PANEL
 # ==============================================================================
 internet_available = check_internet_online()
 
@@ -764,7 +731,7 @@ with st.sidebar:
     st.caption("Created & Architected by **Shubham**")
 
 # ==============================================================================
-# 12. MAIN CONVERSATION VIEWPORT & DEEP-AI UNRESTRICTED PIPELINE
+# 11. MAIN CONVERSATION VIEWPORT & PURE DEEP-AI PIPELINE
 # ==============================================================================
 st.title("🇮🇳 Indian GPT")
 st.markdown("##### *Hybrid Online & 100% Offline Sovereign AI Ecosystem • Created by Shubham*")
@@ -779,8 +746,6 @@ for message in current_messages:
         st.markdown(message["content"])
         if "image_bytes" in message and message["image_bytes"]:
             st.image(message["image_bytes"])
-        if "svg_art" in message and message["svg_art"]:
-            st.markdown(message["svg_art"], unsafe_allow_html=True)
 
 prompt = st.chat_input("Ask anything")
 
@@ -804,7 +769,6 @@ if prompt:
         message_placeholder = st.empty()
         full_response = ""
         generated_image_bytes = None
-        generated_svg_art = None
         
         try:
             p_lower = prompt.lower().strip()
@@ -835,7 +799,6 @@ if prompt:
                         message_placeholder.markdown(step_html, unsafe_allow_html=True)
                         time.sleep(0.4)
                     
-                    # Direct user prompt sent to DeepAI without safety blocks
                     try:
                         deepai_resp = requests.post(
                             "https://api.deepai.org/api/text2img",
@@ -853,26 +816,19 @@ if prompt:
                                     generated_image_bytes = img_data_resp.content
                                     full_response = "Here is your generated image via **DeepAI**:"
                                 else:
-                                    generated_svg_art = generate_offline_svg_art(prompt)
-                                    full_response = "DeepAI image download failed — generated via **Offline Procedural Vector Art Engine**:"
+                                    full_response = "⚠️ **Error:** DeepAI image download failed. Please try again."
                             else:
-                                generated_svg_art = generate_offline_svg_art(prompt)
-                                full_response = "DeepAI server busy — generated via **Offline Procedural Vector Art Engine**:"
+                                full_response = "⚠️ **Error:** DeepAI server did not return an image URL. Please try again."
                         else:
-                            generated_svg_art = generate_offline_svg_art(prompt)
-                            full_response = "DeepAI API error — generated via **Offline Procedural Vector Art Engine**:"
-                    except Exception:
-                        generated_svg_art = generate_offline_svg_art(prompt)
-                        full_response = "Switched to **Offline Procedural Vector Art Engine**:"
+                            full_response = f"⚠️ **API Error:** DeepAI returned status code {deepai_resp.status_code}."
+                    except Exception as err:
+                        full_response = f"⚠️ **Connection Error:** Could not reach DeepAI server. ({err})"
                 else:
-                    generated_svg_art = generate_offline_svg_art(prompt)
-                    full_response = "🔌 *[Offline Procedural Vector Art Engine]* — Generated locally with zero internet:"
+                    full_response = "⚠️ **Offline Mode:** Image generation requires an active internet connection to reach DeepAI."
                 
                 message_placeholder.markdown(full_response)
                 if generated_image_bytes:
                     st.image(generated_image_bytes)
-                if generated_svg_art:
-                    st.markdown(generated_svg_art, unsafe_allow_html=True)
             else:
                 if not is_online_mode:
                     full_response = answer_completely_offline(prompt, detected_script)
@@ -1009,8 +965,6 @@ if prompt:
             assistant_msg = {"role": "assistant", "content": full_response}
             if generated_image_bytes:
                 assistant_msg["image_bytes"] = generated_image_bytes
-            if generated_svg_art:
-                assistant_msg["svg_art"] = generated_svg_art
                 
             current_messages.append(assistant_msg)
             st.rerun()
