@@ -10,13 +10,13 @@ import random
 from datetime import datetime, timezone, timedelta
 
 # ==============================================================================
-# INDIAN GPT - TRUE HYBRID ONLINE/OFFLINE SOVEREIGN AI ECOSYSTEM
+# INDIAN GPT - DEEP AI SOVEREIGN HYBRID ECOSYSTEM
 # Architect & Developer: Shubham
-# Version: 15.0 Ultimate Mega-Scale Sovereign Knowledge Edition
+# Version: 15.3 DeepAI Secure Image Edition
 # ==============================================================================
 
 st.set_page_config(
-    page_title="Indian GPT - Sovereign Hybrid AI Ecosystem",
+    page_title="Indian GPT - DeepAI Sovereign Hybrid AI",
     page_icon="🇮🇳",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -86,10 +86,12 @@ st.markdown("""
 # 2. CONNECTIVITY DETECTION & API KEY POOL
 # ==============================================================================
 KEYS_POOL = [
-    "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",
+    "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",
     "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",
     "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",
 ]
+
+DEEPAI_API_KEY = "225fde75-3d76-4113-adc0-38266cfb29d1"
 
 try:
     sec_key = st.secrets.get("GROQ_API_KEY_2", "")
@@ -309,7 +311,6 @@ def retrieve_from_local_corpus(query_str: str, top_k: int = 3) -> list:
 # 6. EXTENDED OFFLINE SYMBOLIC & NUMERICAL MATH & GEOMETRY ENGINE
 # ==============================================================================
 def solve_quadratic_equation(a: float, b: float, c: float) -> str:
-    """Solves ax^2 + bx + c = 0 with full step-by-step discriminant analysis."""
     if a == 0:
         if b == 0:
             return "Invalid equation: both $a$ and $b$ cannot be zero."
@@ -347,7 +348,6 @@ def solve_quadratic_equation(a: float, b: float, c: float) -> str:
     return "\n\n".join(steps)
 
 def solve_linear_equation(a: float, b: float, c: float) -> str:
-    """Solves linear equation ax + b = c step by step."""
     if a == 0:
         return "Invalid linear equation: coefficient $a$ cannot be zero."
     x = (c - b) / a
@@ -359,7 +359,6 @@ def solve_linear_equation(a: float, b: float, c: float) -> str:
     )
 
 def check_prime_and_factors(n: int) -> str:
-    """Checks primality and computes full prime factorization."""
     if n <= 1:
         return f"**{n}** is neither prime nor composite."
     if n <= 3:
@@ -389,7 +388,6 @@ def check_prime_and_factors(n: int) -> str:
     )
 
 def compute_factorial(n: int) -> str:
-    """Computes n! safely up to n = 100."""
     if n < 0:
         return "Factorial is not defined for negative integers."
     if n > 100:
@@ -398,7 +396,6 @@ def compute_factorial(n: int) -> str:
     return f"The factorial of **{n}** is:\n$${n}! = {val}$$"
 
 def compute_combinatorics(n: int, r: int) -> str:
-    """Computes Permutation nPr and Combination nCr."""
     if n < 0 or r < 0 or r > n:
         return "Invalid inputs: ensure $0 \le r \le n$."
     npr = math.perm(n, r)
@@ -410,7 +407,6 @@ def compute_combinatorics(n: int, r: int) -> str:
     )
 
 def compute_gcd_lcm(a: int, b: int) -> str:
-    """Computes GCD and LCM."""
     if a == 0 and b == 0:
         return "GCD and LCM are undefined when both integers are zero."
     g = math.gcd(a, b)
@@ -422,7 +418,6 @@ def compute_gcd_lcm(a: int, b: int) -> str:
     )
 
 def generate_fibonacci(n: int) -> str:
-    """Generates the first n terms of the Fibonacci sequence."""
     if n <= 0:
         return "Please specify a positive integer $n \ge 1$."
     if n > 50:
@@ -435,7 +430,6 @@ def generate_fibonacci(n: int) -> str:
     return f"**First {n} Fibonacci Numbers:**\n`{', '.join(seq)}`"
 
 def compute_trig_degrees(deg: float) -> str:
-    """Computes trigonometric ratios in degrees."""
     rad = math.radians(deg)
     s = math.sin(rad)
     c = math.cos(rad)
@@ -448,7 +442,6 @@ def compute_trig_degrees(deg: float) -> str:
     )
 
 def compute_compound_interest(p: float, r: float, t: float, n: int = 1) -> str:
-    """Computes Compound Interest and Final Amount."""
     if p < 0 or r < 0 or t < 0 or n <= 0:
         return "Invalid inputs: Principal, Rate, and Time must be non-negative."
     amount = p * ((1 + (r / (100 * n))) ** (n * t))
@@ -462,7 +455,6 @@ def compute_compound_interest(p: float, r: float, t: float, n: int = 1) -> str:
     )
 
 def compute_statistics_summary(numbers: list) -> str:
-    """Computes Mean, Median, Variance, and Standard Deviation."""
     if not numbers:
         return "No valid numbers provided for statistical analysis."
     sorted_nums = sorted(numbers)
@@ -484,7 +476,6 @@ def compute_statistics_summary(numbers: list) -> str:
     )
 
 def compute_geometry_metrics(shape: str, nums: list) -> str:
-    """Computes area, perimeter, and volume for geometric shapes."""
     if shape == "circle" and len(nums) >= 1:
         r = nums[0]
         area = math.pi * (r ** 2)
@@ -504,7 +495,6 @@ def compute_geometry_metrics(shape: str, nums: list) -> str:
     return ""
 
 def evaluate_safe_arithmetic(expr: str):
-    """Safely evaluates arithmetic expressions."""
     cleaned = (
         expr.lower()
         .replace("calculate", "")
@@ -530,7 +520,6 @@ def evaluate_safe_arithmetic(expr: str):
     return None
 
 def solve_math_locally(query_str: str):
-    """Routes mathematical queries to specialized offline solvers."""
     q = query_str.lower().strip()
     arith = evaluate_safe_arithmetic(q)
     if arith:
@@ -599,7 +588,6 @@ def solve_math_locally(query_str: str):
 # 7. OFFLINE PROCEDURAL VECTOR ART ENGINE
 # ==============================================================================
 def generate_offline_svg_art(prompt_text: str) -> str:
-    """Generates procedural SVG artwork offline."""
     seed_val = sum(ord(ch) for ch in prompt_text)
     rng = random.Random(seed_val)
     palettes = [
@@ -632,7 +620,6 @@ def generate_offline_svg_art(prompt_text: str) -> str:
 # 8. UNIFIED OFFLINE ANSWER SYNTHESIZER
 # ==============================================================================
 def answer_completely_offline(prompt_str: str, detected_script: str) -> str:
-    """Generates authoritative answers using 100% local engines."""
     p_lower = prompt_str.lower().strip()
 
     if any(k in p_lower for k in ["time", "date", "ajke", "somoy", "tarikh", "today"]):
@@ -667,7 +654,6 @@ def answer_completely_offline(prompt_str: str, detected_script: str) -> str:
 # 9. GROQ CLOUD MODEL DISCOVERY & ADVANCED FALLBACKS
 # ==============================================================================
 def get_available_models(api_key: str) -> list:
-    """Dynamically queries available text-generation LLMs from Groq Cloud."""
     default_models = [
         "llama-3.3-70b-versatile",
         "llama-3.1-8b-instant",
@@ -699,9 +685,9 @@ if "chat_sessions_v130" not in st.session_state:
             {
                 "role": "assistant",
                 "content": (
-                    "Namaste! I am **Indian GPT**, a true **Hybrid Online + Offline Sovereign AI Ecosystem** "
-                    "created exclusively by **Shubham**.\n\n"
-                    "Ask me anything across Indian Constitution, World History, Science, Mathematics, Geography, or General Knowledge!"
+                    "Namaste! I am **Indian GPT**, powered by **DeepAI Secure Image Engine** "
+                    "and created exclusively by **Shubham**.\n\n"
+                    "Ask me anything or ask me to generate safe, high-definition images!"
                 )
             }
         ]
@@ -779,7 +765,7 @@ with st.sidebar:
     st.caption("Created & Architected by **Shubham**")
 
 # ==============================================================================
-# 12. MAIN CONVERSATION VIEWPORT & HYBRID ROUTING PIPELINE
+# 12. MAIN CONVERSATION VIEWPORT & DEEP-AI HYBRID PIPELINE
 # ==============================================================================
 st.title("🇮🇳 Indian GPT")
 st.markdown("##### *Hybrid Online & 100% Offline Sovereign AI Ecosystem • Created by Shubham*")
@@ -797,7 +783,6 @@ for message in current_messages:
         if "svg_art" in message and message["svg_art"]:
             st.markdown(message["svg_art"], unsafe_allow_html=True)
 
-# Chat input with placeholder set strictly to "Ask anything"
 prompt = st.chat_input("Ask anything")
 
 if prompt:
@@ -833,49 +818,70 @@ if prompt:
             is_image_request = any(starter in p_lower for starter in image_starters)
             
             if is_image_request:
-                if is_online_mode:
-                    steps = [
-                        "🎨 Analyzing prompt semantics and depth layers...",
-                        "📐 Constructing 1024×1024 high-resolution composition...",
-                        "✨ Rendering photorealistic lighting, shadows & textures...",
-                        "🚀 Finalizing ultra-HD polish via Neural Engine..."
-                    ]
-                    for step_text in steps:
-                        step_html = f"""
-                        <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
-                            <span>{step_text}</span>
-                            <span class="dot1" style="font-size: 20px;">.</span>
-                            <span class="dot2" style="font-size: 20px;">.</span>
-                            <span class="dot3" style="font-size: 20px;">.</span>
-                        </div>
-                        """
-                        message_placeholder.markdown(step_html, unsafe_allow_html=True)
-                        time.sleep(0.7)
-                    
-                    enhanced_prompt = f"{prompt}, highly detailed, professional photography, stunning composition, 8k resolution, photorealistic masterpiece"
-                    encoded_prompt = urllib.parse.quote(enhanced_prompt)
-                    image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1024&height=1024&model=flux&nologo=true"
-                    
-                    try:
-                        img_resp = requests.get(image_url, timeout=35)
-                        if img_resp.status_code == 200 and len(img_resp.content) > 1000:
-                            generated_image_bytes = img_resp.content
-                            full_response = "Here is your generated high-definition masterpiece:"
-                        else:
-                            generated_svg_art = generate_offline_svg_art(prompt)
-                            full_response = "Cloud image server busy — generated via **Offline Procedural Vector Art Engine**:"
-                    except Exception:
-                        generated_svg_art = generate_offline_svg_art(prompt)
-                        full_response = "Switched to **Offline Procedural Vector Art Engine**:"
+                # ----------------- STRICT SAFETY FILTER FOR DEEPAI -----------------
+                unsafe_keywords = ["nsfw", "sensual", "nude", "adult", "private", "18+", "sexy", "hot", "explicit"]
+                if any(bad in p_lower for bad in unsafe_keywords):
+                    full_response = "⚠️ **Safety Notice:** এই ধরণের প্রম্পট দিয়ে ছবি তৈরি করা সম্ভব নয়। দয়া করে একটি শালীন এবং সুন্দর প্রম্পট দিন।"
+                    message_placeholder.markdown(full_response)
                 else:
-                    generated_svg_art = generate_offline_svg_art(prompt)
-                    full_response = "🔌 *[Offline Procedural Vector Art Engine]* — Generated locally with zero internet:"
-                
-                message_placeholder.markdown(full_response)
-                if generated_image_bytes:
-                    st.image(generated_image_bytes)
-                if generated_svg_art:
-                    st.markdown(generated_svg_art, unsafe_allow_html=True)
+                    if is_online_mode:
+                        steps = [
+                            "🎨 Connecting to DeepAI Neural Engine...",
+                            "📐 Rendering high-resolution composition...",
+                            "✨ Polishing details & lighting via DeepAI API...",
+                            "🚀 Finalizing masterpiece..."
+                        ]
+                        for step_text in steps:
+                            step_html = f"""
+                            <div style="display: flex; align-items: center; gap: 6px; font-style: italic; color: #a5b4fc;">
+                                <span>{step_text}</span>
+                                <span class="dot1" style="font-size: 20px;">.</span>
+                                <span class="dot2" style="font-size: 20px;">.</span>
+                                <span class="dot3" style="font-size: 20px;">.</span>
+                            </div>
+                            """
+                            message_placeholder.markdown(step_html, unsafe_allow_html=True)
+                            time.sleep(0.5)
+                        
+                        # DeepAI Text2Img API Request
+                        safe_prompt = f"{prompt}, safe for work, highly detailed, professional photography, 8k resolution"
+                        try:
+                            deepai_resp = requests.post(
+                                "https://api.deepai.org/api/text2img",
+                                data={'text': safe_prompt},
+                                headers={'api-key': DEEPAI_API_KEY},
+                                timeout=35
+                            )
+                            
+                            if deepai_resp.status_code == 200:
+                                res_json = deepai_resp.json()
+                                img_url = res_json.get("output_url")
+                                if img_url:
+                                    img_data_resp = requests.get(img_url, timeout=20)
+                                    if img_data_resp.status_code == 200:
+                                        generated_image_bytes = img_data_resp.content
+                                        full_response = "Here is your generated masterpiece via **DeepAI**:"
+                                    else:
+                                        generated_svg_art = generate_offline_svg_art(prompt)
+                                        full_response = "DeepAI image download failed — generated via **Offline Procedural Vector Art Engine**:"
+                                else:
+                                    generated_svg_art = generate_offline_svg_art(prompt)
+                                    full_response = "DeepAI server busy — generated via **Offline Procedural Vector Art Engine**:"
+                            else:
+                                generated_svg_art = generate_offline_svg_art(prompt)
+                                full_response = "DeepAI API error — generated via **Offline Procedural Vector Art Engine**:"
+                        except Exception:
+                            generated_svg_art = generate_offline_svg_art(prompt)
+                            full_response = "Switched to **Offline Procedural Vector Art Engine**:"
+                    else:
+                        generated_svg_art = generate_offline_svg_art(prompt)
+                        full_response = "🔌 *[Offline Procedural Vector Art Engine]* — Generated locally with zero internet:"
+                    
+                    message_placeholder.markdown(full_response)
+                    if generated_image_bytes:
+                        st.image(generated_image_bytes)
+                    if generated_svg_art:
+                        st.markdown(generated_svg_art, unsafe_allow_html=True)
             else:
                 if not is_online_mode:
                     full_response = answer_completely_offline(prompt, detected_script)
