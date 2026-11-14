@@ -90,7 +90,7 @@ KEYS_POOL = [
     "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",
 ]
 
-DEEPAI_API_KEY = "225fde75-3d76-4113-adc0-38266cfb29d1"
+DEEPAI_API_KEY = "ec0adc69-c22e-47b2-860f-79f833d0a271"
 
 try:
     sec_key = st.secrets.get("GROQ_API_KEY_2", "")
