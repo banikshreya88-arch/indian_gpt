@@ -1343,7 +1343,7 @@ def generate_offline_svg_art(prompt_text: str) -> str:
 _EMBEDDED_IMAGE_KEYS = {
     "GEMINI_API_KEY": "AQ.Ab8RN6JTL42RpduUNJdSd2FA-N-DvgZJoBGe6iaOXjDr-xxBXQ",
     "CLOUDFLARE_ACCOUNT_ID": "17d0994c1df0b606d49ea61fa32701ad",
-    "CLOUDFLARE_API_TOKEN": "cfut_6rYKeyU8qttm5fPJy8VRPoLACAiLh69lD4qkgvvr4ccc2e59",
+    "CLOUDFLARE_API_TOKEN": "cfut_thR5FrNJqhdoJNyBiIOft9Q3q1aTLNAgiQZyhXMK4956ad72",
 }
 
 def get_secret(name: str, default: str = "") -> str:
@@ -1782,6 +1782,68 @@ def run_image_connection_test() -> list:
     return lines
 
 # ==============================================================================
+# 7C. LANGUAGE POLICY - Indian GPT understands English and Indian languages only
+# ==============================================================================
+_ALLOWED_LETTER_RANGES = [
+    (0x0041, 0x005A), (0x0061, 0x007A),                                   # basic Latin (English, Hinglish, Banglish)
+    (0x00C0, 0x024F),                                                     # Latin accents (checked separately below)
+    (0x0900, 0x0DFF),                                                     # Devanagari, Bengali, Gurmukhi, Gujarati, Odia, Tamil, Telugu, Kannada, Malayalam
+    (0x0600, 0x06FF), (0x0750, 0x077F), (0xFB50, 0xFDFF), (0xFE70, 0xFEFF),  # Urdu / Kashmiri / Sindhi (Arabic script)
+    (0x1C50, 0x1C7F),                                                     # Ol Chiki (Santali)
+    (0xABC0, 0xABFF), (0xAAE0, 0xAAFF),                                   # Meitei Mayek (Manipuri)
+    (0xA8E0, 0xA8FF), (0x1CD0, 0x1CFF),                                   # Devanagari extended / Vedic marks
+]
+_INDIC_ONLY_RANGES = [(0x0900, 0x0DFF), (0x0600, 0x06FF), (0x1C50, 0x1C7F), (0xABC0, 0xABFF)]
+
+# Distinctive words of common non-Indian languages written in the Latin alphabet.
+# Words that are also common in English, Hinglish or Banglish are deliberately left out.
+_FOREIGN_STOPWORDS = {
+    "Spanish": {"los", "las", "una", "unos", "que", "por", "para", "como", "pero", "muy", "esta", "este", "estoy", "tengo", "quiero", "hola", "gracias", "donde", "cuando", "porque", "también", "está"},
+    "French": {"les", "des", "une", "est", "sont", "avec", "dans", "vous", "nous", "suis", "bonjour", "merci", "pas", "mais", "qui", "quoi", "comment", "très"},
+    "German": {"der", "das", "und", "ist", "nicht", "ich", "sie", "wir", "ein", "eine", "für", "wie", "warum", "hallo", "danke", "bitte", "auch"},
+    "Portuguese": {"não", "você", "uma", "obrigado", "olá", "muito", "está", "são", "isso", "também", "bom", "dia"},
+    "Italian": {"ciao", "grazie", "perché", "anche", "della", "questo", "sono", "quando", "buongiorno", "molto"},
+    "Indonesian/Malay": {"yang", "dan", "ini", "itu", "saya", "kamu", "bagaimana", "terima", "kasih", "tidak", "dengan", "untuk"},
+    "Turkish": {"bir", "için", "merhaba", "nasıl", "teşekkür", "evet", "hayır", "ben", "sen"},
+    "Dutch": {"het", "een", "niet", "dat", "hallo", "dank", "waarom", "jij", "ben"},
+}
+_ENGLISH_HINTS = {"the", "is", "are", "and", "you", "what", "how", "this", "that", "with", "for", "of", "to", "in", "it", "i", "me", "my", "please", "can", "who", "why", "when", "where", "tell", "about", "explain", "give", "make", "write"}
+
+LANGUAGE_POLICY_MESSAGE = (
+    "🌐 Sorry, Indian GPT understands only **English and Indian languages** (Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, Assamese, Urdu and more). Please write in one of these.\n\n"
+    "क्षमा करें, Indian GPT केवल अंग्रेज़ी और भारतीय भाषाएँ समझता है। कृपया इनमें से किसी भाषा में लिखें।\n\n"
+    "দুঃখিত, Indian GPT শুধু ইংরেজি ও ভারতীয় ভাষা বোঝে। অনুগ্রহ করে এর যেকোনো একটিতে লিখুন।"
+)
+
+def _in_ranges(code_point: int, ranges: list) -> bool:
+    return any(lo <= code_point <= hi for lo, hi in ranges)
+
+def _has_unsupported_script(text: str) -> bool:
+    """True when the message is mostly written in a non-Indian, non-Latin script (Chinese, Japanese, Korean, Russian, Greek, Thai, Hebrew...)."""
+    letters = [ch for ch in text if ch.isalpha()]
+    if not letters:
+        return False
+    bad = sum(1 for ch in letters if not _in_ranges(ord(ch), _ALLOWED_LETTER_RANGES))
+    return bad >= 3 and (bad / len(letters)) > 0.4
+
+def _looks_like_foreign_latin_language(text: str) -> bool:
+    """True when a Latin-alphabet message is clearly Spanish, French, German, etc. (not English / Hinglish / Banglish)."""
+    if any(_in_ranges(ord(ch), _INDIC_ONLY_RANGES) for ch in text):
+        return False
+    words = re.findall(r"[^\W\d_]+", text.lower())
+    if len(words) < 4:
+        return False
+    english_hits = sum(1 for w in words if w in _ENGLISH_HINTS)
+    best = max(sum(1 for w in words if w in vocab) for vocab in _FOREIGN_STOPWORDS.values())
+    return best >= 3 and best > english_hits
+
+def get_unsupported_language_reply(text: str) -> str:
+    """Returns the polite language-policy message, or an empty string when the language is supported."""
+    if _has_unsupported_script(text) or _looks_like_foreign_latin_language(text):
+        return LANGUAGE_POLICY_MESSAGE
+    return ""
+
+# ==============================================================================
 # 8. UNIFIED OFFLINE ANSWER SYNTHESIZER
 # ==============================================================================
 def answer_completely_offline(prompt_str: str, detected_script: str) -> str:
@@ -1990,6 +2052,7 @@ if prompt:
         try:
             p_lower = prompt.lower().strip()
             detected_script = detect_indian_script(prompt)
+            unsupported_reply = get_unsupported_language_reply(prompt)
             
             pending_img = st.session_state.get("pending_image_request")
             is_image_request = looks_like_image_request(p_lower)
@@ -1999,12 +2062,16 @@ if prompt:
                 st.session_state.pending_image_request = None
                 if p_lower in _IMG_CANCEL_WORDS:
                     pass
-                elif not is_image_request and len(prompt) <= 400:
+                elif not is_image_request and not unsupported_reply and len(prompt) <= 400:
                     is_image_request = True
                     continuing_clarification = True
                     image_user_text = f"{pending_img['original']}\nUser's answer to the clarification question: {prompt}"
 
-            if is_image_request:
+            if unsupported_reply:
+                is_image_request = False
+                full_response = unsupported_reply
+                message_placeholder.markdown(full_response)
+            elif is_image_request:
                 if is_online_mode:
                     def _show_image_status(status_html):
                         message_placeholder.markdown(status_html, unsafe_allow_html=True)
@@ -2090,7 +2157,8 @@ if prompt:
                         "HYBRID KNOWLEDGE & MULTI-LINGUAL DIRECTIVE: "
                         "1. You natively understand and reply fluently in ALL 22 scheduled Indian languages and scripts as well as English, Banglish, and Hinglish. "
                         "2. Always reply in the exact same language, script, and conversational register used by the user. "
-                        "3. Integrate any verified facts provided below from Indian GPT's built-in Sovereign Knowledge Base with your own deep reasoning."
+                        "3. Integrate any verified facts provided below from Indian GPT's built-in Sovereign Knowledge Base with your own deep reasoning. "
+                        "4. LANGUAGE POLICY (overrides rule 2): you support ONLY English and Indian languages. If the user writes in any other language (for example French, Spanish, German, Chinese, Japanese, Korean, Russian, Arabic), do not answer in it and do not translate into it; reply in English with one polite sentence saying Indian GPT understands only English and Indian languages."
                     )
                     
                     if local_knowledge_context:
