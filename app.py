@@ -1373,36 +1373,36 @@ GEMINI_DEFAULT_MODELS = ["gemini-2.5-flash-lite", "gemini-3.5-flash-lite"]
 
 IMAGE_MESSAGES = {
     "setup": (
-        "🖼️ **Image generation needs setup.** Add `GEMINI_API_KEY`, `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` to your Streamlit secrets (or environment variables). For now, here is an offline vector artwork:",
-        "🖼️ **ছবি তৈরির জন্য সেটআপ দরকার।** Streamlit secrets-এ `GEMINI_API_KEY`, `CLOUDFLARE_ACCOUNT_ID` ও `CLOUDFLARE_API_TOKEN` যোগ করুন। আপাতত অফলাইন ভেক্টর আর্ট দেখানো হলো:",
+        "🖼️ **The Indian GPT image engine is not set up yet.** Please add the image engine keys to the app's secrets. For now, here is an offline vector artwork:",
+        "🖼️ **Indian GPT-র ছবি ইঞ্জিন এখনো সেট করা হয়নি।** অ্যাপের secrets-এ image engine-এর key যোগ করুন। আপাতত অফলাইন ভেক্টর আর্ট দেখানো হলো:",
     ),
     "planner_quota": (
-        "⏳ Gemini's free limit is used up for now (or it is very busy). I don't generate images without the safety check, so please try again in a little while.",
-        "⏳ Gemini-র ফ্রি সীমা এখন শেষ (বা খুব ব্যস্ত)। নিরাপত্তা যাচাই ছাড়া ছবি তৈরি করা হয় না, তাই কিছুক্ষণ পর আবার চেষ্টা করুন।",
+        "⏳ Indian GPT's image brain is very busy right now (a free limit was reached or there are too many requests). Images are only made after a safety check, so please try again in a little while.",
+        "⏳ Indian GPT-র ছবির ব্রেন এখন খুব ব্যস্ত (ফ্রি সীমা শেষ বা অনেক অনুরোধ)। নিরাপত্তা যাচাই ছাড়া ছবি তৈরি হয় না, তাই কিছুক্ষণ পর আবার চেষ্টা করুন।",
     ),
     "planner_down": (
-        "⚠️ Gemini is not responding, so I could not understand and safety-check your request. No image was generated. Please try again shortly.",
-        "⚠️ Gemini সাড়া দিচ্ছে না, তাই আপনার নির্দেশ বোঝা ও নিরাপত্তা যাচাই করা যায়নি। কোনো ছবি তৈরি হয়নি। একটু পরে আবার চেষ্টা করুন।",
+        "⚠️ Indian GPT couldn't understand and safety-check your request just now, so no image was generated. Please try again shortly.",
+        "⚠️ Indian GPT এই মুহূর্তে আপনার নির্দেশ বুঝে নিরাপত্তা যাচাই করতে পারেনি, তাই কোনো ছবি তৈরি হয়নি। একটু পরে আবার চেষ্টা করুন।",
     ),
     "planner_key": (
-        "🔑 The Gemini API key was rejected. Please check `GEMINI_API_KEY` in your secrets.",
-        "🔑 Gemini API key গ্রহণ করা হয়নি। secrets-এ `GEMINI_API_KEY` ঠিক আছে কি না দেখুন।",
+        "🔑 The image engine's access key was rejected. Please check the image keys in the app settings.",
+        "🔑 ছবি ইঞ্জিনের access key গ্রহণ করা হয়নি। অ্যাপের সেটিংসে image key দেখুন।",
     ),
     "refused": (
         "🚫 Sorry, I can't create that image.",
         "🚫 দুঃখিত, এই ছবিটি আমি তৈরি করতে পারব না।",
     ),
     "cf_quota": (
-        "⏳ The free daily image limit on Cloudflare Workers AI (10,000 Neurons) has been reached. It resets daily at 00:00 UTC. I never switch to a paid plan on my own.",
-        "⏳ Cloudflare Workers AI-র ফ্রি দৈনিক ছবির সীমা (১০,০০০ Neurons) শেষ হয়ে গেছে। প্রতিদিন ০০:০০ UTC-তে সীমা রিসেট হয়। আমি নিজে থেকে কখনো paid প্ল্যানে যাই না।",
+        "⏳ Today's free image limit has been reached. It resets daily at 00:00 UTC. Indian GPT never switches to a paid plan on its own.",
+        "⏳ আজকের ফ্রি ছবির সীমা শেষ হয়ে গেছে। প্রতিদিন ০০:০০ UTC-তে সীমা রিসেট হয়। Indian GPT নিজে থেকে কখনো paid প্ল্যানে যায় না।",
     ),
     "cf_auth": (
-        "🔑 Cloudflare rejected the credentials. Please check `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` (the token needs Workers AI permission).",
-        "🔑 Cloudflare আপনার credentials গ্রহণ করেনি। `CLOUDFLARE_ACCOUNT_ID` ও `CLOUDFLARE_API_TOKEN` দেখুন (token-এ Workers AI permission লাগবে)।",
+        "🔑 The image engine rejected the access credentials. Please check the image keys in the app settings.",
+        "🔑 ছবি ইঞ্জিন access credentials গ্রহণ করেনি। অ্যাপের সেটিংসে image key দেখুন।",
     ),
     "cf_fail": (
-        "⚠️ The image server had a problem and the picture could not be generated. Here is an offline vector artwork instead:",
-        "⚠️ ছবির সার্ভারে সমস্যা হওয়ায় ছবি তৈরি করা যায়নি। তার বদলে অফলাইন ভেক্টর আর্ট দেখানো হলো:",
+        "⚠️ The image engine had a problem and the picture could not be created. Here is an offline vector artwork instead:",
+        "⚠️ ছবি ইঞ্জিনে সমস্যা হওয়ায় ছবি তৈরি করা যায়নি। তার বদলে অফলাইন ভেক্টর আর্ট দেখানো হলো:",
     ),
     "done": (
         "🎨 **Here is your image!**",
@@ -1413,6 +1413,8 @@ IMAGE_MESSAGES = {
         "**আমি যা বুঝেছি:**",
     ),
 }
+
+SHOW_IMAGE_TEST_PANEL = True  # developer mode: shows the sidebar test panel and technical error details. Set to False before sharing the app with users (then no provider names or technical details are ever shown).
 
 def _img_msg(key: str, detected_script: str) -> str:
     en_text, bn_text = IMAGE_MESSAGES[key]
@@ -1449,8 +1451,9 @@ def _gemini_model_chain() -> list:
     return chain
 
 def _call_gemini_json(system_text: str, user_text: str, api_key: str) -> str:
-    """Calls Gemini generateContent with JSON output, falling back across models."""
+    """Calls the planner model with JSON output, retrying temporary errors and falling back across models."""
     saw_quota = False
+    last_detail = "no response"
     for model_id in _gemini_model_chain():
         url = f"{GEMINI_API_BASE}/{model_id}:generateContent"
         headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
@@ -1458,23 +1461,38 @@ def _call_gemini_json(system_text: str, user_text: str, api_key: str) -> str:
         body = {
             "systemInstruction": {"parts": [{"text": system_text}]},
             "contents": [{"role": "user", "parts": [{"text": user_text}]}],
-            "generationConfig": {"responseMimeType": "application/json", "maxOutputTokens": 1500},
+            "generationConfig": {"responseMimeType": "application/json", "maxOutputTokens": 2000},
         }
-        try:
-            resp = requests.post(url, headers=headers, json=body, timeout=25)
-        except Exception:
+        resp = None
+        for attempt in range(2):
+            try:
+                resp = requests.post(url, headers=headers, json=body, timeout=30)
+            except Exception as exc:
+                last_detail = f"{model_id}: network error ({type(exc).__name__})"
+                resp = None
+                if attempt == 0:
+                    time.sleep(1.0)
+                continue
+            if resp.status_code in (500, 502, 503, 504) and attempt == 0:
+                last_detail = f"{model_id}: temporary server error (HTTP {resp.status_code})"
+                time.sleep(1.5)
+                continue
+            break
+        if resp is None:
             continue
 
         if resp.status_code == 200:
             try:
                 data = resp.json()
             except Exception:
+                last_detail = f"{model_id}: reply was not JSON"
                 continue
             block_reason = (data.get("promptFeedback") or {}).get("blockReason")
             if block_reason:
                 raise ImagePipelineError("blocked", str(block_reason))
             candidates = data.get("candidates") or []
             if not candidates:
+                last_detail = f"{model_id}: empty answer"
                 continue
             parts = (candidates[0].get("content") or {}).get("parts") or []
             text = "".join(p.get("text", "") for p in parts if isinstance(p, dict))
@@ -1482,25 +1500,28 @@ def _call_gemini_json(system_text: str, user_text: str, api_key: str) -> str:
                 return text
             if candidates[0].get("finishReason") == "SAFETY":
                 raise ImagePipelineError("blocked", "SAFETY")
+            last_detail = f"{model_id}: empty answer (finish reason {candidates[0].get('finishReason', '?')})"
             continue
 
         if resp.status_code == 429:
             saw_quota = True
+            last_detail = f"{model_id}: HTTP 429 (limit reached)"
             continue
 
-        error_text = ""
         try:
-            error_text = json.dumps(resp.json()).lower()
+            error_message = ((resp.json().get("error") or {}).get("message", "") or "")[:140]
         except Exception:
-            error_text = (resp.text or "").lower()
+            error_message = (resp.text or "")[:140]
+        error_text = error_message.lower()
         if "api key" in error_text and any(w in error_text for w in ("not valid", "invalid", "expired")):
             raise ImagePipelineError("bad_key", str(resp.status_code))
+        last_detail = f"{model_id}: HTTP {resp.status_code} - {error_message}"
         # 404 / 403 / other errors: try the next model in the chain
         continue
 
     if saw_quota:
-        raise ImagePipelineError("quota", "gemini")
-    raise ImagePipelineError("unavailable", "gemini")
+        raise ImagePipelineError("quota", last_detail)
+    raise ImagePipelineError("unavailable", last_detail)
 
 def _parse_plan_json(text: str) -> dict:
     cleaned = text.strip()
@@ -1525,13 +1546,13 @@ def plan_image_with_gemini(user_text: str, allow_clarify: bool = True) -> dict:
     try:
         plan = _parse_plan_json(raw_text)
     except Exception:
-        raise ImagePipelineError("bad_response", "json")
+        raise ImagePipelineError("bad_response", "planner answer was not valid JSON")
 
     decision = str(plan.get("decision", "")).strip().lower()
     if decision == "clarify" and not allow_clarify:
         decision = "generate"
     if decision not in ("generate", "clarify", "refuse"):
-        raise ImagePipelineError("bad_response", "decision")
+        raise ImagePipelineError("bad_response", "planner answer had an unknown decision")
 
     plan["decision"] = decision
     for field in ("clarifying_question", "refusal_reason", "subject", "setting", "lighting",
@@ -1661,11 +1682,12 @@ def run_intelligent_image_pipeline(user_text: str, detected_script: str, status_
     except ImagePipelineError as err:
         if err.kind == "blocked":
             return {"message": _img_msg("refused", detected_script)}
+        planner_detail = f"\n\n`Technical detail: {err.detail}`" if (err.detail and SHOW_IMAGE_TEST_PANEL) else ""
         if err.kind == "quota":
-            return {"message": _img_msg("planner_quota", detected_script)}
+            return {"message": _img_msg("planner_quota", detected_script) + planner_detail}
         if err.kind == "bad_key":
             return {"message": _img_msg("planner_key", detected_script)}
-        return {"message": _img_msg("planner_down", detected_script)}
+        return {"message": _img_msg("planner_down", detected_script) + planner_detail}
 
     if plan["decision"] == "refuse":
         reason = plan["refusal_reason"] or _img_msg("refused", detected_script)
@@ -1676,13 +1698,13 @@ def run_intelligent_image_pipeline(user_text: str, detected_script: str, status_
 
     say("✍️ Planning composition, lighting and style...")
     image_prompt = plan["image_prompt"][:2000]
-    say("🎨 Generating your image with FLUX...")
+    say("🎨 Creating your image...")
     try:
         image_bytes = cloudflare_generate_image(image_prompt, account_id, api_token)
     except ImagePipelineError as err:
         if err.kind == "cf_quota":
             return {"message": _img_msg("cf_quota", detected_script), "svg_art": generate_offline_svg_art(user_text)}
-        detail_line = f"\n\n`Cloudflare said: {err.detail}`" if err.detail else ""
+        detail_line = f"\n\n`Technical detail: {err.detail}`" if (err.detail and SHOW_IMAGE_TEST_PANEL) else ""
         if err.kind == "cf_auth":
             return {"message": _img_msg("cf_auth", detected_script) + detail_line}
         return {"message": _img_msg("cf_fail", detected_script) + detail_line, "svg_art": generate_offline_svg_art(user_text)}
@@ -1882,12 +1904,13 @@ with st.sidebar:
             else:
                 st.error("Please fill in both fields.")
 
-    with st.expander("🔧 Image Connection Test"):
-        st.caption("Checks Gemini and Cloudflare and shows exactly what is wrong. Uses a tiny part of the free daily allocation.")
-        if st.button("Test Gemini + Cloudflare"):
-            with st.spinner("Testing..."):
-                for test_line in run_image_connection_test():
-                    st.write(test_line)
+    if SHOW_IMAGE_TEST_PANEL:
+        with st.expander("🔧 Image Connection Test"):
+            st.caption("Developer tool: checks the image engine and shows exactly what is wrong. Uses a tiny part of the free daily allocation.")
+            if st.button("Run image engine test"):
+                with st.spinner("Testing..."):
+                    for test_line in run_image_connection_test():
+                        st.write(test_line)
 
     st.markdown("---")
     st.subheader("💬 Chat History")
@@ -1935,7 +1958,7 @@ for message in current_messages:
         if "svg_art" in message and message["svg_art"]:
             st.markdown(message["svg_art"], unsafe_allow_html=True)
         if "image_prompt" in message and message["image_prompt"]:
-            with st.expander("🔍 Prompt used (optimized by Gemini)"):
+            with st.expander("🔍 Prompt used (optimized by Indian GPT)"):
                 st.write(message["image_prompt"])
 
 # Chat input with placeholder set strictly to "Ask anything"
@@ -2006,7 +2029,7 @@ if prompt:
                 if generated_image_bytes:
                     st.image(generated_image_bytes)
                     if generated_image_prompt:
-                        with st.expander("🔍 Prompt used (optimized by Gemini)"):
+                        with st.expander("🔍 Prompt used (optimized by Indian GPT)"):
                             st.write(generated_image_prompt)
                 if generated_svg_art:
                     st.markdown(generated_svg_art, unsafe_allow_html=True)
