@@ -1334,19 +1334,30 @@ def generate_offline_svg_art(prompt_text: str) -> str:
 # ==============================================================================
 # 7B. INTELLIGENT IMAGE GENERATION SYSTEM
 #     Gemini (understanding + prompt planning + safety)  ->  Cloudflare Workers AI FLUX.1 schnell
-#     Keys are read ONLY from Streamlit secrets / environment variables:
+#     Keys are read from Streamlit secrets / environment variables first, then the embedded fallback:
 #       GEMINI_API_KEY, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN
 #     Optional: GEMINI_MODEL (overrides the first model tried)
 # ==============================================================================
+# Embedded fallback keys (used only when the same name is NOT found in Streamlit secrets or environment variables).
+# Do NOT upload this file to a public GitHub repository while real keys are inside it.
+_EMBEDDED_IMAGE_KEYS = {
+    "GEMINI_API_KEY": "AQ.Ab8RN6JTL42RpduUNJdSd2FA-N-DvgZJoBGe6iaOXjDr-xxBXQ",
+    "CLOUDFLARE_ACCOUNT_ID": "17d0994c1df0b606d49ea61fa32701ad",
+    "CLOUDFLARE_API_TOKEN": "cfut_6rYKeyU8qttm5fPJy8VRPoLACAiLh69lD4qkgvvr4ccc2e59",
+}
+
 def get_secret(name: str, default: str = "") -> str:
-    """Reads a secret from Streamlit secrets first, then environment variables. Never hardcoded."""
+    """Reads a key from Streamlit secrets, then environment variables, then the embedded fallback above."""
     try:
         value = st.secrets.get(name, "")
         if value:
             return str(value).strip()
     except Exception:
         pass
-    return os.environ.get(name, default).strip()
+    env_value = os.environ.get(name, "").strip()
+    if env_value:
+        return env_value
+    return _EMBEDDED_IMAGE_KEYS.get(name, default).strip()
 
 # Verified against official docs (Nov 2026):
 #  - Cloudflare model ID and REST route: /accounts/{id}/ai/run/@cf/black-forest-labs/flux-1-schnell
