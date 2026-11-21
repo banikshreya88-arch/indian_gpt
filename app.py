@@ -1547,6 +1547,17 @@ def plan_image_with_gemini(user_text: str, allow_clarify: bool = True) -> dict:
             raise ImagePipelineError("bad_response", "empty question")
     return plan
 
+def _cf_error_text(resp) -> str:
+    """Extracts Cloudflare's own error message (contains no secrets) for display."""
+    try:
+        data = resp.json()
+        errors = data.get("errors") or []
+        messages = [f"{e.get('code', '')}: {e.get('message', '')}" for e in errors if isinstance(e, dict)]
+        text = "; ".join(messages)
+    except Exception:
+        text = (getattr(resp, "text", "") or "")[:200]
+    return text[:300]
+
 def cloudflare_generate_image(image_prompt: str, account_id: str, api_token: str, steps: int = CF_FLUX_STEPS) -> bytes:
     """Generates an image with FLUX.1 schnell on Cloudflare Workers AI and returns the image bytes."""
     url = f"{CF_API_BASE}/{account_id}/ai/run/{CF_IMAGE_MODEL}"
@@ -1566,7 +1577,7 @@ def cloudflare_generate_image(image_prompt: str, account_id: str, api_token: str
     if resp.status_code == 429:
         raise ImagePipelineError("cf_quota", "429")
     if resp.status_code in (401, 403):
-        raise ImagePipelineError("cf_auth", str(resp.status_code))
+        raise ImagePipelineError("cf_auth", f"HTTP {resp.status_code} - {_cf_error_text(resp)}")
 
     content_type = (resp.headers.get("content-type") or "").lower()
     if resp.status_code == 200 and content_type.startswith("image/") and len(resp.content) > 1000:
@@ -1581,7 +1592,7 @@ def cloudflare_generate_image(image_prompt: str, account_id: str, api_token: str
         errors_text = json.dumps(data.get("errors", "")).lower()
         if any(w in errors_text for w in ("neuron", "allocation", "quota", "rate limit", "too many requests", "daily")):
             raise ImagePipelineError("cf_quota", "errors")
-        raise ImagePipelineError("cf_unavailable", f"status {resp.status_code}")
+        raise ImagePipelineError("cf_unavailable", f"HTTP {resp.status_code} - {_cf_error_text(resp)}")
 
     result = data.get("result")
     image_b64 = ""
@@ -1671,9 +1682,10 @@ def run_intelligent_image_pipeline(user_text: str, detected_script: str, status_
     except ImagePipelineError as err:
         if err.kind == "cf_quota":
             return {"message": _img_msg("cf_quota", detected_script), "svg_art": generate_offline_svg_art(user_text)}
+        detail_line = f"\n\n`Cloudflare said: {err.detail}`" if err.detail else ""
         if err.kind == "cf_auth":
-            return {"message": _img_msg("cf_auth", detected_script)}
-        return {"message": _img_msg("cf_fail", detected_script), "svg_art": generate_offline_svg_art(user_text)}
+            return {"message": _img_msg("cf_auth", detected_script) + detail_line}
+        return {"message": _img_msg("cf_fail", detected_script) + detail_line, "svg_art": generate_offline_svg_art(user_text)}
 
     understood_bits = [plan["subject"], plan["style"], plan["lighting"]]
     understood = " • ".join(bit[:90] for bit in understood_bits if bit)
@@ -1681,6 +1693,71 @@ def run_intelligent_image_pipeline(user_text: str, detected_script: str, status_
     if understood:
         message += f"\n\n{_img_msg('understood', detected_script)} {understood}"
     return {"message": message, "image_bytes": image_bytes, "image_prompt": image_prompt}
+
+def run_image_connection_test() -> list:
+    """Checks Gemini and Cloudflare and reports exactly where a problem is (never prints keys)."""
+    lines = []
+    gemini_key = get_secret("GEMINI_API_KEY")
+    account_id = get_secret("CLOUDFLARE_ACCOUNT_ID")
+    api_token = get_secret("CLOUDFLARE_API_TOKEN")
+    lines.append(f"Keys found -> Gemini: {'yes' if gemini_key else 'NO'} | Cloudflare account ID: {'yes' if account_id else 'NO'} ({len(account_id)} chars, should be 32) | Cloudflare token: {'yes' if api_token else 'NO'} ({len(api_token)} chars)")
+
+    # --- Gemini ---
+    if not gemini_key:
+        lines.append("❌ Gemini: key missing.")
+    else:
+        gemini_ok = False
+        for model_id in _gemini_model_chain():
+            try:
+                resp = requests.post(
+                    f"{GEMINI_API_BASE}/{model_id}:generateContent",
+                    headers={"x-goog-api-key": gemini_key, "Content-Type": "application/json"},
+                    json={"contents": [{"role": "user", "parts": [{"text": "Reply with the single word OK"}]}]},
+                    timeout=25,
+                )
+            except Exception as exc:
+                lines.append(f"❌ Gemini `{model_id}`: network error ({type(exc).__name__})")
+                continue
+            if resp.status_code == 200:
+                lines.append(f"✅ Gemini `{model_id}`: working.")
+                gemini_ok = True
+                break
+            try:
+                err_msg = (resp.json().get("error") or {}).get("message", "")[:200]
+            except Exception:
+                err_msg = (resp.text or "")[:200]
+            lines.append(f"❌ Gemini `{model_id}`: HTTP {resp.status_code} - {err_msg}")
+        if not gemini_ok:
+            lines.append("➡️ Gemini is not working with any model above.")
+
+    # --- Cloudflare ---
+    if not (account_id and api_token):
+        lines.append("❌ Cloudflare: account ID or token missing.")
+        return lines
+    try:
+        verify = requests.get(
+            "https://api.cloudflare.com/client/v4/user/tokens/verify",
+            headers={"Authorization": f"Bearer {api_token}"},
+            timeout=20,
+        )
+        try:
+            verify_json = verify.json()
+        except Exception:
+            verify_json = {}
+        token_state = (verify_json.get("result") or {}).get("status", "")
+        if verify.status_code == 200 and token_state == "active":
+            lines.append("✅ Cloudflare token: valid and active (the token text is correct).")
+        else:
+            lines.append(f"⚠️ Cloudflare token check: HTTP {verify.status_code} - {_cf_error_text(verify)} (if the token is correct but belongs to an account-owned token this check can fail; the image test below decides)")
+    except Exception as exc:
+        lines.append(f"❌ Cloudflare token check: network error ({type(exc).__name__})")
+
+    try:
+        img = cloudflare_generate_image("a simple red circle on a white background", account_id, api_token)
+        lines.append(f"✅ Cloudflare FLUX image test: working ({len(img)} bytes). Image generation is ready!")
+    except ImagePipelineError as err:
+        lines.append(f"❌ Cloudflare FLUX image test failed: {err.kind} - {err.detail}")
+    return lines
 
 # ==============================================================================
 # 8. UNIFIED OFFLINE ANSWER SYNTHESIZER
@@ -1804,6 +1881,13 @@ with st.sidebar:
                 st.success(f"Successfully added '{new_k_topic}' to Sovereign Corpus!")
             else:
                 st.error("Please fill in both fields.")
+
+    with st.expander("🔧 Image Connection Test"):
+        st.caption("Checks Gemini and Cloudflare and shows exactly what is wrong. Uses a tiny part of the free daily allocation.")
+        if st.button("Test Gemini + Cloudflare"):
+            with st.spinner("Testing..."):
+                for test_line in run_image_connection_test():
+                    st.write(test_line)
 
     st.markdown("---")
     st.subheader("💬 Chat History")
