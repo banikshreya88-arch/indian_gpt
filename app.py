@@ -1338,12 +1338,14 @@ def generate_offline_svg_art(prompt_text: str) -> str:
 #       GEMINI_API_KEY, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN
 #     Optional: GEMINI_MODEL (overrides the first model tried)
 # ==============================================================================
-# Embedded fallback keys (used only when the same name is NOT found in Streamlit secrets or environment variables).
-# Do NOT upload this file to a public GitHub repository while real keys are inside it.
+# Embedded fallback values. SECRET keys are intentionally NOT stored here: services such as Cloudflare and Groq
+# automatically revoke keys that appear in public code (for example on GitHub), which kills the key within minutes.
+# Put GEMINI_API_KEY and CLOUDFLARE_API_TOKEN in .streamlit/secrets.toml (or the Secrets box of Streamlit Cloud).
+# The Cloudflare account ID is an identifier, not a secret, so it is safe to keep here.
 _EMBEDDED_IMAGE_KEYS = {
-    "GEMINI_API_KEY": "AQ.Ab8RN6JTL42RpduUNJdSd2FA-N-DvgZJoBGe6iaOXjDr-xxBXQ",
+    "GEMINI_API_KEY": "",
     "CLOUDFLARE_ACCOUNT_ID": "17d0994c1df0b606d49ea61fa32701ad",
-    "CLOUDFLARE_API_TOKEN": "cfut_Yu0r4GorviuRsXBxz8JqLlGVZKFOA5QaOKuyu0s0b6c5e691",
+    "CLOUDFLARE_API_TOKEN": "",
 }
 
 def get_secret(name: str, default: str = "") -> str:
