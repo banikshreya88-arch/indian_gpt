@@ -1343,7 +1343,7 @@ def generate_offline_svg_art(prompt_text: str) -> str:
 _EMBEDDED_IMAGE_KEYS = {
     "GEMINI_API_KEY": "AQ.Ab8RN6JTL42RpduUNJdSd2FA-N-DvgZJoBGe6iaOXjDr-xxBXQ",
     "CLOUDFLARE_ACCOUNT_ID": "17d0994c1df0b606d49ea61fa32701ad",
-    "CLOUDFLARE_API_TOKEN": "cfut_thR5FrNJqhdoJNyBiIOft9Q3q1aTLNAgiQZyhXMK4956ad72",
+    "CLOUDFLARE_API_TOKEN": "cfut_Yu0r4GorviuRsXBxz8JqLlGVZKFOA5QaOKuyu0s0b6c5e691",
 }
 
 def get_secret(name: str, default: str = "") -> str:
@@ -1385,7 +1385,7 @@ CF_API_BASE = "https://api.cloudflare.com/client/v4/accounts"
 CF_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
 CF_FLUX_STEPS = 4
 GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
-GEMINI_DEFAULT_MODELS = ["gemini-2.5-flash-lite", "gemini-3.5-flash-lite"]
+GEMINI_DEFAULT_MODELS = ["gemini-3.5-flash-lite", "gemini-2.5-flash-lite"]  # confirmed by the API itself: 2.5 is closed to new users
 
 IMAGE_MESSAGES = {
     "setup": (
