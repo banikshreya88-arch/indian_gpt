@@ -87,24 +87,30 @@ st.markdown("""
 # ==============================================================================
 # 2. CONNECTIVITY DETECTION & API KEY POOL
 # ==============================================================================
-KEYS_POOL = [
-    "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",
-    "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",
-    "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",
-]
+def _read_secret(name: str) -> str:
+    """Reads a key from Streamlit secrets, then environment variables. Template placeholders (PASTE_...) are ignored."""
+    try:
+        value = str(st.secrets.get(name, "") or "").strip()
+        if value and not value.upper().startswith("PASTE_"):
+            return value
+    except Exception:
+        pass
+    value = os.environ.get(name, "").strip()
+    return "" if value.upper().startswith("PASTE_") else value
 
-try:
-    sec_key = st.secrets.get("GROQ_API_KEY_2", "")
-    if sec_key and sec_key not in KEYS_POOL:
-        KEYS_POOL.append(sec_key)
-except Exception:
-    pass
+# Keys are NOT stored in the source code: services revoke keys that appear in public code (e.g. GitHub).
+# Put them in .streamlit/secrets.toml (or the Secrets box on Streamlit Cloud).
+KEYS_POOL = []
+for _groq_name in ("GROQ_API_KEY", "GROQ_API_KEY_2", "GROQ_API_KEY_3", "GROQ_API_KEY_4"):
+    _groq_value = _read_secret(_groq_name)
+    if _groq_value and _groq_value not in KEYS_POOL:
+        KEYS_POOL.append(_groq_value)
 
 def get_next_key(index: int) -> str:
     """Rotates cleanly through the configured API key pool."""
     return KEYS_POOL[index % len(KEYS_POOL)]
 
-TAVILY_API_KEY = "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"
+TAVILY_API_KEY = _read_secret("TAVILY_API_KEY")
 
 def check_internet_online(timeout: float = 2.0) -> bool:
     """Fast socket check to verify whether active internet connectivity exists."""
