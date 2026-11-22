@@ -1349,15 +1349,31 @@ _EMBEDDED_IMAGE_KEYS = {
 def get_secret(name: str, default: str = "") -> str:
     """Reads a key from Streamlit secrets, then environment variables, then the embedded fallback above."""
     try:
-        value = st.secrets.get(name, "")
+        value = str(st.secrets.get(name, "") or "").strip()
+        if value and not value.upper().startswith("PASTE_"):
+            return value
+    except Exception:
+        pass
+    env_value = os.environ.get(name, "").strip()
+    if env_value and not env_value.upper().startswith("PASTE_"):
+        return env_value
+    return _EMBEDDED_IMAGE_KEYS.get(name, default).strip()
+
+def get_secret_source(name: str) -> str:
+    """Tells where a key is being read from (for the developer test panel)."""
+    try:
+        value = str(st.secrets.get(name, "") or "").strip()
         if value:
-            return str(value).strip()
+            return "secrets.toml (PLACEHOLDER - ignored)" if value.upper().startswith("PASTE_") else "secrets.toml"
     except Exception:
         pass
     env_value = os.environ.get(name, "").strip()
     if env_value:
-        return env_value
-    return _EMBEDDED_IMAGE_KEYS.get(name, default).strip()
+        return "environment variable (PLACEHOLDER - ignored)" if env_value.upper().startswith("PASTE_") else "environment variable"
+    return "built-in code" if _EMBEDDED_IMAGE_KEYS.get(name) else "not found"
+
+def _key_tail(value: str) -> str:
+    return ("ends with ..." + value[-4:]) if len(value) >= 8 else "too short"
 
 # Verified against official docs (Nov 2026):
 #  - Cloudflare model ID and REST route: /accounts/{id}/ai/run/@cf/black-forest-labs/flux-1-schnell
@@ -1722,7 +1738,9 @@ def run_image_connection_test() -> list:
     gemini_key = get_secret("GEMINI_API_KEY")
     account_id = get_secret("CLOUDFLARE_ACCOUNT_ID")
     api_token = get_secret("CLOUDFLARE_API_TOKEN")
-    lines.append(f"Keys found -> Gemini: {'yes' if gemini_key else 'NO'} | Cloudflare account ID: {'yes' if account_id else 'NO'} ({len(account_id)} chars, should be 32) | Cloudflare token: {'yes' if api_token else 'NO'} ({len(api_token)} chars)")
+    lines.append(f"Gemini key: from {get_secret_source('GEMINI_API_KEY')}, {_key_tail(gemini_key)}, {len(gemini_key)} chars")
+    lines.append(f"Cloudflare account ID: from {get_secret_source('CLOUDFLARE_ACCOUNT_ID')}, {_key_tail(account_id)}, {len(account_id)} chars (should be 32)")
+    lines.append(f"Cloudflare token: from {get_secret_source('CLOUDFLARE_API_TOKEN')}, {_key_tail(api_token)}, {len(api_token)} chars")
 
     # --- Gemini ---
     if not gemini_key:
