@@ -97,7 +97,7 @@ st.markdown("""
     }
     .st-key-quick_voice_mic_btn {
         position: fixed !important;
-        bottom: 35px !important;
+        bottom: 48px !important;
         right: 24px !important;
         z-index: 999999 !important;
         width: 46px !important;
