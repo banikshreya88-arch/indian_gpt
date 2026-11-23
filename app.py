@@ -92,6 +92,37 @@ st.markdown("""
     .dot1 { animation: bounce 1.4s infinite ease-in-out both; animation-delay: -0.32s; }
     .dot2 { animation: bounce 1.4s infinite ease-in-out both; animation-delay: -0.16s; }
     .dot3 { animation: bounce 1.4s infinite ease-in-out both; }
+    [data-testid="stBottom"] [data-testid="stChatInput"] {
+        margin-right: 58px !important;
+    }
+    .st-key-quick_voice_mic_btn {
+        position: fixed !important;
+        bottom: 22px !important;
+        right: 24px !important;
+        z-index: 999999 !important;
+        width: 46px !important;
+        height: 46px !important;
+    }
+    .st-key-quick_voice_mic_btn button {
+        width: 46px !important;
+        height: 46px !important;
+        min-height: 46px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        background-color: #f8fafc !important;
+        border: 1px solid rgba(15, 23, 42, 0.18) !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f172a' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='2' width='6' height='11' rx='3'/%3E%3Cpath d='M5 10v1a7 7 0 0 0 14 0v-1'/%3E%3Cline x1='12' y1='18' x2='12' y2='22'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: 22px 22px !important;
+        color: transparent !important;
+    }
+    .st-key-quick_voice_mic_btn button:hover {
+        background-color: #e2e8f0 !important;
+        border-color: #38bdf8 !important;
+        transform: scale(1.06) !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -2088,6 +2119,39 @@ def create_ephemeral_live_token(api_key: str, system_instruction: str, voice_nam
             return {"mode": "ephemeral", "access_token": token_name, "model": model_id}
     raise RuntimeError(f"Ephemeral token error ({resp.status_code}): {resp.text[:200]}")
 
+
+def start_voice_mode(is_online_mode: bool) -> None:
+    """Starts Real-time Voice Mode using Ephemeral Token (Streamlit Cloud) or local WebSocket."""
+    if not is_online_mode:
+        st.warning("Voice Mode ব্যবহার করতে Auto Hybrid (Online) মোড চালু করুন।")
+        return
+    gemini_key = _read_secret("GEMINI_API_KEY")
+    if not gemini_key:
+        st.error("GEMINI_API_KEY পাওয়া যায়নি। Secrets-এ GEMINI_API_KEY যোগ করুন।")
+        return
+    recent_history = st.session_state.chat_sessions_v130[st.session_state.current_chat_v130][-6:]
+    history_ctx = "\n".join(f"{m['role'].title()}: {m['content'][:250]}" for m in recent_history)
+    voice_sys_prompt = (
+        "You are Indian GPT, a warm, natural voice AI assistant created by Shubham. "
+        "Respond naturally in Bengali, Hindi, English, or any Indian language the user speaks. "
+        "Keep spoken replies clear and conversational.\n\n"
+        f"Recent conversation context:\n{history_ctx}"
+    )
+    try:
+        eph = create_ephemeral_live_token(api_key=gemini_key, system_instruction=voice_sys_prompt)
+        st.session_state.voice_session_info = eph
+        st.session_state.voice_mode_active = True
+        st.rerun()
+    except Exception as eph_err:
+        if _WEBSOCKETS_AVAILABLE:
+            ws_port = ensure_voice_ws_running()
+            sess = create_voice_session(api_key=gemini_key, system_instruction=voice_sys_prompt)
+            st.session_state.voice_session_info = {"mode": "local", "port": ws_port, **sess}
+            st.session_state.voice_mode_active = True
+            st.rerun()
+        else:
+            st.error(f"Voice session start error: {eph_err}")
+
 def render_voice_mode_ui(ws_port: int = 0, session_id: str = "", token: str = "", ephemeral_token: str = "", model_id: str = "") -> None:
     """Minimalist ChatGPT-style Voice Mode interface with Animated Blue AI Orb."""
     if ephemeral_token:
@@ -2391,35 +2455,7 @@ with st.sidebar:
         st.rerun()
 
     if st.button("🎙️ Real-time Voice Mode", use_container_width=True):
-        if not is_online_mode:
-            st.warning("Voice Mode ব্যবহার করতে Auto Hybrid (Online) মোড চালু করুন।")
-        else:
-            gemini_key = _read_secret("GEMINI_API_KEY")
-            if not gemini_key:
-                st.error("GEMINI_API_KEY পাওয়া যায়নি। Secrets-এ GEMINI_API_KEY যোগ করুন।")
-            else:
-                recent_history = st.session_state.chat_sessions_v130[st.session_state.current_chat_v130][-6:]
-                history_ctx = "\n".join(f"{m['role'].title()}: {m['content'][:250]}" for m in recent_history)
-                voice_sys_prompt = (
-                    "You are Indian GPT, a warm, natural voice AI assistant created by Shubham. "
-                    "Respond naturally in Bengali, Hindi, English, or any Indian language the user speaks. "
-                    "Keep spoken replies clear and conversational.\n\n"
-                    f"Recent conversation context:\n{history_ctx}"
-                )
-                try:
-                    eph = create_ephemeral_live_token(api_key=gemini_key, system_instruction=voice_sys_prompt)
-                    st.session_state.voice_session_info = eph
-                    st.session_state.voice_mode_active = True
-                    st.rerun()
-                except Exception as eph_err:
-                    if _WEBSOCKETS_AVAILABLE:
-                        ws_port = ensure_voice_ws_running()
-                        sess = create_voice_session(api_key=gemini_key, system_instruction=voice_sys_prompt)
-                        st.session_state.voice_session_info = {"mode": "local", "port": ws_port, **sess}
-                        st.session_state.voice_mode_active = True
-                        st.rerun()
-                    else:
-                        st.error(f"Voice session start error: {eph_err}")
+        start_voice_mode(is_online_mode)
 
     st.markdown("---")
     st.subheader("📚 Knowledge Admin Panel")
@@ -2498,6 +2534,9 @@ for message in current_messages:
         if "image_prompt" in message and message["image_prompt"]:
             with st.expander("🔍 Prompt used (optimized by Indian GPT)"):
                 st.write(message["image_prompt"])
+
+if st.button(" ", key="quick_voice_mic_btn", help="Start Real-time Voice Mode"):
+    start_voice_mode(is_online_mode)
 
 attached_picture_bytes = None
 attached_picture_mime = None
